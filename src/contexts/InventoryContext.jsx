@@ -484,9 +484,8 @@ export function InventoryProvider({ children }) {
     };
     setCoursePayments([...coursePayments, newPayment]);
 
-    // Update enrollment payment status based on payment type
-    // Only update enrollment if payment is not declined
-    if (paymentData.status !== 'declined' && paymentData.paymentType === 'enrollment') {
+    // Update enrollment payment status only for approved payments
+    if (paymentData.status === 'approved' && paymentData.paymentType === 'enrollment') {
       setEnrollments(enrollments.map(enrollment =>
         enrollment.id === paymentData.enrollmentId
           ? {
@@ -496,7 +495,7 @@ export function InventoryProvider({ children }) {
             }
           : enrollment
       ));
-    } else if (paymentData.status !== 'declined' && paymentData.paymentType === 'admission') {
+    } else if (paymentData.status === 'approved' && paymentData.paymentType === 'admission') {
       setEnrollments(enrollments.map(enrollment =>
         enrollment.id === paymentData.enrollmentId
           ? { 
@@ -506,7 +505,7 @@ export function InventoryProvider({ children }) {
             }
           : enrollment
       ));
-    } else if (paymentData.status !== 'declined' && paymentData.paymentType === 'registration') {
+    } else if (paymentData.status === 'approved' && paymentData.paymentType === 'registration') {
       setEnrollments(enrollments.map(enrollment =>
         enrollment.id === paymentData.enrollmentId
           ? { 
@@ -516,7 +515,7 @@ export function InventoryProvider({ children }) {
             }
           : enrollment
       ));
-    } else if (paymentData.status !== 'declined' && paymentData.paymentType === 'exam') {
+    } else if (paymentData.status === 'approved' && paymentData.paymentType === 'exam') {
       setEnrollments(enrollments.map(enrollment =>
         enrollment.id === paymentData.enrollmentId
           ? { 
@@ -539,8 +538,13 @@ export function InventoryProvider({ children }) {
     if (payment && payment.enrollmentId) {
       const enrollment = enrollments.find(e => e.id === payment.enrollmentId);
       if (enrollment) {
-        // Recalculate enrollment amounts based on all payments for this enrollment
-        const enrollmentPayments = coursePayments.filter(p => p.enrollmentId === payment.enrollmentId && p.status !== 'declined');
+        // Get the updated payment data
+        const updatedPayment = { ...payment, ...paymentData };
+        
+        // Recalculate enrollment amounts based on all approved payments for this enrollment
+        const enrollmentPayments = coursePayments.map(p => 
+          p.id === id ? updatedPayment : p
+        ).filter(p => p.enrollmentId === payment.enrollmentId && p.status === 'approved');
         
         let totalPaid = 0;
         let admissionFeeAmount = 0;
@@ -548,45 +552,19 @@ export function InventoryProvider({ children }) {
         let examFeeAmount = 0;
         
         enrollmentPayments.forEach(p => {
-          if (p.id === id) {
-            // Use updated payment data
-            const updatedPayment = { ...p, ...paymentData };
-            // Only count approved payments
-            if (updatedPayment.status !== 'declined') {
-              switch (updatedPayment.paymentType) {
-                case 'enrollment':
-                  totalPaid += updatedPayment.amount;
-                  break;
-                case 'admission':
-                  admissionFeeAmount += updatedPayment.amount;
-                  break;
-                case 'registration':
-                  registrationFeeAmount += updatedPayment.amount;
-                  break;
-                case 'exam':
-                  examFeeAmount += updatedPayment.amount;
-                  break;
-              }
-            }
-          } else {
-            // Use existing payment data
-            // Only count approved payments
-            if (p.status !== 'declined') {
-              switch (p.paymentType) {
-                case 'enrollment':
-                  totalPaid += p.amount;
-                  break;
-                case 'admission':
-                  admissionFeeAmount += p.amount;
-                  break;
-                case 'registration':
-                  registrationFeeAmount += p.amount;
-                  break;
-                case 'exam':
-                  examFeeAmount += p.amount;
-                  break;
-              }
-            }
+          switch (p.paymentType) {
+            case 'enrollment':
+              totalPaid += p.amount;
+              break;
+            case 'admission':
+              admissionFeeAmount += p.amount;
+              break;
+            case 'registration':
+              registrationFeeAmount += p.amount;
+              break;
+            case 'exam':
+              examFeeAmount += p.amount;
+              break;
           }
         });
         
@@ -599,7 +577,10 @@ export function InventoryProvider({ children }) {
                 remainingAmount: e.totalAmount - totalPaid,
                 admissionFeeAmount,
                 registrationFeeAmount,
-                examFeeAmount
+                examFeeAmount,
+                admissionFeePaid: admissionFeeAmount > 0,
+                registrationFeePaid: registrationFeeAmount > 0,
+                examFeePaid: examFeeAmount > 0
               }
             : e
         ));

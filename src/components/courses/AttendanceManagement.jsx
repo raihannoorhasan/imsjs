@@ -1,13 +1,20 @@
 import React, { useState } from 'react';
 import { useInventory } from '../../contexts/InventoryContext';
-import { Plus, Calendar } from 'lucide-react';
+import { Plus, Calendar, Users, Clock, CheckCircle } from 'lucide-react';
 import { Button } from '../common/Button';
+import { Card } from '../common/Card';
+import { SearchInput } from '../common/SearchInput';
+import { Select } from '../common/Select';
 import { AttendanceSessionForm } from './AttendanceSessionForm';
 import { AttendanceList } from './AttendanceList';
+import { formatDate } from '../../utils/helpers';
 
 export function AttendanceManagement() {
-  const { attendanceSessions, addAttendanceSession } = useInventory();
+  const { attendanceSessions, addAttendanceSession, courseBatches, courses } = useInventory();
   const [showSessionForm, setShowSessionForm] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedBatch, setSelectedBatch] = useState('all');
+  const [dateFilter, setDateFilter] = useState('all');
 
   const handleAddSession = (sessionData) => {
     addAttendanceSession({
@@ -17,17 +24,132 @@ export function AttendanceManagement() {
     setShowSessionForm(false);
   };
 
+  // Filter sessions based on search and filters
+  const filteredSessions = attendanceSessions.filter(session => {
+    const batch = courseBatches.find(b => b.id === session.batchId);
+    const course = batch ? courses.find(c => c.id === batch.courseId) : null;
+    
+    const matchesSearch = session.topic.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         (course?.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         (batch?.batchName || '').toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesBatch = selectedBatch === 'all' || session.batchId === selectedBatch;
+    
+    const sessionDate = new Date(session.date);
+    const today = new Date();
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+    const weekAgo = new Date(today);
+    weekAgo.setDate(weekAgo.getDate() - 7);
+    
+    let matchesDate = true;
+    if (dateFilter === 'today') {
+      matchesDate = sessionDate.toDateString() === today.toDateString();
+    } else if (dateFilter === 'yesterday') {
+      matchesDate = sessionDate.toDateString() === yesterday.toDateString();
+    } else if (dateFilter === 'week') {
+      matchesDate = sessionDate >= weekAgo;
+    }
+    
+    return matchesSearch && matchesBatch && matchesDate;
+  });
+
+  // Calculate statistics
+  const totalSessions = filteredSessions.length;
+  const todaySessions = attendanceSessions.filter(s => 
+    new Date(s.date).toDateString() === new Date().toDateString()
+  ).length;
+  const completedSessions = filteredSessions.filter(s => 
+    s.attendanceRecords && s.attendanceRecords.length > 0
+  ).length;
+
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-xl font-semibold text-gray-900">Attendance Management</h2>
         <Button onClick={() => setShowSessionForm(true)}>
           <Plus size={20} className="mr-2" />
-          New Session
+          Create Session
         </Button>
       </div>
 
-      <AttendanceList sessions={attendanceSessions} />
+      {/* Statistics Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+        <Card>
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-600">Total Sessions</p>
+              <p className="text-2xl font-bold text-gray-900">{totalSessions}</p>
+            </div>
+            <div className="bg-blue-100 p-3 rounded-lg">
+              <Calendar className="w-6 h-6 text-blue-600" />
+            </div>
+          </div>
+        </Card>
+
+        <Card>
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-600">Today's Sessions</p>
+              <p className="text-2xl font-bold text-gray-900">{todaySessions}</p>
+            </div>
+            <div className="bg-green-100 p-3 rounded-lg">
+              <Clock className="w-6 h-6 text-green-600" />
+            </div>
+          </div>
+        </Card>
+
+        <Card>
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-600">Completed Sessions</p>
+              <p className="text-2xl font-bold text-gray-900">{completedSessions}</p>
+            </div>
+            <div className="bg-purple-100 p-3 rounded-lg">
+              <CheckCircle className="w-6 h-6 text-purple-600" />
+            </div>
+          </div>
+        </Card>
+      </div>
+
+      {/* Filters */}
+      <Card className="mb-6" padding="p-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <SearchInput
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            onClear={() => setSearchTerm('')}
+            placeholder="Search by topic, course, or batch..."
+          />
+          
+          <Select
+            value={selectedBatch}
+            onChange={(e) => setSelectedBatch(e.target.value)}
+          >
+            <option value="all">All Batches</option>
+            {courseBatches.map(batch => {
+              const course = courses.find(c => c.id === batch.courseId);
+              return (
+                <option key={batch.id} value={batch.id}>
+                  {course?.name} - {batch.batchName}
+                </option>
+              );
+            })}
+          </Select>
+          
+          <Select
+            value={dateFilter}
+            onChange={(e) => setDateFilter(e.target.value)}
+          >
+            <option value="all">All Dates</option>
+            <option value="today">Today</option>
+            <option value="yesterday">Yesterday</option>
+            <option value="week">This Week</option>
+          </Select>
+        </div>
+      </Card>
+
+      <AttendanceList sessions={filteredSessions} />
 
       <AttendanceSessionForm
         isOpen={showSessionForm}

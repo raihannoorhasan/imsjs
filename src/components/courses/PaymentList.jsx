@@ -67,7 +67,7 @@ export function PaymentList({ payments, onViewVoucher, onEditPayment, onApproveP
               </TableCell>
               <TableCell>
                 <span className="capitalize text-sm font-medium text-gray-900">
-                  {payment.paymentType.replace('_', ' ')}
+                  {payment.paymentType ? payment.paymentType.replace('_', ' ') : 'N/A'}
                 </span>
               </TableCell>
               <TableCell>

@@ -8,6 +8,7 @@ import { BatchManagement } from './BatchManagement';
 import { StudentManagement } from './StudentManagement';
 import { AttendanceManagement } from './AttendanceManagement';
 import { PaymentManagement } from './PaymentManagement';
+import { EnrollmentManagement } from './EnrollmentManagement';
 
 export function Courses() {
   const { courses, addCourse, updateCourse, deleteCourse } = useInventory();
@@ -19,6 +20,7 @@ export function Courses() {
     { id: 'courses', label: 'Courses', icon: BookOpen },
     { id: 'batches', label: 'Batches', icon: Calendar },
     { id: 'students', label: 'Students', icon: Users },
+    { id: 'enrollments', label: 'Enrollments', icon: Users },
     { id: 'attendance', label: 'Attendance', icon: Calendar },
     { id: 'payments', label: 'Payments', icon: BookOpen }
   ];
@@ -56,6 +58,8 @@ export function Courses() {
         return <BatchManagement />;
       case 'students':
         return <StudentManagement />;
+      case 'enrollments':
+        return <EnrollmentManagement />;
       case 'attendance':
         return <AttendanceManagement />;
       case 'payments':

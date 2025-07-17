@@ -59,13 +59,13 @@ export function PaymentForm({ isOpen, onClose, onSubmit }) {
         let amount = 0;
         switch (formData.paymentType) {
           case 'admission':
-            amount = course.admissionFee;
+            amount = Math.max(0, course.admissionFee - (enrollment.admissionFeeAmount || 0));
             break;
           case 'registration':
-            amount = course.registrationFee;
+            amount = Math.max(0, course.registrationFee - (enrollment.registrationFeeAmount || 0));
             break;
           case 'exam':
-            amount = course.examFee;
+            amount = Math.max(0, course.examFee - (enrollment.examFeeAmount || 0));
             break;
           case 'enrollment':
             amount = enrollment ? enrollment.remainingAmount : course.price;

@@ -498,19 +498,31 @@ export function InventoryProvider({ children }) {
     } else if (paymentData.paymentType === 'admission') {
       setEnrollments(enrollments.map(enrollment =>
         enrollment.id === paymentData.enrollmentId
-          ? { ...enrollment, admissionFeePaid: true }
+          ? { 
+              ...enrollment, 
+              admissionFeePaid: true,
+              admissionFeeAmount: (enrollment.admissionFeeAmount || 0) + paymentData.amount
+            }
           : enrollment
       ));
     } else if (paymentData.paymentType === 'registration') {
       setEnrollments(enrollments.map(enrollment =>
         enrollment.id === paymentData.enrollmentId
-          ? { ...enrollment, registrationFeePaid: true }
+          ? { 
+              ...enrollment, 
+              registrationFeePaid: true,
+              registrationFeeAmount: (enrollment.registrationFeeAmount || 0) + paymentData.amount
+            }
           : enrollment
       ));
     } else if (paymentData.paymentType === 'exam') {
       setEnrollments(enrollments.map(enrollment =>
         enrollment.id === paymentData.enrollmentId
-          ? { ...enrollment, examFeePaid: true }
+          ? { 
+              ...enrollment, 
+              examFeePaid: true,
+              examFeeAmount: (enrollment.examFeeAmount || 0) + paymentData.amount
+            }
           : enrollment
       ));
     }
@@ -539,19 +551,28 @@ export function InventoryProvider({ children }) {
       } else if (payment.paymentType === 'admission') {
         setEnrollments(enrollments.map(enrollment =>
           enrollment.id === payment.enrollmentId
-            ? { ...enrollment, admissionFeePaid: false }
+            ? { 
+                ...enrollment, 
+                admissionFeeAmount: Math.max(0, (enrollment.admissionFeeAmount || 0) - payment.amount)
+              }
             : enrollment
         ));
       } else if (payment.paymentType === 'registration') {
         setEnrollments(enrollments.map(enrollment =>
           enrollment.id === payment.enrollmentId
-            ? { ...enrollment, registrationFeePaid: false }
+            ? { 
+                ...enrollment, 
+                registrationFeeAmount: Math.max(0, (enrollment.registrationFeeAmount || 0) - payment.amount)
+              }
             : enrollment
         ));
       } else if (payment.paymentType === 'exam') {
         setEnrollments(enrollments.map(enrollment =>
           enrollment.id === payment.enrollmentId
-            ? { ...enrollment, examFeePaid: false }
+            ? { 
+                ...enrollment, 
+                examFeeAmount: Math.max(0, (enrollment.examFeeAmount || 0) - payment.amount)
+              }
             : enrollment
         ));
       }

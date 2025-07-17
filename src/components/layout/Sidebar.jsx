@@ -1,4 +1,5 @@
 import React from 'react';
+import { useAuth } from '../../contexts/AuthContext';
 import { 
   Package, 
   Users, 
@@ -9,10 +10,13 @@ import {
   BarChart3, 
   Settings,
   Home,
-  Wrench
+  Wrench,
+  UserCheck
 } from 'lucide-react';
 
 export function Sidebar({ activeTab, onTabChange }) {
+  const { canAccess } = useAuth();
+
   const menuItems = [
     { id: 'dashboard', label: 'Dashboard', icon: Home },
     { id: 'inventory', label: 'Inventory', icon: Package },
@@ -26,6 +30,9 @@ export function Sidebar({ activeTab, onTabChange }) {
     { id: 'settings', label: 'Settings', icon: Settings },
   ];
 
+  // Filter menu items based on user permissions
+  const accessibleMenuItems = menuItems.filter(item => canAccess(item.id));
+
   return (
     <div className="w-64 bg-slate-900 text-white h-screen p-4">
       <div className="mb-8">
@@ -34,7 +41,7 @@ export function Sidebar({ activeTab, onTabChange }) {
       </div>
       
       <nav className="space-y-2">
-        {menuItems.map((item) => {
+        {accessibleMenuItems.map((item) => {
           const Icon = item.icon;
           return (
             <button

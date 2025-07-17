@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
 import { useInventory } from '../../contexts/InventoryContext';
+import { useAuth } from '../../contexts/AuthContext';
 import { Plus } from 'lucide-react';
-import { Button } from '../common/Button';
+import { ActionButton } from '../common/ActionButton';
 import { ProductFilters } from './ProductFilters';
 import { ProductTable } from './ProductTable';
 import { ProductForm } from './ProductForm';
 
 export function Inventory() {
   const { products, suppliers, addProduct, updateProduct, deleteProduct } = useInventory();
+  const { canModify } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [showAddForm, setShowAddForm] = useState(false);
@@ -21,6 +23,7 @@ export function Inventory() {
   });
 
   const handleEdit = (product) => {
+    if (!canModify('inventory')) return;
     setEditingProduct(product);
     setShowAddForm(true);
   };
@@ -30,6 +33,11 @@ export function Inventory() {
     setEditingProduct(null);
   };
 
+  const handleDelete = (id) => {
+    if (!canModify('inventory')) return;
+    deleteProduct(id);
+  };
+
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
@@ -37,10 +45,10 @@ export function Inventory() {
           <h1 className="text-3xl font-bold text-gray-900">Inventory Management</h1>
           <p className="text-gray-600 mt-2">Manage your products, stock levels, and pricing</p>
         </div>
-        <Button onClick={() => setShowAddForm(true)}>
+        <ActionButton module="inventory" onClick={() => setShowAddForm(true)}>
           <Plus size={20} className="mr-2" />
           Add Product
-        </Button>
+        </ActionButton>
       </div>
 
       <ProductFilters
@@ -53,7 +61,7 @@ export function Inventory() {
       <ProductTable
         products={filteredProducts}
         onEdit={handleEdit}
-        onDelete={deleteProduct}
+        onDelete={handleDelete}
       />
 
       <ProductForm

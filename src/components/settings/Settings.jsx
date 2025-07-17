@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
-import { Settings as SettingsIcon, User, Bell, Shield, Database } from 'lucide-react';
+import { useAuth } from '../../contexts/AuthContext';
+import { Settings as SettingsIcon, User, Bell, Shield, Database, UserCheck } from 'lucide-react';
 import { GeneralSettings } from './GeneralSettings';
 import { UserSettings } from './UserSettings';
 import { NotificationSettings } from './NotificationSettings';
 import { SecuritySettings } from './SecuritySettings';
 import { DataSettings } from './DataSettings';
+import { UserManagement } from './UserManagement';
 
 export function Settings() {
+  const { canAccess } = useAuth();
   const [activeTab, setActiveTab] = useState('general');
 
   const tabs = [
@@ -14,8 +17,14 @@ export function Settings() {
     { id: 'user', label: 'User Profile', icon: User },
     { id: 'notifications', label: 'Notifications', icon: Bell },
     { id: 'security', label: 'Security', icon: Shield },
-    { id: 'data', label: 'Data Management', icon: Database }
+    { id: 'data', label: 'Data Management', icon: Database },
+    { id: 'users', label: 'User Management', icon: UserCheck, requiresAccess: 'users' }
   ];
+
+  // Filter tabs based on user permissions
+  const accessibleTabs = tabs.filter(tab => 
+    !tab.requiresAccess || canAccess(tab.requiresAccess)
+  );
 
   const renderContent = () => {
     switch (activeTab) {
@@ -29,6 +38,8 @@ export function Settings() {
         return <SecuritySettings />;
       case 'data':
         return <DataSettings />;
+      case 'users':
+        return <UserManagement />;
       default:
         return <GeneralSettings />;
     }
@@ -45,7 +56,7 @@ export function Settings() {
         {/* Settings Navigation */}
         <div className="lg:w-64">
           <nav className="space-y-2">
-            {tabs.map((tab) => {
+            {accessibleTabs.map((tab) => {
               const Icon = tab.icon;
               return (
                 <button

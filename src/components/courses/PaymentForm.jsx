@@ -115,7 +115,9 @@ export function PaymentForm({ isOpen, onClose, onSubmit, preSelectedEnrollment }
       ...formData,
       voucherNumber,
       paymentDate: new Date(formData.paymentDate),
-      amount: parseFloat(formData.amount)
+      amount: parseFloat(formData.amount),
+      status: 'pending',
+      createdAt: new Date()
     });
     
     setFormData({

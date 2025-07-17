@@ -1,10 +1,13 @@
 import React from 'react';
+import { useAuth } from '../../contexts/AuthContext';
 import { Edit2, Trash2, AlertCircle } from 'lucide-react';
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '../common/Table';
 import { StatusBadge } from '../common/StatusBadge';
 import { calculateProfitMargin } from '../../utils/helpers';
 
 export function ProductTable({ products, onEdit, onDelete }) {
+  const { canModify } = useAuth();
+
   return (
     <Table>
       <TableHeader>
@@ -16,7 +19,7 @@ export function ProductTable({ products, onEdit, onDelete }) {
           <TableHead>Buying Price</TableHead>
           <TableHead>Selling Price</TableHead>
           <TableHead>Profit %</TableHead>
-          <TableHead>Actions</TableHead>
+          {canModify('inventory') && <TableHead>Actions</TableHead>}
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -51,22 +54,24 @@ export function ProductTable({ products, onEdit, onDelete }) {
                 {calculateProfitMargin(product.sellingPrice, product.buyingPrice)}%
               </span>
             </TableCell>
-            <TableCell>
-              <div className="flex space-x-2">
-                <button
-                  onClick={() => onEdit(product)}
-                  className="text-blue-600 hover:text-blue-800"
-                >
-                  <Edit2 size={16} />
-                </button>
-                <button
-                  onClick={() => onDelete(product.id)}
-                  className="text-red-600 hover:text-red-800"
-                >
-                  <Trash2 size={16} />
-                </button>
-              </div>
-            </TableCell>
+            {canModify('inventory') && (
+              <TableCell>
+                <div className="flex space-x-2">
+                  <button
+                    onClick={() => onEdit(product)}
+                    className="text-blue-600 hover:text-blue-800"
+                  >
+                    <Edit2 size={16} />
+                  </button>
+                  <button
+                    onClick={() => onDelete(product.id)}
+                    className="text-red-600 hover:text-red-800"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </div>
+              </TableCell>
+            )}
           </TableRow>
         ))}
       </TableBody>

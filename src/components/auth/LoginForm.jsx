@@ -104,7 +104,7 @@ export function LoginForm() {
             </Button>
           </form>
 
-          {/* Demo Credentials */}
+          {/* Demo Credentials 
           <div className="mt-6 p-4 bg-gray-50 rounded-lg">
             <h3 className="text-sm font-medium text-gray-700 mb-2">Demo Credentials:</h3>
             <div className="space-y-2">
@@ -120,7 +120,7 @@ export function LoginForm() {
             </div>
           </div>
         </div>
-
+*/}
         {/* Footer */}
         <div className="text-center mt-6">
           <p className="text-gray-500 text-sm">

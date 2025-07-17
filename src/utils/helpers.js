@@ -11,7 +11,7 @@ export const generateTicketNumber = () => `ST-${Date.now()}`;
 export const generateServiceInvoiceNumber = () => `SRV-${Date.now()}`;
 
 // Format currency
-export const formatCurrency = (amount) => `$${amount.toFixed(2)}`;
+export const formatCurrency = (amount) => `$${(amount || 0).toFixed(2)}`;
 
 // Format date
 export const formatDate = (date) => new Date(date).toLocaleDateString();
@@ -106,5 +106,8 @@ export const capitalize = (str) => {
 
 // Format status text
 export const formatStatus = (status) => {
-  return status.replace('_', ' ').split(' ').map(capitalize).join(' ');
+  if (!status || typeof status !== 'string') {
+    return '';
+  }
+  return status.replace(/_/g, ' ').split(' ').map(capitalize).join(' ');
 };

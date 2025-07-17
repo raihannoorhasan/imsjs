@@ -5,12 +5,13 @@ import { Select } from '../common/Select';
 import { Button } from '../common/Button';
 
 export function EnrollmentForm({ isOpen, onClose }) {
-  const { students, courseBatches, courses, addEnrollment } = useInventory();
+  const { students, courseBatches, courses, addEnrollment, enrollments } = useInventory();
   const [formData, setFormData] = useState({
     studentId: '',
     courseId: '',
     batchId: ''
   });
+  const [error, setError] = useState('');
 
   const availableBatches = courseBatches.filter(batch => 
     batch.courseId === formData.courseId && batch.status !== 'completed'
@@ -18,6 +19,20 @@ export function EnrollmentForm({ isOpen, onClose }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    setError('');
+    
+    // Check if student is already enrolled in this course
+    const existingEnrollment = enrollments.find(enrollment => 
+      enrollment.studentId === formData.studentId && 
+      enrollment.courseId === formData.courseId &&
+      enrollment.status === 'active'
+    );
+    
+    if (existingEnrollment) {
+      setError('This student is already enrolled in this course.');
+      return;
+    }
+    
     const batch = courseBatches.find(b => b.id === formData.batchId);
     const course = courses.find(c => c.id === formData.courseId);
     
@@ -37,6 +52,7 @@ export function EnrollmentForm({ isOpen, onClose }) {
       
       addEnrollment(enrollmentData);
       setFormData({ studentId: '', courseId: '', batchId: '' });
+      setError('');
       onClose();
     }
   };
@@ -51,6 +67,12 @@ export function EnrollmentForm({ isOpen, onClose }) {
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Enroll Student">
       <form onSubmit={handleSubmit} className="space-y-4">
+        {error && (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+            <p className="text-red-600 text-sm">{error}</p>
+          </div>
+        )}
+        
         <Select
           label="Student"
           value={formData.studentId}

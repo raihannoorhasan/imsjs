@@ -7,7 +7,7 @@ import { EnrollmentForm } from './EnrollmentForm';
 import { PaymentForm } from './PaymentForm';
 
 export function EnrollmentManagement() {
-  const { enrollments, deleteEnrollment, addPayment } = useInventory();
+  const { enrollments, deleteEnrollment, addCoursePayment } = useInventory();
   const [showEnrollmentForm, setShowEnrollmentForm] = useState(false);
   const [showPaymentForm, setShowPaymentForm] = useState(false);
   const [selectedEnrollment, setSelectedEnrollment] = useState(null);
@@ -18,7 +18,7 @@ export function EnrollmentManagement() {
   };
 
   const handleAddPayment = (paymentData) => {
-    addPayment(paymentData);
+    addCoursePayment(paymentData);
     setShowPaymentForm(false);
     setSelectedEnrollment(null);
   };
@@ -51,6 +51,7 @@ export function EnrollmentManagement() {
           setSelectedEnrollment(null);
         }}
         onSubmit={handleAddPayment}
+        preSelectedEnrollment={selectedEnrollment}
         preSelectedEnrollment={selectedEnrollment}
       />
     </div>

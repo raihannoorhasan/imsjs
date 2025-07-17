@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useInventory } from '../../contexts/InventoryContext';
 import { Modal } from '../common/Modal';
 import { Input } from '../common/Input';
@@ -6,7 +6,7 @@ import { Select } from '../common/Select';
 import { Button } from '../common/Button';
 import { generateId } from '../../utils/helpers';
 
-export function PaymentForm({ isOpen, onClose, onSubmit }) {
+export function PaymentForm({ isOpen, onClose, onSubmit, preSelectedEnrollment }) {
   const { students, enrollments, courses, courseBatches } = useInventory();
   const [formData, setFormData] = useState({
     studentId: '',
@@ -18,11 +18,97 @@ export function PaymentForm({ isOpen, onClose, onSubmit }) {
     receivedBy: 'Admin',
     notes: ''
   });
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+
+  // Set pre-selected enrollment data when component opens
+  useEffect(() => {
+    if (preSelectedEnrollment && isOpen) {
+      const student = students.find(s => s.id === preSelectedEnrollment.studentId);
+      setFormData(prev => ({
+        ...prev,
+        studentId: preSelectedEnrollment.studentId,
+        enrollmentId: preSelectedEnrollment.id,
+        paymentType: 'enrollment'
+      }));
+      
+      // Calculate remaining amount for enrollment payment
+      const remainingAmount = preSelectedEnrollment.remainingAmount || 0;
+      setFormData(prev => ({ ...prev, amount: remainingAmount }));
+    } else if (!isOpen) {
+      // Reset form when modal closes
+      setFormData({
+        studentId: '',
+        enrollmentId: '',
+        paymentType: 'enrollment',
+        amount: 0,
+        paymentMethod: 'cash',
+        paymentDate: new Date().toISOString().split('T')[0],
+        receivedBy: 'Admin',
+        notes: ''
+      });
+    }
+  }, [preSelectedEnrollment, isOpen, students]);
 
   const studentEnrollments = enrollments.filter(e => e.studentId === formData.studentId);
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    setError('');
+    setSuccess('');
+    
+    const enrollment = enrollments.find(e => e.id === formData.enrollmentId);
+    const course = enrollment ? courses.find(c => c.id === enrollment.courseId) : null;
+    
+    if (!enrollment || !course) {
+      setError('Invalid enrollment or course data.');
+      return;
+    }
+    
+    const paymentAmount = parseFloat(formData.amount);
+    let maxAmount = 0;
+    let alreadyPaid = 0;
+    
+    // Calculate max amount and already paid based on payment type
+    switch (formData.paymentType) {
+      case 'admission':
+        maxAmount = course.admissionFee;
+        alreadyPaid = enrollment.admissionFeeAmount || 0;
+        break;
+      case 'registration':
+        maxAmount = course.registrationFee;
+        alreadyPaid = enrollment.registrationFeeAmount || 0;
+        break;
+      case 'exam':
+        maxAmount = course.examFee;
+        alreadyPaid = enrollment.examFeeAmount || 0;
+        break;
+      case 'enrollment':
+        maxAmount = enrollment.remainingAmount;
+        alreadyPaid = 0; // For enrollment, we check remaining amount directly
+        break;
+    }
+    
+    const remainingAmount = maxAmount - alreadyPaid;
+    
+    // Check if fee is already fully paid
+    if (remainingAmount <= 0 && formData.paymentType !== 'enrollment') {
+      setSuccess(`🎉 Awesome! The ${formData.paymentType} fee is already fully paid!`);
+      return;
+    }
+    
+    // Check if payment amount exceeds remaining amount
+    if (paymentAmount > remainingAmount) {
+      setError(`Payment amount cannot exceed the remaining ${formData.paymentType} fee of $${remainingAmount.toFixed(2)}.`);
+      return;
+    }
+    
+    // Check if payment amount is valid
+    if (paymentAmount <= 0) {
+      setError('Payment amount must be greater than 0.');
+      return;
+    }
+    
     const voucherNumber = `PV-${generateId()}`;
     
     onSubmit({
@@ -42,6 +128,8 @@ export function PaymentForm({ isOpen, onClose, onSubmit }) {
       receivedBy: 'Admin',
       notes: ''
     });
+    setError('');
+    setSuccess('');
   };
 
   const handleChange = (field, value) => {
@@ -52,12 +140,15 @@ export function PaymentForm({ isOpen, onClose, onSubmit }) {
     }
     
     if (field === 'enrollmentId' || field === 'paymentType') {
-      const enrollment = enrollments.find(e => e.id === formData.enrollmentId);
+      const enrollmentId = field === 'enrollmentId' ? value : formData.enrollmentId;
+      const paymentType = field === 'paymentType' ? value : formData.paymentType;
+      
+      const enrollment = enrollments.find(e => e.id === enrollmentId);
       const course = enrollment ? courses.find(c => c.id === enrollment.courseId) : null;
       
       if (course) {
         let amount = 0;
-        switch (formData.paymentType) {
+        switch (paymentType) {
           case 'admission':
             amount = Math.max(0, course.admissionFee - (enrollment.admissionFeeAmount || 0));
             break;
@@ -87,6 +178,18 @@ export function PaymentForm({ isOpen, onClose, onSubmit }) {
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Record Payment" size="lg">
       <form onSubmit={handleSubmit} className="space-y-4">
+        {error && (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+            <p className="text-red-600 text-sm">{error}</p>
+          </div>
+        )}
+        
+        {success && (
+          <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+            <p className="text-green-600 text-sm">{success}</p>
+          </div>
+        )}
+        
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Select
             label="Student"

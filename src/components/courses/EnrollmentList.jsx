@@ -1,12 +1,15 @@
 import React from 'react';
 import { useInventory } from '../../contexts/InventoryContext';
-import { Trash2, DollarSign, CheckCircle, XCircle, CreditCard } from 'lucide-react';
+import { useAuth } from '../../contexts/AuthContext';
+import { Trash2, DollarSign, CheckCircle, XCircle, CreditCard, Edit2 } from 'lucide-react';
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '../common/Table';
 import { StatusBadge } from '../common/StatusBadge';
 import { formatCurrency, formatDate } from '../../utils/helpers';
 
-export function EnrollmentList({ enrollments, onMakePayment, onDelete }) {
+export function EnrollmentList({ enrollments, onMakePayment, onDelete, onEdit }) {
   const { students, courses, courseBatches } = useInventory();
+  const { currentUser } = useAuth();
+  const isAdmin = currentUser?.role === 'admin';
 
   const getEnrollmentDetails = (enrollment) => {
     const student = students.find(s => s.id === enrollment.studentId);
@@ -146,6 +149,16 @@ export function EnrollmentList({ enrollments, onMakePayment, onDelete }) {
                   >
                     <CreditCard size={16} />
                   </button>
+                  {isAdmin && (
+                    <button
+                      onClick={() => onEdit(enrollment)}
+                      className="text-green-600 hover:text-green-800"
+                      title="Edit Enrollment"
+                    >
+                      <Edit2 size={16} />
+                    </button>
+                  )}
+                  {isAdmin && (
                   <button
                     onClick={() => onDelete(enrollment.id)}
                     className="text-red-600 hover:text-red-800"
@@ -153,6 +166,7 @@ export function EnrollmentList({ enrollments, onMakePayment, onDelete }) {
                   >
                     <Trash2 size={16} />
                   </button>
+                  )}
                 </div>
               </TableCell>
             </TableRow>

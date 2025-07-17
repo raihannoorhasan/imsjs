@@ -9,6 +9,13 @@ export function PaymentVoucher({ payment, student, course, batch, onClose }) {
   const handleDownload = () => {
     // Create a new window with the voucher content
     const printWindow = window.open('', '_blank');
+    
+    // Check if popup was blocked
+    if (!printWindow) {
+      alert('Pop-up blocker is preventing the download. Please disable pop-up blocker for this site and try again.');
+      return;
+    }
+    
     const voucherContent = document.getElementById('voucher-content').innerHTML;
     
     printWindow.document.write(`

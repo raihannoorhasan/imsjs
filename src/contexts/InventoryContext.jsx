@@ -485,7 +485,8 @@ export function InventoryProvider({ children }) {
     setCoursePayments([...coursePayments, newPayment]);
 
     // Update enrollment payment status based on payment type
-    if (paymentData.paymentType === 'enrollment') {
+    // Only update enrollment if payment is not declined
+    if (paymentData.status !== 'declined' && paymentData.paymentType === 'enrollment') {
       setEnrollments(enrollments.map(enrollment =>
         enrollment.id === paymentData.enrollmentId
           ? {
@@ -495,7 +496,7 @@ export function InventoryProvider({ children }) {
             }
           : enrollment
       ));
-    } else if (paymentData.paymentType === 'admission') {
+    } else if (paymentData.status !== 'declined' && paymentData.paymentType === 'admission') {
       setEnrollments(enrollments.map(enrollment =>
         enrollment.id === paymentData.enrollmentId
           ? { 
@@ -505,7 +506,7 @@ export function InventoryProvider({ children }) {
             }
           : enrollment
       ));
-    } else if (paymentData.paymentType === 'registration') {
+    } else if (paymentData.status !== 'declined' && paymentData.paymentType === 'registration') {
       setEnrollments(enrollments.map(enrollment =>
         enrollment.id === paymentData.enrollmentId
           ? { 
@@ -515,7 +516,7 @@ export function InventoryProvider({ children }) {
             }
           : enrollment
       ));
-    } else if (paymentData.paymentType === 'exam') {
+    } else if (paymentData.status !== 'declined' && paymentData.paymentType === 'exam') {
       setEnrollments(enrollments.map(enrollment =>
         enrollment.id === paymentData.enrollmentId
           ? { 
@@ -532,6 +533,78 @@ export function InventoryProvider({ children }) {
     setCoursePayments(coursePayments.map(payment => 
       payment.id === id ? { ...payment, ...paymentData } : payment
     ));
+    
+    // Update enrollment data when payment is updated
+    const payment = coursePayments.find(p => p.id === id);
+    if (payment && payment.enrollmentId) {
+      const enrollment = enrollments.find(e => e.id === payment.enrollmentId);
+      if (enrollment) {
+        // Recalculate enrollment amounts based on all payments for this enrollment
+        const enrollmentPayments = coursePayments.filter(p => p.enrollmentId === payment.enrollmentId && p.status !== 'declined');
+        
+        let totalPaid = 0;
+        let admissionFeeAmount = 0;
+        let registrationFeeAmount = 0;
+        let examFeeAmount = 0;
+        
+        enrollmentPayments.forEach(p => {
+          if (p.id === id) {
+            // Use updated payment data
+            const updatedPayment = { ...p, ...paymentData };
+            // Only count approved payments
+            if (updatedPayment.status !== 'declined') {
+              switch (updatedPayment.paymentType) {
+                case 'enrollment':
+                  totalPaid += updatedPayment.amount;
+                  break;
+                case 'admission':
+                  admissionFeeAmount += updatedPayment.amount;
+                  break;
+                case 'registration':
+                  registrationFeeAmount += updatedPayment.amount;
+                  break;
+                case 'exam':
+                  examFeeAmount += updatedPayment.amount;
+                  break;
+              }
+            }
+          } else {
+            // Use existing payment data
+            // Only count approved payments
+            if (p.status !== 'declined') {
+              switch (p.paymentType) {
+                case 'enrollment':
+                  totalPaid += p.amount;
+                  break;
+                case 'admission':
+                  admissionFeeAmount += p.amount;
+                  break;
+                case 'registration':
+                  registrationFeeAmount += p.amount;
+                  break;
+                case 'exam':
+                  examFeeAmount += p.amount;
+                  break;
+              }
+            }
+          }
+        });
+        
+        // Update enrollment with recalculated amounts
+        setEnrollments(enrollments.map(e => 
+          e.id === enrollment.id 
+            ? {
+                ...e,
+                paidAmount: totalPaid,
+                remainingAmount: e.totalAmount - totalPaid,
+                admissionFeeAmount,
+                registrationFeeAmount,
+                examFeeAmount
+              }
+            : e
+        ));
+      }
+    }
   };
 
   const deleteCoursePayment = (id) => {

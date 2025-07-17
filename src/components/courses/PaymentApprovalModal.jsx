@@ -7,6 +7,11 @@ export function PaymentApprovalModal({ isOpen, onClose, payment, onApprove, onDe
   const [action, setAction] = useState('');
   const [message, setMessage] = useState('');
 
+  // Return early if payment is null or undefined
+  if (!payment) {
+    return null;
+  }
+
   const handleSubmit = (e) => {
     e.preventDefault();
     if (action === 'approve') {

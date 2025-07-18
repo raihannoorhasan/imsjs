@@ -19,6 +19,17 @@ import { ServiceCenter } from './components/service/ServiceCenter';
 function AppContent() {
   const { isAuthenticated, isLoading } = useAuth();
   const [activeTab, setActiveTab] = useState('dashboard');
+  
+  // Get currentUser from the same useAuth call to avoid multiple hook calls
+  const { currentUser } = useAuth();
+  const isInstructor = currentUser?.role === 'instructor';
+  
+  // Move useEffect to top level, before any conditional returns
+  React.useEffect(() => {
+    if (isInstructor && activeTab !== 'courses') {
+      setActiveTab('courses');
+    }
+  }, [isInstructor, activeTab]);
 
   if (isLoading) {
     return (
@@ -31,16 +42,6 @@ function AppContent() {
   if (!isAuthenticated) {
     return <LoginForm />;
   }
-
-  // For instructors, redirect directly to courses
-  const { currentUser } = useAuth();
-  const isInstructor = currentUser?.role === 'instructor';
-  
-  React.useEffect(() => {
-    if (isInstructor && activeTab !== 'courses') {
-      setActiveTab('courses');
-    }
-  }, [isInstructor, activeTab]);
 
   const renderContent = () => {
     switch (activeTab) {

@@ -742,6 +742,24 @@ export function InventoryProvider({ children }) {
           ? { ...sale, status: 'completed', completedAt: new Date() }
           : sale
       ));
+      
+      // Add parts cost to the service ticket
+      if (paymentData.serviceTicketId && paymentData.paymentType === 'parts_payment') {
+        const totalPartsCost = paymentData.pendingSalesToComplete.reduce((sum, saleId) => {
+          const sale = sales.find(s => s.id === saleId);
+          return sum + (sale ? sale.total : 0);
+        }, 0);
+        
+        setServiceTickets(serviceTickets.map(ticket => 
+          ticket.id === paymentData.serviceTicketId
+            ? { 
+                ...ticket, 
+                partsCost: (ticket.partsCost || 0) + totalPartsCost,
+                updatedAt: new Date()
+              }
+            : ticket
+        ));
+      }
     }
     
     return newPayment;
@@ -760,6 +778,24 @@ export function InventoryProvider({ children }) {
           ? { ...sale, status: 'completed', completedAt: new Date() }
           : sale
       ));
+      
+      // Add parts cost to the service ticket when payment is approved
+      if (payment.serviceTicketId && payment.paymentType === 'parts_payment') {
+        const totalPartsCost = payment.pendingSalesToComplete.reduce((sum, saleId) => {
+          const sale = sales.find(s => s.id === saleId);
+          return sum + (sale ? sale.total : 0);
+        }, 0);
+        
+        setServiceTickets(serviceTickets.map(ticket => 
+          ticket.id === payment.serviceTicketId
+            ? { 
+                ...ticket, 
+                partsCost: (ticket.partsCost || 0) + totalPartsCost,
+                updatedAt: new Date()
+              }
+            : ticket
+        ));
+      }
       
       // Generate invoices for the completed sales
       setTimeout(() => {

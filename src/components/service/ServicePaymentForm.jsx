@@ -4,6 +4,20 @@ import { Modal } from '../common/Modal';
 import { Input } from '../common/Input';
 import { Select } from '../common/Select';
 import { Button } from '../common/Button';
+import { 
+  DollarSign, 
+  CreditCard, 
+  Calendar, 
+  User, 
+  FileText, 
+  ShoppingCart, 
+  Wrench, 
+  CheckCircle, 
+  AlertCircle,
+  Info,
+  Receipt,
+  Package
+} from 'lucide-react';
 import { generateId, formatCurrency } from '../../utils/helpers';
 
 export function ServicePaymentForm({ isOpen, onClose, onSubmit }) {
@@ -19,9 +33,11 @@ export function ServicePaymentForm({ isOpen, onClose, onSubmit }) {
     receivedBy: 'Admin',
     notes: '',
     paymentType: 'service_charge',
-    autoCalculateFromSale: false
+    autoCalculateFromSale: false,
+    autoFillFromPendingSales: false
   });
   const [selectedSale, setSelectedSale] = useState(null);
+  const [pendingSalesTotal, setPendingSalesTotal] = useState(0);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -42,14 +58,17 @@ export function ServicePaymentForm({ isOpen, onClose, onSubmit }) {
       customerId: '',
       serviceTicketId: '',
       relatedSaleId: '',
+      completePendingSale: false,
       amount: 0,
       paymentMethod: 'cash',
       paymentDate: new Date().toISOString().split('T')[0],
       receivedBy: 'Admin',
       notes: '',
       paymentType: 'service_charge',
-      autoCalculateFromSale: false
+      autoCalculateFromSale: false,
+      autoFillFromPendingSales: false
     });
+    setPendingSalesTotal(0);
   };
 
   const handleChange = (field, value) => {
@@ -64,6 +83,37 @@ export function ServicePaymentForm({ isOpen, onClose, onSubmit }) {
           customerId: ticket.customerId,
           // Auto-suggest parts cost if available
           amount: prev.paymentType === 'parts_payment' ? ticket.partsCost : prev.amount
+        }));
+        
+        // Calculate total from pending sales for this ticket
+        const pendingSales = sales.filter(s => 
+          s.serviceTicketId === value && 
+          s.status === 'pending'
+        );
+        const total = pendingSales.reduce((sum, sale) => sum + sale.total, 0);
+        setPendingSalesTotal(total);
+      }
+    }
+    
+    // Handle auto-fill from pending sales checkbox
+    if (field === 'completePendingSale') {
+      if (value && pendingSalesForTicket.length > 0) {
+        const totalAmount = pendingSalesForTicket.reduce((sum, sale) => sum + sale.total, 0);
+        setFormData(prev => ({
+          ...prev,
+          paymentType: 'parts_payment',
+          amount: totalAmount,
+          notes: `Parts payment for ${pendingSalesForTicket.length} POS sale(s) - Total: ${formatCurrency(totalAmount)}`,
+          autoFillFromPendingSales: true
+        }));
+      } else if (!value && formData.autoFillFromPendingSales) {
+        // Reset when unchecked
+        setFormData(prev => ({
+          ...prev,
+          paymentType: 'service_charge',
+          amount: 0,
+          notes: '',
+          autoFillFromPendingSales: false
         }));
       }
     }
@@ -85,7 +135,7 @@ export function ServicePaymentForm({ isOpen, onClose, onSubmit }) {
     if (field === 'paymentType') {
       if (value === 'parts_payment' && formData.serviceTicketId) {
         const ticket = serviceTickets.find(t => t.id === formData.serviceTicketId);
-        if (ticket && ticket.partsCost > 0) {
+        if (ticket && ticket.partsCost > 0 && !formData.autoFillFromPendingSales) {
           setFormData(prev => ({ ...prev, amount: ticket.partsCost }));
         }
       }
@@ -122,184 +172,441 @@ export function ServicePaymentForm({ isOpen, onClose, onSubmit }) {
     return `Sale #${sale.id.slice(-6)} - ${productName}${itemCount > 1 ? ` +${itemCount - 1} more` : ''} ($${sale.total.toFixed(2)})${statusText}`;
   };
 
+  const paymentMethods = [
+    { id: 'cash', label: 'Cash', icon: DollarSign, color: 'text-green-600', bgColor: 'bg-green-50 border-green-200' },
+    { id: 'card', label: 'Card', icon: CreditCard, color: 'text-blue-600', bgColor: 'bg-blue-50 border-blue-200' },
+    { id: 'transfer', label: 'Bank Transfer', icon: FileText, color: 'text-purple-600', bgColor: 'bg-purple-50 border-purple-200' },
+    { id: 'check', label: 'Check', icon: Receipt, color: 'text-orange-600', bgColor: 'bg-orange-50 border-orange-200' }
+  ];
+
+  const paymentTypes = [
+    { id: 'service_charge', label: 'Service Charge', icon: Wrench, description: 'General service fees' },
+    { id: 'advance_payment', label: 'Advance Payment', icon: DollarSign, description: 'Payment in advance' },
+    { id: 'parts_payment', label: 'Parts Payment', icon: Package, description: 'Payment for parts used' },
+    { id: 'labor_payment', label: 'Labor Payment', icon: User, description: 'Payment for labor costs' },
+    { id: 'diagnostic_fee', label: 'Diagnostic Fee', icon: AlertCircle, description: 'Device diagnosis fee' }
+  ];
+
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Record Service Payment" size="lg">
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Select
-            label="Customer"
-            value={formData.customerId}
-            onChange={(e) => handleChange('customerId', e.target.value)}
-            required
-          >
-            <option value="">Select Customer</option>
-            {customers.map(customer => (
-              <option key={customer.id} value={customer.id}>{customer.name}</option>
-            ))}
-          </Select>
+    <Modal 
+      isOpen={isOpen} 
+      onClose={onClose} 
+      title={
+        <div className="flex items-center space-x-3">
+          <div className="bg-gradient-to-r from-green-500 to-emerald-600 p-2 rounded-lg">
+            <DollarSign className="w-6 h-6 text-white" />
+          </div>
+          <div>
+            <h2 className="text-xl font-semibold text-gray-900">Record Service Payment</h2>
+            <p className="text-sm text-gray-600">Process customer payments for service work</p>
+          </div>
+        </div>
+      }
+      size="xl"
+    >
+      <form onSubmit={handleSubmit} className="space-y-8">
+        {/* Customer & Service Selection */}
+        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-6">
+          <div className="flex items-center space-x-2 mb-4">
+            <User className="w-5 h-5 text-blue-600" />
+            <h3 className="text-lg font-semibold text-blue-900">Customer & Service Information</h3>
+          </div>
           
-          <Select
-            label="Service Ticket"
-            value={formData.serviceTicketId}
-            onChange={(e) => handleChange('serviceTicketId', e.target.value)}
-            required
-            disabled={!formData.customerId}
-          >
-            <option value="">Select Service Ticket</option>
-            {customerTickets.map(ticket => (
-              <option key={ticket.id} value={ticket.id}>
-                {ticket.ticketNumber} - {ticket.deviceBrand} {ticket.deviceModel}
-              </option>
-            ))}
-          </Select>
-          
-          <Select
-            label="Payment Type"
-            value={formData.paymentType}
-            onChange={(e) => handleChange('paymentType', e.target.value)}
-          >
-            <option value="service_charge">Service Charge</option>
-            <option value="advance_payment">Advance Payment</option>
-            <option value="parts_payment">Parts Payment</option>
-            <option value="labor_payment">Labor Payment</option>
-            <option value="diagnostic_fee">Diagnostic Fee</option>
-          </Select>
-          
-          {/* Show sale selection for parts payment */}
-          {formData.paymentType === 'parts_payment' && customerSales.length > 0 && (
-            <Select
-              label="Related Sale (Optional)"
-              value={formData.relatedSaleId}
-              onChange={(e) => handleChange('relatedSaleId', e.target.value)}
-            >
-              <option value="">Select related sale</option>
-              {customerSales.map(sale => (
-                <option key={sale.id} value={sale.id}>
-                  {getSaleDescription(sale)}
-                </option>
-              ))}
-            </Select>
-          )}
-          
-          {/* Show pending sales completion option */}
-          {pendingSalesForTicket.length > 0 && (
-            <div className="md:col-span-2">
-              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                <div className="flex items-start space-x-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">Customer</label>
+              <div className="relative">
+                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                <select
+                  value={formData.customerId}
+                  onChange={(e) => handleChange('customerId', e.target.value)}
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white shadow-sm"
+                  required
+                >
+                  <option value="">Select Customer</option>
+                  {customers.map(customer => (
+                    <option key={customer.id} value={customer.id}>{customer.name}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+            
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">Service Ticket</label>
+              <div className="relative">
+                <Wrench className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                <select
+                  value={formData.serviceTicketId}
+                  onChange={(e) => handleChange('serviceTicketId', e.target.value)}
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white shadow-sm"
+                  required
+                  disabled={!formData.customerId}
+                >
+                  <option value="">Select Service Ticket</option>
+                  {customerTickets.map(ticket => (
+                    <option key={ticket.id} value={ticket.id}>
+                      {ticket.ticketNumber} - {ticket.deviceBrand} {ticket.deviceModel}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Pending Sales Auto-fill Section */}
+        {pendingSalesForTicket.length > 0 && (
+          <div className="bg-gradient-to-r from-amber-50 to-yellow-50 border-2 border-amber-200 rounded-xl p-6">
+            <div className="flex items-start space-x-4">
+              <div className="flex-shrink-0">
+                <div className="bg-amber-100 p-2 rounded-lg">
+                  <ShoppingCart className="w-6 h-6 text-amber-600" />
+                </div>
+              </div>
+              <div className="flex-1">
+                <div className="flex items-center space-x-3 mb-3">
                   <input
                     type="checkbox"
                     id="completePendingSale"
                     checked={formData.completePendingSale}
                     onChange={(e) => handleChange('completePendingSale', e.target.checked)}
-                    className="mt-1"
+                    className="w-5 h-5 text-amber-600 border-amber-300 rounded focus:ring-amber-500"
                   />
-                  <div className="flex-1">
-                    <label htmlFor="completePendingSale" className="text-sm font-medium text-yellow-800 cursor-pointer">
-                      Complete Pending POS Sales
-                    </label>
-                    <p className="text-sm text-yellow-700 mt-1">
-                      This service ticket has {pendingSalesForTicket.length} pending POS sale(s). 
-                      Check this to mark them as completed when this payment is approved.
-                    </p>
-                    <div className="mt-2 space-y-1">
-                      {pendingSalesForTicket.map(sale => (
-                        <div key={sale.id} className="text-xs text-yellow-600">
-                          • Sale #{sale.id.slice(-6)} - {formatCurrency(sale.total)} ({sale.items.length} items)
+                  <label htmlFor="completePendingSale" className="text-lg font-semibold text-amber-900 cursor-pointer">
+                    Complete Pending POS Sales
+                  </label>
+                  <div className="bg-amber-200 text-amber-800 px-3 py-1 rounded-full text-sm font-medium">
+                    Auto-fill Payment
+                  </div>
+                </div>
+                
+                <p className="text-amber-800 mb-4">
+                  This service ticket has <span className="font-semibold">{pendingSalesForTicket.length} pending POS sale(s)</span> totaling{' '}
+                  <span className="font-bold text-lg">{formatCurrency(pendingSalesTotal)}</span>. 
+                  Check this to automatically fill payment details and mark sales as completed when approved.
+                </p>
+                
+                <div className="bg-white border border-amber-200 rounded-lg p-4">
+                  <h4 className="font-medium text-amber-900 mb-3 flex items-center">
+                    <Package className="w-4 h-4 mr-2" />
+                    Pending Sales Details
+                  </h4>
+                  <div className="space-y-2">
+                    {pendingSalesForTicket.map(sale => (
+                      <div key={sale.id} className="flex items-center justify-between p-3 bg-amber-50 rounded-lg">
+                        <div className="flex items-center space-x-3">
+                          <div className="bg-amber-100 p-1 rounded">
+                            <Receipt className="w-4 h-4 text-amber-600" />
+                          </div>
+                          <div>
+                            <p className="font-medium text-amber-900">Sale #{sale.id.slice(-6)}</p>
+                            <p className="text-sm text-amber-700">{sale.items.length} item(s)</p>
+                          </div>
                         </div>
-                      ))}
+                        <div className="text-right">
+                          <p className="font-bold text-amber-900">{formatCurrency(sale.total)}</p>
+                          <p className="text-xs text-amber-600">PENDING</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                
+                {formData.completePendingSale && (
+                  <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+                    <div className="flex items-center space-x-2">
+                      <CheckCircle className="w-5 h-5 text-green-600" />
+                      <p className="text-green-800 font-medium">Auto-fill Active</p>
                     </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-          
-          <Input
-            label="Amount"
-            type="number"
-            step="0.01"
-            value={formData.amount}
-            onChange={(e) => handleChange('amount', e.target.value)}
-            required
-          />
-          
-          {/* Show helpful info for parts payment */}
-          {formData.paymentType === 'parts_payment' && formData.serviceTicketId && (
-            <div className="md:col-span-2">
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-                <div className="flex items-start space-x-2">
-                  <div className="bg-blue-100 p-1 rounded">
-                    <svg className="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-                    </svg>
-                  </div>
-                  <div className="text-sm">
-                    <p className="text-blue-800 font-medium">Parts Payment</p>
-                    <p className="text-blue-700">
-                      {(() => {
-                        const ticket = serviceTickets.find(t => t.id === formData.serviceTicketId);
-                        if (ticket && ticket.partsCost > 0) {
-                          return `Service ticket has parts cost of $${ticket.partsCost.toFixed(2)}`;
-                        }
-                        return 'Record payment for parts used in this service';
-                      })()}
+                    <p className="text-green-700 text-sm mt-1">
+                      Payment type set to "Parts Payment" and amount auto-filled to {formatCurrency(pendingSalesTotal)}
                     </p>
-                    {selectedSale && (
-                      <p className="text-blue-600 mt-1">
-                        Linked to sale: {getSaleDescription(selectedSale)}
-                      </p>
-                    )}
                   </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Payment Type Selection */}
+        <div className="bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 rounded-xl p-6">
+          <div className="flex items-center space-x-2 mb-4">
+            <FileText className="w-5 h-5 text-purple-600" />
+            <h3 className="text-lg font-semibold text-purple-900">Payment Type</h3>
+            {formData.autoFillFromPendingSales && (
+              <div className="bg-purple-200 text-purple-800 px-2 py-1 rounded-full text-xs font-medium">
+                AUTO-FILLED
+              </div>
+            )}
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+            {paymentTypes.map(type => {
+              const Icon = type.icon;
+              const isSelected = formData.paymentType === type.id;
+              const isDisabled = formData.autoFillFromPendingSales;
+              
+              return (
+                <button
+                  key={type.id}
+                  type="button"
+                  onClick={() => !isDisabled && handleChange('paymentType', type.id)}
+                  disabled={isDisabled}
+                  className={`p-4 border-2 rounded-xl text-left transition-all duration-200 ${
+                    isSelected
+                      ? 'border-purple-500 bg-purple-100 shadow-md transform scale-105'
+                      : isDisabled
+                      ? 'border-gray-200 bg-gray-50 cursor-not-allowed opacity-60'
+                      : 'border-gray-200 hover:border-purple-300 hover:bg-purple-50 hover:shadow-sm'
+                  }`}
+                >
+                  <div className="flex items-center space-x-3 mb-2">
+                    <Icon className={`w-5 h-5 ${isSelected ? 'text-purple-600' : 'text-gray-500'}`} />
+                    <span className={`font-medium ${isSelected ? 'text-purple-900' : 'text-gray-700'}`}>
+                      {type.label}
+                    </span>
+                  </div>
+                  <p className={`text-sm ${isSelected ? 'text-purple-700' : 'text-gray-500'}`}>
+                    {type.description}
+                  </p>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Related Sale Selection for Parts Payment */}
+        {formData.paymentType === 'parts_payment' && customerSales.length > 0 && !formData.autoFillFromPendingSales && (
+          <div className="bg-gradient-to-r from-indigo-50 to-blue-50 border border-indigo-200 rounded-xl p-6">
+            <div className="flex items-center space-x-2 mb-4">
+              <ShoppingCart className="w-5 h-5 text-indigo-600" />
+              <h3 className="text-lg font-semibold text-indigo-900">Related Sale (Optional)</h3>
+            </div>
+            
+            <div className="relative">
+              <Receipt className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+              <select
+                value={formData.relatedSaleId}
+                onChange={(e) => handleChange('relatedSaleId', e.target.value)}
+                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white shadow-sm"
+              >
+                <option value="">Select related sale</option>
+                {customerSales.map(sale => (
+                  <option key={sale.id} value={sale.id}>
+                    {getSaleDescription(sale)}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+        )}
+
+        {/* Payment Details */}
+        <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-6">
+          <div className="flex items-center space-x-2 mb-6">
+            <DollarSign className="w-5 h-5 text-green-600" />
+            <h3 className="text-lg font-semibold text-green-900">Payment Details</h3>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Amount Input */}
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
+                Payment Amount
+                {formData.autoFillFromPendingSales && (
+                  <span className="ml-2 text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">AUTO-CALCULATED</span>
+                )}
+              </label>
+              <div className="relative">
+                <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                <input
+                  type="number"
+                  step="0.01"
+                  value={formData.amount}
+                  onChange={(e) => handleChange('amount', e.target.value)}
+                  disabled={formData.autoFillFromPendingSales}
+                  className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent shadow-sm text-lg font-semibold ${
+                    formData.autoFillFromPendingSales 
+                      ? 'bg-green-50 border-green-200 text-green-800' 
+                      : 'bg-white border-gray-300'
+                  }`}
+                  placeholder="0.00"
+                  required
+                />
+              </div>
+              {formData.autoFillFromPendingSales && (
+                <p className="text-sm text-green-600 flex items-center">
+                  <Info className="w-4 h-4 mr-1" />
+                  Amount calculated from pending POS sales
+                </p>
+              )}
+            </div>
+
+            {/* Payment Date */}
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">Payment Date</label>
+              <div className="relative">
+                <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                <input
+                  type="date"
+                  value={formData.paymentDate}
+                  onChange={(e) => handleChange('paymentDate', e.target.value)}
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white shadow-sm"
+                  required
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Payment Method Selection */}
+        <div className="bg-gradient-to-r from-slate-50 to-gray-50 border border-slate-200 rounded-xl p-6">
+          <div className="flex items-center space-x-2 mb-4">
+            <CreditCard className="w-5 h-5 text-slate-600" />
+            <h3 className="text-lg font-semibold text-slate-900">Payment Method</h3>
+          </div>
+          
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            {paymentMethods.map(method => {
+              const Icon = method.icon;
+              const isSelected = formData.paymentMethod === method.id;
+              
+              return (
+                <button
+                  key={method.id}
+                  type="button"
+                  onClick={() => handleChange('paymentMethod', method.id)}
+                  className={`p-4 border-2 rounded-xl text-center transition-all duration-200 ${
+                    isSelected
+                      ? `${method.bgColor} border-current shadow-md transform scale-105`
+                      : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50 hover:shadow-sm'
+                  }`}
+                >
+                  <Icon className={`w-6 h-6 mx-auto mb-2 ${isSelected ? method.color : 'text-gray-500'}`} />
+                  <span className={`text-sm font-medium ${isSelected ? method.color : 'text-gray-700'}`}>
+                    {method.label}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Additional Information */}
+        <div className="bg-gradient-to-r from-gray-50 to-slate-50 border border-gray-200 rounded-xl p-6">
+          <div className="flex items-center space-x-2 mb-4">
+            <FileText className="w-5 h-5 text-gray-600" />
+            <h3 className="text-lg font-semibold text-gray-900">Additional Information</h3>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">Received By</label>
+              <div className="relative">
+                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                <input
+                  type="text"
+                  value={formData.receivedBy}
+                  onChange={(e) => handleChange('receivedBy', e.target.value)}
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent bg-white shadow-sm"
+                  placeholder="Staff member name"
+                  required
+                />
+              </div>
+            </div>
+            
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
+                Payment Notes
+                {formData.autoFillFromPendingSales && (
+                  <span className="ml-2 text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">AUTO-GENERATED</span>
+                )}
+              </label>
+              <div className="relative">
+                <FileText className="absolute left-3 top-3 text-gray-400" size={18} />
+                <textarea
+                  value={formData.notes}
+                  onChange={(e) => handleChange('notes', e.target.value)}
+                  disabled={formData.autoFillFromPendingSales}
+                  className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent shadow-sm resize-none ${
+                    formData.autoFillFromPendingSales 
+                      ? 'bg-blue-50 border-blue-200 text-blue-800' 
+                      : 'bg-white border-gray-300'
+                  }`}
+                  rows={3}
+                  placeholder="Additional payment notes..."
+                />
+              </div>
+              {formData.autoFillFromPendingSales && (
+                <p className="text-sm text-blue-600 flex items-center">
+                  <Info className="w-4 h-4 mr-1" />
+                  Notes auto-generated from pending sales
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Service Ticket Info Display */}
+        {formData.paymentType === 'parts_payment' && formData.serviceTicketId && (
+          <div className="bg-gradient-to-r from-blue-50 to-cyan-50 border-2 border-blue-200 rounded-xl p-6">
+            <div className="flex items-start space-x-4">
+              <div className="bg-blue-100 p-2 rounded-lg">
+                <Info className="w-6 h-6 text-blue-600" />
+              </div>
+              <div className="flex-1">
+                <h3 className="font-semibold text-blue-900 mb-2">Parts Payment Information</h3>
+                <div className="space-y-2">
+                  {(() => {
+                    const ticket = serviceTickets.find(t => t.id === formData.serviceTicketId);
+                    if (ticket && ticket.partsCost > 0) {
+                      return (
+                        <p className="text-blue-800">
+                          Service ticket has existing parts cost of{' '}
+                          <span className="font-bold">${ticket.partsCost.toFixed(2)}</span>
+                        </p>
+                      );
+                    }
+                    return (
+                      <p className="text-blue-800">
+                        Recording payment for parts used in this service
+                      </p>
+                    );
+                  })()}
+                  
+                  {selectedSale && (
+                    <div className="bg-white border border-blue-200 rounded-lg p-3 mt-3">
+                      <p className="text-blue-900 font-medium">Linked to Sale:</p>
+                      <p className="text-blue-700">{getSaleDescription(selectedSale)}</p>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
-          )}
-          
-          <Select
-            label="Payment Method"
-            value={formData.paymentMethod}
-            onChange={(e) => handleChange('paymentMethod', e.target.value)}
-          >
-            <option value="cash">Cash</option>
-            <option value="card">Card</option>
-            <option value="transfer">Bank Transfer</option>
-            <option value="check">Check</option>
-          </Select>
-          
-          <Input
-            label="Payment Date"
-            type="date"
-            value={formData.paymentDate}
-            onChange={(e) => handleChange('paymentDate', e.target.value)}
-            required
-          />
-        </div>
-        
-        <Input
-          label="Received By"
-          value={formData.receivedBy}
-          onChange={(e) => handleChange('receivedBy', e.target.value)}
-          required
-        />
-        
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Notes</label>
-          <textarea
-            value={formData.notes}
-            onChange={(e) => handleChange('notes', e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            rows={3}
-            placeholder="Additional payment notes..."
-          />
-        </div>
-        
-        <div className="flex justify-end space-x-4 pt-4">
-          <Button variant="outline" onClick={onClose}>
-            Cancel
-          </Button>
-          <Button type="submit">
-            Record Payment
-          </Button>
+          </div>
+        )}
+
+        {/* Form Actions */}
+        <div className="flex justify-between items-center pt-6 border-t border-gray-200">
+          <div className="text-sm text-gray-500">
+            Payment will be marked as pending and require admin approval
+          </div>
+          <div className="flex space-x-4">
+            <Button 
+              variant="outline" 
+              onClick={onClose}
+              className="px-6 py-3"
+            >
+              Cancel
+            </Button>
+            <Button 
+              type="submit"
+              className="px-8 py-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200"
+            >
+              <DollarSign className="w-5 h-5 mr-2" />
+              Record Payment
+            </Button>
+          </div>
         </div>
       </form>
     </Modal>

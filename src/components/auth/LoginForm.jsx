@@ -1,8 +1,7 @@
-import React, { useState } from 'react';
+import { Eye, EyeOff, Lock, Shield, User } from 'lucide-react';
+import { useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
-import { Lock, User, Eye, EyeOff, Shield } from 'lucide-react';
 import { Button } from '../common/Button';
-import { Input } from '../common/Input';
 
 export function LoginForm() {
   const { login } = useAuth();
@@ -105,7 +104,7 @@ export function LoginForm() {
           </form>
 
           {/* Demo Credentials */}
-          <div className="mt-6 p-4 bg-gray-50 rounded-lg">
+          {/* <div className="mt-6 p-4 bg-gray-50 rounded-lg">
             <h3 className="text-sm font-medium text-gray-700 mb-2">Demo Credentials:</h3>
             <div className="space-y-2">
               <div className="flex justify-between items-center text-sm">
@@ -130,17 +129,17 @@ export function LoginForm() {
                 </div>
               </div>
             </div>
-          </div>
+          </div> */}
 
           {/* Role Descriptions */}
-          <div className="mt-4 p-4 bg-blue-50 rounded-lg">
+          {/* <div className="mt-4 p-4 bg-blue-50 rounded-lg">
             <h3 className="text-sm font-medium text-blue-700 mb-2">Role Access:</h3>
             <div className="space-y-1 text-xs text-blue-600">
               <div>• <strong>Admin:</strong> Full system access</div>
               <div>• <strong>Operator:</strong> Limited management access</div>
               <div>• <strong>Instructor:</strong> Attendance management only</div>
             </div>
-          </div>
+          </div> */}
 
           {/* <div className="mt-6 p-4 bg-gray-50 rounded-lg">
             <h3 className="text-sm font-medium text-gray-700 mb-2">Demo Credentials:</h3>

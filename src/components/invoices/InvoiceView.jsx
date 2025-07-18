@@ -10,7 +10,8 @@ export function InvoiceView({ isOpen, onClose, invoice }) {
 
   if (!invoice) return null;
 
-  const customer = customers.find(c => c.id === invoice.customerId);
+  const customer = invoice.customerId === 'guest' ? null : customers.find(c => c.id === invoice.customerId);
+  const customerName = invoice.customerId === 'guest' ? 'Guest Customer' : (customer?.name || 'Unknown Customer');
 
   const handlePrint = () => {
     window.print();
@@ -56,9 +57,9 @@ export function InvoiceView({ isOpen, onClose, invoice }) {
             <h3 className="font-medium text-gray-900">Bill To:</h3>
           </div>
           <div className="text-sm text-gray-700">
-            <p className="font-medium">{customer?.name || 'Unknown Customer'}</p>
-            <p>{customer?.email}</p>
-            <p>{customer?.phone}</p>
+            <p className="font-medium">{customerName}</p>
+            {customer?.email && <p>{customer.email}</p>}
+            {customer?.phone && <p>{customer.phone}</p>}
             {customer?.address && <p>{customer.address}</p>}
           </div>
         </div>

@@ -50,6 +50,7 @@ export function SalesHistory() {
   const averageOrderValue = totalSales > 0 ? totalRevenue / totalSales : 0;
 
   const getCustomerName = (customerId) => {
+    if (customerId === 'guest') return 'Guest Customer';
     const customer = customers.find(c => c.id === customerId);
     return customer ? customer.name : 'Unknown Customer';
   };

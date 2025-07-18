@@ -10,6 +10,7 @@ export function InvoiceList({ invoices, onView, onUpdateStatus, onSend }) {
   const { customers } = useInventory();
 
   const getCustomerName = (customerId) => {
+    if (customerId === 'guest') return 'Guest Customer';
     const customer = customers.find(c => c.id === customerId);
     return customer ? customer.name : 'Unknown Customer';
   };

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useInventory } from '../../contexts/InventoryContext';
 import { Plus, ShoppingCart, Search, X, Calculator, CreditCard, DollarSign, Receipt, User, Package, FileText, CheckCircle, Printer } from 'lucide-react';
+import { formatCurrency } from '../../utils/helpers';
 import { Button } from '../common/Button';
 import { Card } from '../common/Card';
 import { Modal } from '../common/Modal';
@@ -98,10 +99,13 @@ export function Sales() {
   const change = amountReceived - total;
 
   const handleSale = () => {
-    if (cart.length === 0 || !selectedCustomer) return;
+    if (cart.length === 0) return;
+
+    // Use guest customer if no customer is selected
+    const customerId = selectedCustomer || 'guest';
 
     const saleData = {
-      customerId: selectedCustomer,
+      customerId,
       items: cart,
       subtotal,
       tax,
@@ -150,6 +154,9 @@ export function Sales() {
       // Create a simple invoice print layout
       const printWindow = window.open('', '_blank');
       const customer = customers.find(c => c.id === completedSale?.customerId);
+      const customerName = completedSale?.customerId === 'guest' ? 'Guest Customer' : (customer?.name || 'Unknown Customer');
+      const customerEmail = completedSale?.customerId === 'guest' ? '' : (customer?.email || '');
+      const customerPhone = completedSale?.customerId === 'guest' ? '' : (customer?.phone || '');
       
       printWindow.document.write(`
         <!DOCTYPE html>
@@ -184,9 +191,9 @@ export function Sales() {
             
             <div class="customer-info">
               <h3>Bill To:</h3>
-              <p><strong>${customer?.name || 'Unknown Customer'}</strong></p>
-              <p>${customer?.email || ''}</p>
-              <p>${customer?.phone || ''}</p>
+              <p><strong>${customerName}</strong></p>
+              ${customerEmail ? `<p>${customerEmail}</p>` : ''}
+              ${customerPhone ? `<p>${customerPhone}</p>` : ''}
             </div>
             
             <table>
@@ -601,13 +608,19 @@ export function Sales() {
               {/* Complete Sale Button */}
               <Button
                 onClick={handleSale}
-                disabled={!selectedCustomer || (paymentMethod === 'cash' && amountReceived < total)}
+                disabled={cart.length === 0 || (paymentMethod === 'cash' && amountReceived < total)}
                 variant="success"
                 className="w-full py-3 text-lg font-semibold"
               >
                 <Receipt className="w-5 h-5 mr-2" />
                 Complete Sale
               </Button>
+              
+              {!selectedCustomer && (
+                <p className="text-xs text-gray-500 text-center mt-2">
+                  No customer selected - sale will be processed as guest purchase
+                </p>
+              )}
             </div>
           )}
         </div>
@@ -640,7 +653,12 @@ export function Sales() {
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
                 <p className="text-gray-600">Customer:</p>
-                <p className="font-medium">{customers.find(c => c.id === completedSale?.customerId)?.name}</p>
+                <p className="font-medium">
+                  {completedSale?.customerId === 'guest' 
+                    ? 'Guest Customer' 
+                    : customers.find(c => c.id === completedSale?.customerId)?.name || 'Unknown Customer'
+                  }
+                </p>
               </div>
               <div>
                 <p className="text-gray-600">Total Amount:</p>

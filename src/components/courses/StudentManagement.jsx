@@ -6,6 +6,7 @@ import { SearchInput } from '../common/SearchInput';
 import { Card } from '../common/Card';
 import { StudentList } from './StudentList';
 import { StudentForm } from './StudentForm';
+import { StudentView } from './StudentView';
 import { EnrollmentForm } from './EnrollmentForm';
 
 export function StudentManagement() {
@@ -13,16 +14,28 @@ export function StudentManagement() {
   const [searchTerm, setSearchTerm] = useState('');
   const [showAddForm, setShowAddForm] = useState(false);
   const [showEnrollmentForm, setShowEnrollmentForm] = useState(false);
+  const [showStudentView, setShowStudentView] = useState(false);
   const [editingStudent, setEditingStudent] = useState(null);
+  const [viewingStudent, setViewingStudent] = useState(null);
 
   const handleEdit = (student) => {
     setEditingStudent(student);
     setShowAddForm(true);
   };
 
+  const handleView = (student) => {
+    setViewingStudent(student);
+    setShowStudentView(true);
+  };
+
   const handleCloseForm = () => {
     setShowAddForm(false);
     setEditingStudent(null);
+  };
+
+  const handleCloseView = () => {
+    setShowStudentView(false);
+    setViewingStudent(null);
   };
 
   const handleSubmit = (studentData) => {
@@ -93,6 +106,7 @@ export function StudentManagement() {
         <StudentList
           students={filteredStudents}
           onEdit={handleEdit}
+          onView={handleView}
           onDelete={deleteStudent}
         />
       </div>
@@ -102,6 +116,16 @@ export function StudentManagement() {
         onClose={handleCloseForm}
         student={editingStudent}
         onSubmit={handleSubmit}
+      />
+
+      <StudentView
+        isOpen={showStudentView}
+        onClose={handleCloseView}
+        student={viewingStudent}
+        onEdit={(student) => {
+          handleCloseView();
+          handleEdit(student);
+        }}
       />
 
       <EnrollmentForm

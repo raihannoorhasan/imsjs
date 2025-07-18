@@ -1,6 +1,6 @@
 import React from 'react';
 import { useInventory } from '../../contexts/InventoryContext';
-import { Edit2, Smartphone, Laptop, Monitor, Tablet, Search, Filter, Eye, Plus } from 'lucide-react';
+import { Edit2, Smartphone, Laptop, Monitor, Tablet, Search, Filter, Eye, Plus, Wrench, FileText, CheckCircle } from 'lucide-react';
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '../common/Table';
 import { StatusBadge } from '../common/StatusBadge';
 import { Card } from '../common/Card';

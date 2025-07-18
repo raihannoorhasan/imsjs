@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useInventory } from '../../contexts/InventoryContext';
+import { Plus } from 'lucide-react';
 import { Modal } from '../common/Modal';
 import { Input } from '../common/Input';
 import { Select } from '../common/Select';
 import { Button } from '../common/Button';
+import { CustomerForm } from '../customers/CustomerForm';
 
 export function ServiceTicketForm({ isOpen, onClose, ticket, onSubmit }) {
-  const { customers, technicians, generateServiceInvoice } = useInventory();
+  const { customers, technicians, generateServiceInvoice, addCustomer } = useInventory();
   const [formData, setFormData] = useState({
     customerId: '',
     deviceType: 'laptop',
@@ -24,6 +26,7 @@ export function ServiceTicketForm({ isOpen, onClose, ticket, onSubmit }) {
     technicianNotes: '',
     partsUsed: []
   });
+  const [showCustomerForm, setShowCustomerForm] = useState(false);
 
   useEffect(() => {
     if (ticket) {
@@ -88,26 +91,47 @@ export function ServiceTicketForm({ isOpen, onClose, ticket, onSubmit }) {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
+  const handleAddCustomer = (customerData) => {
+    const newCustomer = addCustomer(customerData);
+    setFormData(prev => ({ ...prev, customerId: newCustomer.id }));
+    setShowCustomerForm(false);
+  };
+
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={onClose}
-      title={ticket ? 'Edit Service Ticket' : 'New Service Ticket'}
-      size="xl"
-    >
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Select
-            label="Customer"
-            value={formData.customerId}
-            onChange={(e) => handleChange('customerId', e.target.value)}
-            required
-          >
-            <option value="">Select Customer</option>
-            {customers.map(customer => (
-              <option key={customer.id} value={customer.id}>{customer.name}</option>
-            ))}
-          </Select>
+    <>
+      <Modal
+        isOpen={isOpen}
+        onClose={onClose}
+        title={ticket ? 'Edit Service Ticket' : 'New Service Ticket'}
+        size="xl"
+      >
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Customer</label>
+              <div className="flex space-x-2">
+                <select
+                  value={formData.customerId}
+                  onChange={(e) => handleChange('customerId', e.target.value)}
+                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  required
+                >
+                  <option value="">Select Customer</option>
+                  {customers.map(customer => (
+                    <option key={customer.id} value={customer.id}>{customer.name}</option>
+                  ))}
+                </select>
+                <Button
+                  type="button"
+                  size="sm"
+                  onClick={() => setShowCustomerForm(true)}
+                  className="px-3 bg-green-600 hover:bg-green-700"
+                  title="Add New Customer"
+                >
+                  <Plus size={16} />
+                </Button>
+              </div>
+            </div>
           
           <Select
             label="Device Type"
@@ -280,6 +304,13 @@ export function ServiceTicketForm({ isOpen, onClose, ticket, onSubmit }) {
           </Button>
         </div>
       </form>
-    </Modal>
+      </Modal>
+
+      <CustomerForm
+        isOpen={showCustomerForm}
+        onClose={() => setShowCustomerForm(false)}
+        onSubmit={handleAddCustomer}
+      />
+    </>
   );
 }

@@ -19,7 +19,9 @@ export function ServicePaymentManagement() {
     addServicePayment, 
     updateServicePayment,
     customers, 
-    serviceTickets 
+    serviceTickets,
+    sales,
+    products
   } = useInventory();
   const { currentUser } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
@@ -71,18 +73,20 @@ export function ServicePaymentManagement() {
   const getPaymentDetails = (payment) => {
     const customer = customers.find(c => c.id === payment.customerId);
     const ticket = serviceTickets.find(t => t.id === payment.serviceTicketId);
+    const relatedSale = payment.relatedSaleId ? sales.find(s => s.id === payment.relatedSaleId) : null;
     
-    return { customer, ticket };
+    return { customer, ticket, relatedSale };
   };
 
   const filteredPayments = servicePayments.filter(payment => {
-    const { customer, ticket } = getPaymentDetails(payment);
+    const { customer, ticket, relatedSale } = getPaymentDetails(payment);
     
     const matchesSearch = 
       customer?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       customer?.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
       ticket?.ticketNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      payment.receiptNumber.toLowerCase().includes(searchTerm.toLowerCase());
+      payment.receiptNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (relatedSale && relatedSale.id.toLowerCase().includes(searchTerm.toLowerCase()));
     
     const matchesStatus = statusFilter === 'all' || payment.status === statusFilter;
     
@@ -215,6 +219,7 @@ export function ServicePaymentManagement() {
                 <TableHead>Receipt</TableHead>
                 <TableHead>Customer</TableHead>
                 <TableHead>Service Ticket</TableHead>
+                <TableHead>Payment Type</TableHead>
                 <TableHead>Amount</TableHead>
                 <TableHead>Payment Method</TableHead>
                 <TableHead>Date</TableHead>
@@ -224,7 +229,7 @@ export function ServicePaymentManagement() {
             </TableHeader>
             <TableBody>
               {filteredPayments.map((payment) => {
-                const { customer, ticket } = getPaymentDetails(payment);
+                const { customer, ticket, relatedSale } = getPaymentDetails(payment);
                 
                 return (
                   <TableRow key={payment.id} className="hover:bg-gray-50">
@@ -243,7 +248,22 @@ export function ServicePaymentManagement() {
                     <TableCell>
                       <div>
                         <p className="text-sm font-medium text-gray-900">{ticket?.ticketNumber || 'N/A'}</p>
-                        <p className="text-xs text-gray-500">{ticket?.deviceBrand} {ticket?.deviceModel}</p>
+                        <p className="text-xs text-gray-500">
+                          {ticket?.deviceBrand} {ticket?.deviceModel}
+                          {relatedSale && (
+                            <span className="ml-2 text-purple-600">• Sale #{relatedSale.id.slice(-6)}</span>
+                          )}
+                        </p>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div>
+                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800 capitalize">
+                          {payment.paymentType.replace('_', ' ')}
+                        </span>
+                        {payment.paymentType === 'parts_payment' && relatedSale && (
+                          <p className="text-xs text-purple-600 mt-1">Linked to POS sale</p>
+                        )}
                       </div>
                     </TableCell>
                     <TableCell>

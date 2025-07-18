@@ -98,6 +98,13 @@ export function ServiceTicketForm({ isOpen, onClose, ticket, onSubmit }) {
     const customer = customers.find(c => c.id === generatedTicket.customerId);
     
     const printWindow = window.open('', '_blank');
+    
+    // Check if popup was blocked
+    if (!printWindow) {
+      alert('Pop-up blocker is preventing the receipt from opening. Please disable your pop-up blocker for this site and try again.');
+      return;
+    }
+    
     printWindow.document.write(`
       <!DOCTYPE html>
       <html>
@@ -382,9 +389,14 @@ export function ServiceTicketForm({ isOpen, onClose, ticket, onSubmit }) {
                 <span className="ml-2 font-bold text-green-600">${((formData.laborCost + formData.partsCost) * 1.1).toFixed(2)}</span>
               </div>
             </div>
-            {formData.status === 'completed' && (
+            {formData.status === 'completed' && (formData.laborCost > 0 || formData.partsCost > 0) && (
               <div className="mt-2 p-2 bg-green-50 border border-green-200 rounded text-sm text-green-700">
                 💡 Invoice will be automatically generated when this ticket is marked as completed
+              </div>
+            )}
+            {formData.partsCost > 0 && (
+              <div className="mt-2 p-2 bg-purple-50 border border-purple-200 rounded text-sm text-purple-700">
+                💡 Parts cost can be linked to POS sales in Service Payments section
               </div>
             )}
           </div>

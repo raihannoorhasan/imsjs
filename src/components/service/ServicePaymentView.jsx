@@ -6,12 +6,18 @@ import { DollarSign, Receipt, User, Calendar, FileText, Printer } from 'lucide-r
 import { formatCurrency, formatDate, formatDateTime } from '../../utils/helpers';
 
 export function ServicePaymentView({ isOpen, onClose, payment }) {
-  const { customers, serviceTickets } = useInventory();
+  const { customers, serviceTickets, sales, products } = useInventory();
 
   if (!payment) return null;
 
   const customer = customers.find(c => c.id === payment.customerId);
   const ticket = serviceTickets.find(t => t.id === payment.serviceTicketId);
+  const relatedSale = payment.relatedSaleId ? sales.find(s => s.id === payment.relatedSaleId) : null;
+  
+  const getProductName = (productId) => {
+    const product = products.find(p => p.id === productId);
+    return product ? product.name : 'Unknown Product';
+  };
 
   const handlePrintReceipt = () => {
     const printWindow = window.open('', '_blank');
@@ -92,8 +98,38 @@ export function ServicePaymentView({ isOpen, onClose, payment }) {
                 <span class="detail-label">Service Type:</span>
                 <span class="detail-value" style="text-transform: capitalize;">${payment.paymentType.replace('_', ' ')}</span>
               </div>
+              ${payment.relatedSaleId ? `
+                <div class="detail-item">
+                  <span class="detail-label">Related Sale:</span>
+                  <span class="detail-value">#${payment.relatedSaleId.slice(-6)}</span>
+                </div>
+              ` : ''}
             </div>
           </div>
+          
+          ${relatedSale ? `
+            <div class="detail-section">
+              <h3>Related Sale Details</h3>
+              <div style="background: #f3e8ff; border: 1px solid #a855f7; padding: 15px; border-radius: 8px; margin: 10px 0;">
+                <div class="detail-item">
+                  <span class="detail-label">Sale ID:</span>
+                  <span class="detail-value">#${relatedSale.id.slice(-6)}</span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">Sale Date:</span>
+                  <span class="detail-value">${formatDate(relatedSale.createdAt)}</span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">Items:</span>
+                  <span class="detail-value">${relatedSale.items.length} item(s)</span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">Sale Total:</span>
+                  <span class="detail-value">$${relatedSale.total.toFixed(2)}</span>
+                </div>
+              </div>
+            </div>
+          ` : ''}
           
           <div class="detail-section">
             <h3>Payment Details</h3>
@@ -218,9 +254,43 @@ export function ServicePaymentView({ isOpen, onClose, payment }) {
               <p><span className="font-medium">Ticket:</span> {ticket?.ticketNumber || 'N/A'}</p>
               <p><span className="font-medium">Device:</span> {ticket?.deviceBrand} {ticket?.deviceModel}</p>
               <p><span className="font-medium">Payment Type:</span> {payment.paymentType.replace('_', ' ')}</p>
+              {relatedSale && (
+                <p><span className="font-medium">Related Sale:</span> #{relatedSale.id.slice(-6)}</p>
+              )}
             </div>
           </div>
         </div>
+
+        {/* Related Sale Details */}
+        {relatedSale && (
+          <div className="bg-purple-50 border border-purple-200 p-4 rounded-lg">
+            <h3 className="font-medium text-gray-900 mb-3 flex items-center">
+              <svg className="w-5 h-5 mr-2 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z" />
+              </svg>
+              Related Sale Information
+            </h3>
+            <div className="space-y-2 text-sm">
+              <p><span className="font-medium">Sale ID:</span> #{relatedSale.id.slice(-6)}</p>
+              <p><span className="font-medium">Sale Date:</span> {formatDate(relatedSale.createdAt)}</p>
+              <p><span className="font-medium">Items:</span></p>
+              <div className="ml-4 space-y-1">
+                {relatedSale.items.map((item, index) => (
+                  <div key={index} className="flex justify-between">
+                    <span>{getProductName(item.productId)} (x{item.quantity})</span>
+                    <span>${item.total.toFixed(2)}</span>
+                  </div>
+                ))}
+              </div>
+              <div className="border-t pt-2 mt-2">
+                <div className="flex justify-between font-medium">
+                  <span>Sale Total:</span>
+                  <span>${relatedSale.total.toFixed(2)}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Payment Details */}
         <div className="bg-green-50 border border-green-200 p-4 rounded-lg">

@@ -7,17 +7,20 @@ import { Button } from '../common/Button';
 import { generateId } from '../../utils/helpers';
 
 export function ServicePaymentForm({ isOpen, onClose, onSubmit }) {
-  const { customers, serviceTickets } = useInventory();
+  const { customers, serviceTickets, sales, products } = useInventory();
   const [formData, setFormData] = useState({
     customerId: '',
     serviceTicketId: '',
+    relatedSaleId: '',
     amount: 0,
     paymentMethod: 'cash',
     paymentDate: new Date().toISOString().split('T')[0],
     receivedBy: 'Admin',
     notes: '',
-    paymentType: 'service_charge'
+    paymentType: 'service_charge',
+    autoCalculateFromSale: false
   });
+  const [selectedSale, setSelectedSale] = useState(null);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -36,12 +39,14 @@ export function ServicePaymentForm({ isOpen, onClose, onSubmit }) {
     setFormData({
       customerId: '',
       serviceTicketId: '',
+      relatedSaleId: '',
       amount: 0,
       paymentMethod: 'cash',
       paymentDate: new Date().toISOString().split('T')[0],
       receivedBy: 'Admin',
       notes: '',
-      paymentType: 'service_charge'
+      paymentType: 'service_charge',
+      autoCalculateFromSale: false
     });
   };
 
@@ -52,15 +57,61 @@ export function ServicePaymentForm({ isOpen, onClose, onSubmit }) {
     if (field === 'serviceTicketId') {
       const ticket = serviceTickets.find(t => t.id === value);
       if (ticket) {
-        setFormData(prev => ({ ...prev, customerId: ticket.customerId }));
+        setFormData(prev => ({ 
+          ...prev, 
+          customerId: ticket.customerId,
+          // Auto-suggest parts cost if available
+          amount: prev.paymentType === 'parts_payment' ? ticket.partsCost : prev.amount
+        }));
+      }
+    }
+    
+    // Handle sale selection for parts payment
+    if (field === 'relatedSaleId') {
+      const sale = sales.find(s => s.id === value);
+      setSelectedSale(sale);
+      if (sale && formData.paymentType === 'parts_payment') {
+        setFormData(prev => ({ 
+          ...prev, 
+          amount: sale.total,
+          notes: `Parts payment for sale #${sale.id.slice(-6)} - ${sale.items.length} item(s)`
+        }));
+      }
+    }
+    
+    // Handle payment type change
+    if (field === 'paymentType') {
+      if (value === 'parts_payment' && formData.serviceTicketId) {
+        const ticket = serviceTickets.find(t => t.id === formData.serviceTicketId);
+        if (ticket && ticket.partsCost > 0) {
+          setFormData(prev => ({ ...prev, amount: ticket.partsCost }));
+        }
       }
     }
   };
 
   const customerTickets = serviceTickets.filter(t => 
     t.customerId === formData.customerId && 
-    ['completed', 'delivered'].includes(t.status)
+    !['cancelled'].includes(t.status)
   );
+  
+  // Get sales for the selected customer (for parts payment)
+  const customerSales = sales.filter(s => 
+    s.customerId === formData.customerId && 
+    s.status === 'completed'
+  );
+  
+  const getProductName = (productId) => {
+    const product = products.find(p => p.id === productId);
+    return product ? product.name : 'Unknown Product';
+  };
+  
+  const getSaleDescription = (sale) => {
+    const itemCount = sale.items.length;
+    const firstItem = sale.items[0];
+    const productName = firstItem ? getProductName(firstItem.productId) : 'Unknown';
+    return `Sale #${sale.id.slice(-6)} - ${productName}${itemCount > 1 ? ` +${itemCount - 1} more` : ''} ($${sale.total.toFixed(2)})`;
+  };
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Record Service Payment" size="lg">
@@ -102,7 +153,24 @@ export function ServicePaymentForm({ isOpen, onClose, onSubmit }) {
             <option value="advance_payment">Advance Payment</option>
             <option value="parts_payment">Parts Payment</option>
             <option value="labor_payment">Labor Payment</option>
+            <option value="diagnostic_fee">Diagnostic Fee</option>
           </Select>
+          
+          {/* Show sale selection for parts payment */}
+          {formData.paymentType === 'parts_payment' && customerSales.length > 0 && (
+            <Select
+              label="Related Sale (Optional)"
+              value={formData.relatedSaleId}
+              onChange={(e) => handleChange('relatedSaleId', e.target.value)}
+            >
+              <option value="">Select related sale</option>
+              {customerSales.map(sale => (
+                <option key={sale.id} value={sale.id}>
+                  {getSaleDescription(sale)}
+                </option>
+              ))}
+            </Select>
+          )}
           
           <Input
             label="Amount"
@@ -112,6 +180,38 @@ export function ServicePaymentForm({ isOpen, onClose, onSubmit }) {
             onChange={(e) => handleChange('amount', e.target.value)}
             required
           />
+          
+          {/* Show helpful info for parts payment */}
+          {formData.paymentType === 'parts_payment' && formData.serviceTicketId && (
+            <div className="md:col-span-2">
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                <div className="flex items-start space-x-2">
+                  <div className="bg-blue-100 p-1 rounded">
+                    <svg className="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <div className="text-sm">
+                    <p className="text-blue-800 font-medium">Parts Payment</p>
+                    <p className="text-blue-700">
+                      {(() => {
+                        const ticket = serviceTickets.find(t => t.id === formData.serviceTicketId);
+                        if (ticket && ticket.partsCost > 0) {
+                          return `Service ticket has parts cost of $${ticket.partsCost.toFixed(2)}`;
+                        }
+                        return 'Record payment for parts used in this service';
+                      })()}
+                    </p>
+                    {selectedSale && (
+                      <p className="text-blue-600 mt-1">
+                        Linked to sale: {getSaleDescription(selectedSale)}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
           
           <Select
             label="Payment Method"

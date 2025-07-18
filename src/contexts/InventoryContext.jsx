@@ -310,6 +310,13 @@ export function InventoryProvider({ children }) {
     setInvoices([...invoices, newInvoice]);
   };
 
+  const updateInvoice = (id, invoiceData) => {
+    setInvoices(invoices.map(invoice => 
+      invoice.id === id 
+        ? { ...invoice, ...invoiceData, updatedAt: new Date() }
+        : invoice
+    ));
+  };
   const updateStock = (productId, quantity) => {
     setProducts(products.map(product => 
       product.id === productId
@@ -740,6 +747,7 @@ export function InventoryProvider({ children }) {
     updateCourse,
     deleteCourse,
     generateInvoice,
+    updateInvoice,
     updateStock,
     addServiceTicket,
     updateServiceTicket,

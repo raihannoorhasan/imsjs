@@ -6,22 +6,25 @@ import { Button } from '../common/Button';
 import { formatDateTime } from '../../utils/helpers';
 
 export function AttendanceMarking({ session, viewMode = 'mark', onClose }) {
-  const { enrollments, students, updateAttendanceRecord, courseBatches, courses } = useInventory();
+  const { enrollments, students, updateAttendanceRecord, courseBatches, courses, attendanceSessions } = useInventory();
+
+  // Get the most up-to-date session data from the context
+  const currentSession = attendanceSessions.find(s => s.id === session.id) || session;
 
   const batchEnrollments = enrollments.filter(e => 
-    e.batchId === session.batchId && e.status === 'active'
+    e.batchId === currentSession.batchId && e.status === 'active'
   );
   
-  const batch = courseBatches.find(b => b.id === session.batchId);
+  const batch = courseBatches.find(b => b.id === currentSession.batchId);
   const course = batch ? courses.find(c => c.id === batch.courseId) : null;
   
   const getStudentAttendance = (studentId) => {
-    return (session.attendanceRecords || []).find(r => r.studentId === studentId);
+    return (currentSession.attendanceRecords || []).find(r => r.studentId === studentId);
   };
 
   const handleStatusChange = (studentId, status) => {
     if (viewMode === 'view') return; // Prevent changes in view mode
-    updateAttendanceRecord(session.id, studentId, status);
+    updateAttendanceRecord(currentSession.id, studentId, status);
   };
 
   const statusOptions = [
@@ -32,7 +35,7 @@ export function AttendanceMarking({ session, viewMode = 'mark', onClose }) {
   ];
 
   const getStatusStats = () => {
-    const records = session.attendanceRecords || [];
+    const records = currentSession.attendanceRecords || [];
     return statusOptions.map(option => ({
       ...option,
       count: records.filter(r => r.status === option.id).length
@@ -60,9 +63,9 @@ export function AttendanceMarking({ session, viewMode = 'mark', onClose }) {
       <div className="bg-gray-50 p-4 rounded-lg mb-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <h3 className="font-medium text-gray-900">{session.topic}</h3>
+            <h3 className="font-medium text-gray-900">{currentSession.topic}</h3>
             <p className="text-sm text-gray-600">{course?.name} - {batch?.batchName}</p>
-            <p className="text-sm text-gray-500">{formatDateTime(session.date)}</p>
+            <p className="text-sm text-gray-500">{formatDateTime(currentSession.date)}</p>
           </div>
           <div className="flex flex-wrap gap-2">
             {getStatusStats().map(stat => (

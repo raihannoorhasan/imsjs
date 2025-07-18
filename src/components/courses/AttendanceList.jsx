@@ -7,9 +7,14 @@ import { AttendanceMarking } from './AttendanceMarking';
 import { formatDate, formatDateTime } from '../../utils/helpers';
 
 export function AttendanceList({ sessions }) {
-  const { courseBatches, courses, enrollments } = useInventory();
+  const { courseBatches, courses, enrollments, attendanceSessions } = useInventory();
   const [selectedSession, setSelectedSession] = useState(null);
   const [viewMode, setViewMode] = useState('mark'); // 'mark' or 'view'
+
+  // Get updated session data when selectedSession changes
+  const currentSelectedSession = selectedSession ? 
+    attendanceSessions.find(s => s.id === selectedSession.id) || selectedSession : 
+    null;
 
   const getBatchInfo = (batchId) => {
     const batch = courseBatches.find(b => b.id === batchId);
@@ -190,9 +195,9 @@ export function AttendanceList({ sessions }) {
         })}
       </div>
 
-      {selectedSession && (
+      {currentSelectedSession && (
         <AttendanceMarking
-          session={selectedSession}
+          session={currentSelectedSession}
           viewMode={viewMode}
           onClose={() => setSelectedSession(null)}
         />

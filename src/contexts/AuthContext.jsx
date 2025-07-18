@@ -9,7 +9,7 @@ const defaultUsers = [
   {
     id: '1',
     username: 'admin',
-    password: 'admin123',
+    password: 'admin1234',
     email: 'admin@hitech.com',
     name: 'System Administrator',
     role: 'admin',
@@ -20,7 +20,7 @@ const defaultUsers = [
   {
     id: '2',
     username: 'operator',
-    password: 'operator123',
+    password: 'operator1234',
     email: 'operator@hitech.com',
     name: 'System Operator',
     role: 'operator',

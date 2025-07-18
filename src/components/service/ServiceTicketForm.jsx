@@ -6,7 +6,7 @@ import { Select } from '../common/Select';
 import { Button } from '../common/Button';
 
 export function ServiceTicketForm({ isOpen, onClose, ticket, onSubmit }) {
-  const { customers, technicians } = useInventory();
+  const { customers, technicians, generateServiceInvoice } = useInventory();
   const [formData, setFormData] = useState({
     customerId: '',
     deviceType: 'laptop',
@@ -67,7 +67,21 @@ export function ServiceTicketForm({ isOpen, onClose, ticket, onSubmit }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    
+    // Check if status is being changed to completed
+    const wasCompleted = ticket?.status === 'completed';
+    const isNowCompleted = formData.status === 'completed';
+    
     onSubmit(formData);
+    
+    // Generate invoice automatically when ticket is completed
+    if (!wasCompleted && isNowCompleted && (formData.laborCost > 0 || formData.partsCost > 0)) {
+      setTimeout(() => {
+        if (ticket) {
+          generateServiceInvoice(ticket.id);
+        }
+      }, 100);
+    }
   };
 
   const handleChange = (field, value) => {
@@ -169,6 +183,7 @@ export function ServiceTicketForm({ isOpen, onClose, ticket, onSubmit }) {
             step="0.01"
             value={formData.estimatedCost}
             onChange={(e) => handleChange('estimatedCost', parseFloat(e.target.value) || 0)}
+            placeholder="0.00"
           />
           
           <Input
@@ -177,6 +192,7 @@ export function ServiceTicketForm({ isOpen, onClose, ticket, onSubmit }) {
             step="0.01"
             value={formData.laborCost}
             onChange={(e) => handleChange('laborCost', parseFloat(e.target.value) || 0)}
+            placeholder="0.00"
           />
           
           <Input
@@ -185,8 +201,39 @@ export function ServiceTicketForm({ isOpen, onClose, ticket, onSubmit }) {
             step="0.01"
             value={formData.partsCost}
             onChange={(e) => handleChange('partsCost', parseFloat(e.target.value) || 0)}
+            placeholder="0.00"
           />
         </div>
+        
+        {/* Cost Summary */}
+        {(formData.laborCost > 0 || formData.partsCost > 0) && (
+          <div className="bg-gray-50 p-4 rounded-lg">
+            <h3 className="font-medium text-gray-900 mb-2">Cost Summary</h3>
+            <div className="grid grid-cols-2 gap-4 text-sm">
+              <div>
+                <span className="text-gray-600">Labor Cost:</span>
+                <span className="ml-2 font-medium text-blue-600">${formData.laborCost.toFixed(2)}</span>
+              </div>
+              <div>
+                <span className="text-gray-600">Parts Cost:</span>
+                <span className="ml-2 font-medium text-purple-600">${formData.partsCost.toFixed(2)}</span>
+              </div>
+              <div>
+                <span className="text-gray-600">Subtotal:</span>
+                <span className="ml-2 font-medium text-gray-900">${(formData.laborCost + formData.partsCost).toFixed(2)}</span>
+              </div>
+              <div>
+                <span className="text-gray-600">Total (with tax):</span>
+                <span className="ml-2 font-bold text-green-600">${((formData.laborCost + formData.partsCost) * 1.1).toFixed(2)}</span>
+              </div>
+            </div>
+            {formData.status === 'completed' && (
+              <div className="mt-2 p-2 bg-green-50 border border-green-200 rounded text-sm text-green-700">
+                💡 Invoice will be automatically generated when this ticket is marked as completed
+              </div>
+            )}
+          </div>
+        )}
         
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">Issue Description</label>
@@ -196,6 +243,7 @@ export function ServiceTicketForm({ isOpen, onClose, ticket, onSubmit }) {
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             rows={3}
             required
+            placeholder="Describe the issue in detail..."
           />
         </div>
         
@@ -207,6 +255,7 @@ export function ServiceTicketForm({ isOpen, onClose, ticket, onSubmit }) {
               onChange={(e) => handleChange('customerNotes', e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               rows={2}
+              placeholder="Any additional notes from the customer..."
             />
           </div>
           
@@ -217,6 +266,7 @@ export function ServiceTicketForm({ isOpen, onClose, ticket, onSubmit }) {
               onChange={(e) => handleChange('technicianNotes', e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               rows={2}
+              placeholder="Technical notes and work performed..."
             />
           </div>
         </div>

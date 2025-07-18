@@ -370,6 +370,12 @@ export function InventoryProvider({ children }) {
     const ticket = serviceTickets.find(t => t.id === serviceTicketId);
     if (!ticket) return;
 
+    // Check if invoice already exists
+    const existingInvoice = serviceInvoices.find(inv => inv.serviceTicketId === serviceTicketId);
+    if (existingInvoice) {
+      console.log('Invoice already exists for this ticket');
+      return;
+    }
     const invoiceNumber = generateServiceInvoiceNumber();
     const subtotal = ticket.laborCost + ticket.partsCost;
     const tax = subtotal * 0.1; // 10% tax
@@ -391,6 +397,8 @@ export function InventoryProvider({ children }) {
       createdAt: new Date()
     };
     setServiceInvoices([...serviceInvoices, newServiceInvoice]);
+    
+    return newServiceInvoice;
   };
 
   const addCourseBatch = (batchData) => {

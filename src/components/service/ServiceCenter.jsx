@@ -1,19 +1,22 @@
 import React, { useState } from 'react';
 import { useInventory } from '../../contexts/InventoryContext';
-import { Plus, Wrench, Users, FileText } from 'lucide-react';
+import { Plus, Wrench, Users, FileText, Search, Filter, BarChart3 } from 'lucide-react';
 import { Button } from '../common/Button';
+import { Card } from '../common/Card';
 import { ServiceTicketList } from './ServiceTicketList';
 import { ServiceTicketForm } from './ServiceTicketForm';
 import { TechnicianManagement } from './TechnicianManagement';
 import { ServiceInvoices } from './ServiceInvoices';
+import { ServiceDashboard } from './ServiceDashboard';
 
 export function ServiceCenter() {
-  const { serviceTickets, addServiceTicket, updateServiceTicket } = useInventory();
-  const [activeTab, setActiveTab] = useState('tickets');
+  const { serviceTickets, addServiceTicket, updateServiceTicket, customers } = useInventory();
+  const [activeTab, setActiveTab] = useState('dashboard');
   const [showTicketForm, setShowTicketForm] = useState(false);
   const [editingTicket, setEditingTicket] = useState(null);
 
   const tabs = [
+    { id: 'dashboard', label: 'Dashboard', icon: BarChart3 },
     { id: 'tickets', label: 'Service Tickets', icon: Wrench },
     { id: 'technicians', label: 'Technicians', icon: Users },
     { id: 'invoices', label: 'Service Invoices', icon: FileText }
@@ -40,6 +43,8 @@ export function ServiceCenter() {
 
   const renderContent = () => {
     switch (activeTab) {
+      case 'dashboard':
+        return <ServiceDashboard />;
       case 'tickets':
         return (
           <ServiceTicketList
@@ -57,44 +62,57 @@ export function ServiceCenter() {
   };
 
   return (
-    <div className="p-6">
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Service Center</h1>
-          <p className="text-gray-600 mt-2">Manage service tickets, technicians, and repairs</p>
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <div className="bg-white border-b border-gray-200 px-6 py-8">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">Service Center</h1>
+            <p className="text-gray-600">Complete service management solution for repairs and maintenance</p>
+          </div>
+          {activeTab === 'tickets' && (
+            <Button 
+              onClick={() => setShowTicketForm(true)}
+              className="bg-gradient-to-r from-orange-600 to-orange-700 hover:from-orange-700 hover:to-orange-800 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200"
+            >
+              <Plus size={20} className="mr-2" />
+              New Service Ticket
+            </Button>
+          )}
         </div>
-        {activeTab === 'tickets' && (
-          <Button onClick={() => setShowTicketForm(true)}>
-            <Plus size={20} className="mr-2" />
-            New Ticket
-          </Button>
-        )}
       </div>
 
-      {/* Tab Navigation */}
-      <div className="border-b border-gray-200 mb-6">
-        <nav className="-mb-px flex space-x-8">
+      {/* Tab Navigation with Modern Design */}
+      <div className="bg-white border-b border-gray-200 px-6">
+        <div className="flex overflow-x-auto">
+          <nav className="flex space-x-1 min-w-full">
           {tabs.map((tab) => {
             const Icon = tab.icon;
             return (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center space-x-2 py-2 px-1 border-b-2 font-medium text-sm ${
+                  className={`flex items-center space-x-2 px-6 py-4 font-medium text-sm whitespace-nowrap transition-all duration-200 border-b-2 ${
                   activeTab === tab.id
-                    ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                      ? 'border-orange-500 text-orange-600 bg-orange-50'
+                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
                 }`}
               >
-                <Icon size={16} />
+                  <Icon size={18} />
                 <span>{tab.label}</span>
               </button>
             );
           })}
         </nav>
+        </div>
       </div>
 
-      {renderContent()}
+      {/* Content Area */}
+      <div className="p-6">
+        <div className="max-w-7xl mx-auto">
+          {renderContent()}
+        </div>
+      </div>
 
       <ServiceTicketForm
         isOpen={showTicketForm}

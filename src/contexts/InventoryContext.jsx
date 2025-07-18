@@ -734,6 +734,16 @@ export function InventoryProvider({ children }) {
       createdAt: new Date()
     };
     setServicePayments([...servicePayments, newPayment]);
+    
+    // If payment is approved and has pending sales to complete, mark them as completed
+    if (paymentData.status === 'approved' && paymentData.pendingSalesToComplete && paymentData.pendingSalesToComplete.length > 0) {
+      setSales(sales.map(sale => 
+        paymentData.pendingSalesToComplete.includes(sale.id)
+          ? { ...sale, status: 'completed', completedAt: new Date() }
+          : sale
+      ));
+    }
+    
     return newPayment;
   };
 
@@ -741,6 +751,23 @@ export function InventoryProvider({ children }) {
     setServicePayments(servicePayments.map(payment => 
       payment.id === id ? { ...payment, ...paymentData } : payment
     ));
+    
+    // If payment is being approved and has pending sales to complete
+    const payment = servicePayments.find(p => p.id === id);
+    if (payment && paymentData.status === 'approved' && payment.pendingSalesToComplete && payment.pendingSalesToComplete.length > 0) {
+      setSales(sales.map(sale => 
+        payment.pendingSalesToComplete.includes(sale.id)
+          ? { ...sale, status: 'completed', completedAt: new Date() }
+          : sale
+      ));
+      
+      // Generate invoices for the completed sales
+      setTimeout(() => {
+        payment.pendingSalesToComplete.forEach(saleId => {
+          generateInvoice(saleId);
+        });
+      }, 100);
+    }
   };
 
   const value = {

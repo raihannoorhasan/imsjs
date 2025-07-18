@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useInventory } from '../../contexts/InventoryContext';
-import { Plus, ShoppingCart, Search, X, Calculator, CreditCard, DollarSign, Receipt, User, Package, FileText, CheckCircle, Printer } from 'lucide-react';
+import { Plus, ShoppingCart, Search, X, Calculator, CreditCard, DollarSign, Receipt, User, Package, FileText, CheckCircle, Printer, Clock } from 'lucide-react';
 import { formatCurrency } from '../../utils/helpers';
 import { Button } from '../common/Button';
 import { Card } from '../common/Card';
@@ -10,9 +10,10 @@ import { QuickActions } from './QuickActions';
 import { SalesHistory } from './SalesHistory';
 
 export function Sales() {
-  const { products, customers, addSale, addCustomer, generateInvoice } = useInventory();
+  const { products, customers, addSale, addCustomer, generateInvoice, serviceTickets } = useInventory();
   const [cart, setCart] = useState([]);
   const [selectedCustomer, setSelectedCustomer] = useState('');
+  const [selectedServiceTicket, setSelectedServiceTicket] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('cash');
   const [discount, setDiscount] = useState(0);
   const [discountType, setDiscountType] = useState('amount'); // 'amount' or 'percentage'
@@ -25,6 +26,15 @@ export function Sales() {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [completedSale, setCompletedSale] = useState(null);
   const [generatedInvoice, setGeneratedInvoice] = useState(null);
+
+  // Get service tickets for selected customer
+  const getCustomerServiceTickets = () => {
+    if (!selectedCustomer) return [];
+    return serviceTickets.filter(ticket => 
+      ticket.customerId === selectedCustomer && 
+      !['completed', 'delivered', 'cancelled'].includes(ticket.status)
+    );
+  };
 
   // Filter products based on search and category
   const filteredProducts = products.filter(product => {
@@ -84,6 +94,7 @@ export function Sales() {
     setCart([]);
     setDiscount(0);
     setAmountReceived(0);
+    setSelectedServiceTicket('');
   };
 
   const subtotal = cart.reduce((sum, item) => sum + item.total, 0);
@@ -101,8 +112,24 @@ export function Sales() {
   const handleSale = () => {
     if (cart.length === 0) return;
 
-    // Use guest customer if no customer is selected
-    const customerId = selectedCustomer || 'guest';
+    // For service payments, customer must be selected
+    if (paymentMethod === 'service_payment' && !selectedCustomer) {
+      alert('Please select a customer for service payments');
+      return;
+    }
+    
+    if (paymentMethod === 'service_payment' && !selectedServiceTicket) {
+      alert('Please select a service ticket');
+      return;
+    }
+
+    // Use guest customer if no customer is selected (except for service payments)
+    const customerId = selectedCustomer || (paymentMethod === 'service_payment' ? null : 'guest');
+    
+    if (!customerId) {
+      alert('Customer selection is required for service payments');
+      return;
+    }
 
     const saleData = {
       customerId,
@@ -114,28 +141,43 @@ export function Sales() {
       paymentMethod,
       amountReceived,
       change: Math.max(0, change),
-      status: 'completed'
+      status: paymentMethod === 'service_payment' ? 'pending' : 'completed',
+      serviceTicketId: paymentMethod === 'service_payment' ? selectedServiceTicket : null,
+      linkedToService: paymentMethod === 'service_payment'
     };
 
     addSale(saleData);
     
-    // Generate invoice
-    setTimeout(() => {
-      const sales = JSON.parse(localStorage.getItem('sales') || '[]');
-      const latestSale = sales[sales.length - 1];
-      if (latestSale) {
-        generateInvoice(latestSale.id);
-        setCompletedSale(latestSale);
-        
-        // Get the generated invoice
-        setTimeout(() => {
-          const invoices = JSON.parse(localStorage.getItem('invoices') || '[]');
-          const latestInvoice = invoices[invoices.length - 1];
-          setGeneratedInvoice(latestInvoice);
+    // Only generate invoice for completed sales
+    if (paymentMethod !== 'service_payment') {
+      // Generate invoice
+      setTimeout(() => {
+        const sales = JSON.parse(localStorage.getItem('sales') || '[]');
+        const latestSale = sales[sales.length - 1];
+        if (latestSale) {
+          generateInvoice(latestSale.id);
+          setCompletedSale(latestSale);
+          
+          // Get the generated invoice
+          setTimeout(() => {
+            const invoices = JSON.parse(localStorage.getItem('invoices') || '[]');
+            const latestInvoice = invoices[invoices.length - 1];
+            setGeneratedInvoice(latestInvoice);
+            setShowSuccessModal(true);
+          }, 100);
+        }
+      }, 100);
+    } else {
+      // For service payments, show different success message
+      setTimeout(() => {
+        const sales = JSON.parse(localStorage.getItem('sales') || '[]');
+        const latestSale = sales[sales.length - 1];
+        if (latestSale) {
+          setCompletedSale(latestSale);
           setShowSuccessModal(true);
-        }, 100);
-      }
-    }, 100);
+        }
+      }, 100);
+    }
   };
 
   const handleCloseSuccessModal = () => {
@@ -512,11 +554,12 @@ export function Sales() {
               {/* Payment Method */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Payment Method</label>
-                <div className="grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-2 gap-2">
                   {[
                     { id: 'cash', label: 'Cash', icon: DollarSign },
                     { id: 'card', label: 'Card', icon: CreditCard },
-                    { id: 'transfer', label: 'Transfer', icon: Calculator }
+                    { id: 'transfer', label: 'Transfer', icon: Calculator },
+                    { id: 'service_payment', label: 'Service Payment', icon: Calculator }
                   ].map(method => {
                     const Icon = method.icon;
                     return (
@@ -573,6 +616,31 @@ export function Sales() {
                 </div>
               )}
 
+              {/* Service Ticket Selection (for service payments) */}
+              {paymentMethod === 'service_payment' && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Service Ticket</label>
+                  <select
+                    value={selectedServiceTicket}
+                    onChange={(e) => setSelectedServiceTicket(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    required
+                  >
+                    <option value="">Select Service Ticket</option>
+                    {getCustomerServiceTickets().map(ticket => (
+                      <option key={ticket.id} value={ticket.id}>
+                        {ticket.ticketNumber} - {ticket.deviceBrand} {ticket.deviceModel}
+                      </option>
+                    ))}
+                  </select>
+                  {selectedCustomer && getCustomerServiceTickets().length === 0 && (
+                    <p className="text-sm text-gray-500 mt-1">
+                      No active service tickets found for this customer
+                    </p>
+                  )}
+                </div>
+              )}
+
               {/* Totals */}
               <div className="bg-gray-50 rounded-lg p-4 space-y-2">
                 <div className="flex justify-between text-sm">
@@ -608,7 +676,9 @@ export function Sales() {
               {/* Complete Sale Button */}
               <Button
                 onClick={handleSale}
-                disabled={cart.length === 0 || (paymentMethod === 'cash' && amountReceived < total)}
+                disabled={cart.length === 0 || 
+                         (paymentMethod === 'cash' && amountReceived < total) ||
+                         (paymentMethod === 'service_payment' && !selectedServiceTicket)}
                 variant="success"
                 className="w-full py-3 text-lg font-semibold"
               >
@@ -618,8 +688,20 @@ export function Sales() {
               
               {!selectedCustomer && (
                 <p className="text-xs text-gray-500 text-center mt-2">
-                  No customer selected - sale will be processed as guest purchase
+                  {paymentMethod === 'service_payment' 
+                    ? 'Customer selection required for service payments'
+                    : 'No customer selected - sale will be processed as guest purchase'
+                  }
                 </p>
+              )}
+              
+              {paymentMethod === 'service_payment' && (
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mt-2">
+                  <p className="text-xs text-blue-700">
+                    💡 This sale will be marked as pending and linked to the service ticket. 
+                    Payment will be completed when the customer pays through the service system.
+                  </p>
+                </div>
               )}
             </div>
           )}
@@ -630,22 +712,29 @@ export function Sales() {
       <Modal 
         isOpen={showSuccessModal} 
         onClose={handleCloseSuccessModal}
-        title="Sale Completed Successfully!"
+        title={completedSale?.status === 'pending' ? "Sale Created - Pending Payment" : "Sale Completed Successfully!"}
         size="md"
       >
         <div className="text-center space-y-6">
           <div className="flex justify-center">
-            <div className="bg-green-100 p-4 rounded-full">
-              <CheckCircle className="w-12 h-12 text-green-600" />
+            <div className={`p-4 rounded-full ${completedSale?.status === 'pending' ? 'bg-yellow-100' : 'bg-green-100'}`}>
+              {completedSale?.status === 'pending' ? (
+                <Clock className="w-12 h-12 text-yellow-600" />
+              ) : (
+                <CheckCircle className="w-12 h-12 text-green-600" />
+              )}
             </div>
           </div>
           
           <div>
             <h3 className="text-xl font-semibold text-gray-900 mb-2">
-              Sale #{completedSale?.id.slice(-6)} Completed
+              Sale #{completedSale?.id.slice(-6)} {completedSale?.status === 'pending' ? 'Created' : 'Completed'}
             </h3>
             <p className="text-gray-600">
-              Invoice {generatedInvoice?.invoiceNumber} has been generated automatically
+              {completedSale?.status === 'pending' 
+                ? 'Sale is pending payment through service ticket'
+                : `Invoice ${generatedInvoice?.invoiceNumber} has been generated automatically`
+              }
             </p>
           </div>
           
@@ -672,18 +761,34 @@ export function Sales() {
                 <p className="text-gray-600">Items:</p>
                 <p className="font-medium">{completedSale?.items.length} items</p>
               </div>
+              {completedSale?.serviceTicketId && (
+                <>
+                  <div>
+                    <p className="text-gray-600">Service Ticket:</p>
+                    <p className="font-medium text-blue-600">
+                      {serviceTickets.find(t => t.id === completedSale.serviceTicketId)?.ticketNumber || 'N/A'}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-gray-600">Status:</p>
+                    <p className="font-medium text-yellow-600">Pending Payment</p>
+                  </div>
+                </>
+              )}
             </div>
           </div>
           
           <div className="flex space-x-3">
-            <Button 
-              onClick={handlePrintInvoice}
-              variant="outline"
-              className="flex-1"
-            >
-              <Printer className="w-4 h-4 mr-2" />
-              Print Invoice
-            </Button>
+            {completedSale?.status !== 'pending' && (
+              <Button 
+                onClick={handlePrintInvoice}
+                variant="outline"
+                className="flex-1"
+              >
+                <Printer className="w-4 h-4 mr-2" />
+                Print Invoice
+              </Button>
+            )}
             <Button 
               onClick={handleCloseSuccessModal}
               className="flex-1"
@@ -693,7 +798,10 @@ export function Sales() {
           </div>
           
           <p className="text-xs text-gray-500">
-            You can also find this invoice in the Invoices section
+            {completedSale?.status === 'pending' 
+              ? 'You can track this sale in the Sales History and complete payment through Service Payments'
+              : 'You can also find this invoice in the Invoices section'
+            }
           </p>
         </div>
       </Modal>

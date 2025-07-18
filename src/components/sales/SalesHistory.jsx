@@ -164,6 +164,9 @@ export function SalesHistory() {
               <div className="flex items-center text-sm text-gray-600">
                 <DollarSign size={14} className="mr-2" />
                 {sale.paymentMethod.charAt(0).toUpperCase() + sale.paymentMethod.slice(1)}
+                {sale.linkedToService && (
+                  <span className="ml-2 text-blue-600 text-xs">• Linked to Service</span>
+                )}
               </div>
             </div>
             

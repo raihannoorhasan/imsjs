@@ -4,14 +4,15 @@ import { Modal } from '../common/Modal';
 import { Input } from '../common/Input';
 import { Select } from '../common/Select';
 import { Button } from '../common/Button';
-import { generateId } from '../../utils/helpers';
+import { generateId, formatCurrency } from '../../utils/helpers';
 
 export function ServicePaymentForm({ isOpen, onClose, onSubmit }) {
-  const { customers, serviceTickets, sales, products } = useInventory();
+  const { customers, serviceTickets, sales, products, updateStock } = useInventory();
   const [formData, setFormData] = useState({
     customerId: '',
     serviceTicketId: '',
     relatedSaleId: '',
+    completePendingSale: false,
     amount: 0,
     paymentMethod: 'cash',
     paymentDate: new Date().toISOString().split('T')[0],
@@ -33,6 +34,7 @@ export function ServicePaymentForm({ isOpen, onClose, onSubmit }) {
       paymentDate: new Date(formData.paymentDate),
       amount: parseFloat(formData.amount),
       status: 'pending',
+      pendingSalesToComplete: formData.completePendingSale ? pendingSalesForTicket.map(s => s.id) : [],
       createdAt: new Date()
     });
     
@@ -98,7 +100,13 @@ export function ServicePaymentForm({ isOpen, onClose, onSubmit }) {
   // Get sales for the selected customer (for parts payment)
   const customerSales = sales.filter(s => 
     s.customerId === formData.customerId && 
-    s.status === 'completed'
+    (s.status === 'completed' || s.status === 'pending')
+  );
+  
+  // Get pending sales linked to the selected service ticket
+  const pendingSalesForTicket = sales.filter(s => 
+    s.serviceTicketId === formData.serviceTicketId && 
+    s.status === 'pending'
   );
   
   const getProductName = (productId) => {
@@ -110,7 +118,8 @@ export function ServicePaymentForm({ isOpen, onClose, onSubmit }) {
     const itemCount = sale.items.length;
     const firstItem = sale.items[0];
     const productName = firstItem ? getProductName(firstItem.productId) : 'Unknown';
-    return `Sale #${sale.id.slice(-6)} - ${productName}${itemCount > 1 ? ` +${itemCount - 1} more` : ''} ($${sale.total.toFixed(2)})`;
+    const statusText = sale.status === 'pending' ? ' [PENDING]' : '';
+    return `Sale #${sale.id.slice(-6)} - ${productName}${itemCount > 1 ? ` +${itemCount - 1} more` : ''} ($${sale.total.toFixed(2)})${statusText}`;
   };
 
   return (
@@ -170,6 +179,39 @@ export function ServicePaymentForm({ isOpen, onClose, onSubmit }) {
                 </option>
               ))}
             </Select>
+          )}
+          
+          {/* Show pending sales completion option */}
+          {pendingSalesForTicket.length > 0 && (
+            <div className="md:col-span-2">
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                <div className="flex items-start space-x-3">
+                  <input
+                    type="checkbox"
+                    id="completePendingSale"
+                    checked={formData.completePendingSale}
+                    onChange={(e) => handleChange('completePendingSale', e.target.checked)}
+                    className="mt-1"
+                  />
+                  <div className="flex-1">
+                    <label htmlFor="completePendingSale" className="text-sm font-medium text-yellow-800 cursor-pointer">
+                      Complete Pending POS Sales
+                    </label>
+                    <p className="text-sm text-yellow-700 mt-1">
+                      This service ticket has {pendingSalesForTicket.length} pending POS sale(s). 
+                      Check this to mark them as completed when this payment is approved.
+                    </p>
+                    <div className="mt-2 space-y-1">
+                      {pendingSalesForTicket.map(sale => (
+                        <div key={sale.id} className="text-xs text-yellow-600">
+                          • Sale #{sale.id.slice(-6)} - {formatCurrency(sale.total)} ({sale.items.length} items)
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           )}
           
           <Input

@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useInventory } from '../../contexts/InventoryContext';
-import { Plus } from 'lucide-react';
+import { Plus, Printer } from 'lucide-react';
 import { Modal } from '../common/Modal';
 import { Input } from '../common/Input';
 import { Select } from '../common/Select';
 import { Button } from '../common/Button';
 import { CustomerForm } from '../customers/CustomerForm';
+import { formatDate, formatDateTime } from '../../utils/helpers';
 
 export function ServiceTicketForm({ isOpen, onClose, ticket, onSubmit }) {
-  const { customers, technicians, generateServiceInvoice, addCustomer } = useInventory();
+  const { customers, technicians, addCustomer, servicePayments, addServicePayment } = useInventory();
   const [formData, setFormData] = useState({
     customerId: '',
     deviceType: 'laptop',
@@ -27,6 +28,8 @@ export function ServiceTicketForm({ isOpen, onClose, ticket, onSubmit }) {
     partsUsed: []
   });
   const [showCustomerForm, setShowCustomerForm] = useState(false);
+  const [showReceiptModal, setShowReceiptModal] = useState(false);
+  const [generatedTicket, setGeneratedTicket] = useState(null);
 
   useEffect(() => {
     if (ticket) {
@@ -70,20 +73,12 @@ export function ServiceTicketForm({ isOpen, onClose, ticket, onSubmit }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    const result = onSubmit(formData);
     
-    // Check if status is being changed to completed
-    const wasCompleted = ticket?.status === 'completed';
-    const isNowCompleted = formData.status === 'completed';
-    
-    onSubmit(formData);
-    
-    // Generate invoice automatically when ticket is completed
-    if (!wasCompleted && isNowCompleted && (formData.laborCost > 0 || formData.partsCost > 0)) {
-      setTimeout(() => {
-        if (ticket) {
-          generateServiceInvoice(ticket.id);
-        }
-      }, 100);
+    // If creating a new ticket, show receipt option
+    if (!ticket && result) {
+      setGeneratedTicket(result);
+      setShowReceiptModal(true);
     }
   };
 
@@ -97,6 +92,142 @@ export function ServiceTicketForm({ isOpen, onClose, ticket, onSubmit }) {
     setShowCustomerForm(false);
   };
 
+  const handlePrintReceipt = () => {
+    if (!generatedTicket) return;
+    
+    const customer = customers.find(c => c.id === generatedTicket.customerId);
+    
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>Service Receipt - ${generatedTicket.ticketNumber}</title>
+          <style>
+            body { font-family: Arial, sans-serif; margin: 20px; line-height: 1.6; }
+            .header { text-align: center; border-bottom: 3px solid #f97316; padding-bottom: 20px; margin-bottom: 30px; }
+            .company-name { font-size: 28px; font-weight: bold; color: #ea580c; margin-bottom: 5px; }
+            .receipt-title { background: linear-gradient(135deg, #f97316, #ea580c); color: white; padding: 15px; text-align: center; font-size: 20px; font-weight: bold; margin: 20px 0; }
+            .ticket-number { background: #f3f4f6; padding: 10px; text-align: center; font-weight: bold; color: #374151; }
+            .details-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin: 30px 0; }
+            .detail-section h3 { color: #1f2937; font-size: 16px; margin-bottom: 15px; border-bottom: 2px solid #e5e7eb; padding-bottom: 5px; }
+            .detail-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f3f4f6; }
+            .detail-label { font-weight: 600; color: #4b5563; }
+            .detail-value { color: #1f2937; }
+            .footer { margin-top: 40px; padding-top: 20px; border-top: 2px solid #e5e7eb; text-align: center; }
+            @media print { body { margin: 0; } }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <div class="company-name">Hi Tech Computer</div>
+            <div>Professional Computer Service & Repair</div>
+            <div style="margin-top: 10px; color: #6b7280; font-size: 14px;">
+              📍 123 Tech Street, Silicon Valley | 📞 +1-555-0123 | ✉️ service@hitechcomputer.com
+            </div>
+          </div>
+          
+          <div class="receipt-title">SERVICE RECEIPT</div>
+          
+          <div class="ticket-number">
+            Ticket No: ${generatedTicket.ticketNumber}
+          </div>
+          
+          <div class="details-grid">
+            <div class="detail-section">
+              <h3>Customer Information</h3>
+              <div class="detail-item">
+                <span class="detail-label">Name:</span>
+                <span class="detail-value">${customer?.name || 'N/A'}</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Phone:</span>
+                <span class="detail-value">${customer?.phone || 'N/A'}</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Email:</span>
+                <span class="detail-value">${customer?.email || 'N/A'}</span>
+              </div>
+            </div>
+            
+            <div class="detail-section">
+              <h3>Device Information</h3>
+              <div class="detail-item">
+                <span class="detail-label">Device:</span>
+                <span class="detail-value">${generatedTicket.deviceBrand} ${generatedTicket.deviceModel}</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Type:</span>
+                <span class="detail-value" style="text-transform: capitalize;">${generatedTicket.deviceType}</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Serial Number:</span>
+                <span class="detail-value">${generatedTicket.serialNumber || 'N/A'}</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="detail-section">
+            <h3>Service Details</h3>
+            <div style="background: #fef3c7; border: 1px solid #f59e0b; padding: 15px; border-radius: 8px; margin: 10px 0;">
+              <strong>Issue Description:</strong><br>
+              ${generatedTicket.issueDescription}
+            </div>
+            ${generatedTicket.customerNotes ? `
+              <div style="background: #e0f2fe; border: 1px solid #0284c7; padding: 15px; border-radius: 8px; margin: 10px 0;">
+                <strong>Customer Notes:</strong><br>
+                ${generatedTicket.customerNotes}
+              </div>
+            ` : ''}
+          </div>
+          
+          <div class="detail-section">
+            <h3>Service Information</h3>
+            <div class="detail-item">
+              <span class="detail-label">Priority:</span>
+              <span class="detail-value" style="text-transform: capitalize;">${generatedTicket.priority}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Received Date:</span>
+              <span class="detail-value">${formatDateTime(generatedTicket.createdAt)}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Estimated Cost:</span>
+              <span class="detail-value">$${generatedTicket.estimatedCost.toFixed(2)}</span>
+            </div>
+          </div>
+          
+          <div class="footer">
+            <div style="background: #f3f4f6; padding: 15px; border-radius: 8px; margin: 20px 0;">
+              <div style="font-weight: bold; color: #1f2937; margin-bottom: 10px;">
+                Important Information:
+              </div>
+              <div style="color: #6b7280; font-size: 14px; text-align: left;">
+                • Please keep this receipt for your records<br>
+                • You will be contacted once diagnosis is complete<br>
+                • Estimated repair time: 3-5 business days<br>
+                • For inquiries, please reference ticket number: ${generatedTicket.ticketNumber}
+              </div>
+            </div>
+            
+            <div style="margin-top: 30px;">
+              <div style="font-weight: bold; color: #1f2937; margin-bottom: 5px;">
+                Thank you for choosing Hi Tech Computer!
+              </div>
+              <div style="color: #6b7280; font-size: 12px;">
+                Generated on ${formatDateTime(new Date())}
+              </div>
+            </div>
+          </div>
+        </body>
+      </html>
+    `);
+    
+    printWindow.document.close();
+    printWindow.focus();
+    printWindow.print();
+    printWindow.close();
+  };
   return (
     <>
       <Modal
@@ -306,6 +437,63 @@ export function ServiceTicketForm({ isOpen, onClose, ticket, onSubmit }) {
       </form>
       </Modal>
 
+      {/* Receipt Modal */}
+      <Modal
+        isOpen={showReceiptModal}
+        onClose={() => {
+          setShowReceiptModal(false);
+          setGeneratedTicket(null);
+          onClose();
+        }}
+        title="Service Ticket Created Successfully!"
+        size="md"
+      >
+        <div className="text-center space-y-6">
+          <div className="flex justify-center">
+            <div className="bg-green-100 p-4 rounded-full">
+              <Printer className="w-12 h-12 text-green-600" />
+            </div>
+          </div>
+          
+          <div>
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">
+              Ticket {generatedTicket?.ticketNumber} Created
+            </h3>
+            <p className="text-gray-600">
+              Would you like to print a receipt for the customer?
+            </p>
+          </div>
+          
+          <div className="bg-gray-50 rounded-lg p-4">
+            <div className="text-sm text-gray-600">
+              <p>Device: {generatedTicket?.deviceBrand} {generatedTicket?.deviceModel}</p>
+              <p>Priority: {generatedTicket?.priority}</p>
+              <p>Estimated Cost: ${generatedTicket?.estimatedCost?.toFixed(2) || '0.00'}</p>
+            </div>
+          </div>
+          
+          <div className="flex space-x-3">
+            <Button 
+              onClick={handlePrintReceipt}
+              className="flex-1"
+            >
+              <Printer className="w-4 h-4 mr-2" />
+              Print Receipt
+            </Button>
+            <Button 
+              onClick={() => {
+                setShowReceiptModal(false);
+                setGeneratedTicket(null);
+                onClose();
+              }}
+              variant="outline"
+              className="flex-1"
+            >
+              Skip
+            </Button>
+          </div>
+        </div>
+      </Modal>
       <CustomerForm
         isOpen={showCustomerForm}
         onClose={() => setShowCustomerForm(false)}

@@ -1,21 +1,22 @@
 import React from 'react';
 import { useInventory } from '../../contexts/InventoryContext';
-import { Edit2, Smartphone, Laptop, Monitor, Tablet, Search, Filter, Eye, Plus, Wrench, FileText, CheckCircle } from 'lucide-react';
+import { Edit2, Smartphone, Laptop, Monitor, Tablet, Search, Filter, Eye, Plus, Wrench, FileText, CheckCircle, Truck } from 'lucide-react';
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '../common/Table';
 import { StatusBadge } from '../common/StatusBadge';
 import { Card } from '../common/Card';
 import { Button } from '../common/Button';
 import { SearchInput } from '../common/SearchInput';
 import { Select } from '../common/Select';
+import { DeliveryForm } from './DeliveryForm';
 import { formatCurrency, formatDate, getPriorityColor } from '../../utils/helpers';
 
 export function ServiceTicketList({ tickets, onEdit }) {
-  const { customers, technicians, generateServiceInvoice, serviceInvoices } = useInventory();
+  const { customers, technicians, generateServiceInvoice, serviceInvoices, updateServiceTicket } = useInventory();
   const [searchTerm, setSearchTerm] = React.useState('');
   const [statusFilter, setStatusFilter] = React.useState('all');
   const [priorityFilter, setPriorityFilter] = React.useState('all');
   const [technicianFilter, setTechnicianFilter] = React.useState('all');
-  const [showInvoiceModal, setShowInvoiceModal] = React.useState(false);
+  const [showDeliveryForm, setShowDeliveryForm] = React.useState(false);
   const [selectedTicket, setSelectedTicket] = React.useState(null);
 
   // Filter tickets based on search and filters
@@ -82,6 +83,20 @@ export function ServiceTicketList({ tickets, onEdit }) {
     return serviceInvoices.some(inv => inv.serviceTicketId === ticketId);
   };
 
+  const handleDelivery = (ticket) => {
+    setSelectedTicket(ticket);
+    setShowDeliveryForm(true);
+  };
+
+  const handleDeliverySubmit = (deliveryData) => {
+    updateServiceTicket(selectedTicket.id, {
+      status: 'delivered',
+      deliveryInfo: deliveryData,
+      deliveredAt: new Date()
+    });
+    setShowDeliveryForm(false);
+    setSelectedTicket(null);
+  };
   return (
     <div className="space-y-6">
       {/* Search and Filters */}
@@ -264,6 +279,15 @@ export function ServiceTicketList({ tickets, onEdit }) {
                           <CheckCircle size={16} />
                         </span>
                       )}
+                      {ticket.status === 'completed' && (
+                        <button
+                          onClick={() => handleDelivery(ticket)}
+                          className="text-purple-600 hover:text-purple-800 p-1 rounded hover:bg-purple-50"
+                          title="Mark as Delivered"
+                        >
+                          <Truck size={16} />
+                        </button>
+                      )}
                     </div>
                   </TableCell>
                 </TableRow>
@@ -272,6 +296,18 @@ export function ServiceTicketList({ tickets, onEdit }) {
           </Table>
         )}
       </div>
+
+      {selectedTicket && (
+        <DeliveryForm
+          isOpen={showDeliveryForm}
+          onClose={() => {
+            setShowDeliveryForm(false);
+            setSelectedTicket(null);
+          }}
+          ticket={selectedTicket}
+          onSubmit={handleDeliverySubmit}
+        />
+      )}
     </div>
   );
 }

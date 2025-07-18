@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useInventory } from '../../contexts/InventoryContext';
-import { Plus, Wrench, Users, FileText, Search, Filter, BarChart3 } from 'lucide-react';
+import { Plus, Wrench, Users, FileText, Search, Filter, BarChart3, CreditCard } from 'lucide-react';
 import { Button } from '../common/Button';
 import { Card } from '../common/Card';
 import { ServiceTicketList } from './ServiceTicketList';
@@ -8,9 +8,10 @@ import { ServiceTicketForm } from './ServiceTicketForm';
 import { TechnicianManagement } from './TechnicianManagement';
 import { ServiceInvoices } from './ServiceInvoices';
 import { ServiceDashboard } from './ServiceDashboard';
+import { ServicePaymentManagement } from './ServicePaymentManagement';
 
 export function ServiceCenter() {
-  const { serviceTickets, addServiceTicket, updateServiceTicket, customers } = useInventory();
+  const { serviceTickets, addServiceTicket, updateServiceTicket, customers, generateServiceInvoice } = useInventory();
   const [activeTab, setActiveTab] = useState('dashboard');
   const [showTicketForm, setShowTicketForm] = useState(false);
   const [editingTicket, setEditingTicket] = useState(null);
@@ -18,6 +19,7 @@ export function ServiceCenter() {
   const tabs = [
     { id: 'dashboard', label: 'Dashboard', icon: BarChart3 },
     { id: 'tickets', label: 'Service Tickets', icon: Wrench },
+    { id: 'payments', label: 'Service Payments', icon: CreditCard },
     { id: 'technicians', label: 'Technicians', icon: Users },
     { id: 'invoices', label: 'Service Invoices', icon: FileText }
   ];
@@ -33,10 +35,30 @@ export function ServiceCenter() {
   };
 
   const handleSubmit = (ticketData) => {
+    // Check if status is being changed to completed
+    const wasCompleted = editingTicket?.status === 'completed';
+    const isNowCompleted = ticketData.status === 'completed';
+    
     if (editingTicket) {
       updateServiceTicket(editingTicket.id, ticketData);
+      
+      // Generate invoice automatically when existing ticket is completed
+      if (!wasCompleted && isNowCompleted && (ticketData.laborCost > 0 || ticketData.partsCost > 0)) {
+        setTimeout(() => {
+          generateServiceInvoice(editingTicket.id);
+        }, 100);
+      }
     } else {
-      addServiceTicket(ticketData);
+      const newTicket = addServiceTicket(ticketData);
+      
+      // Generate invoice automatically when new ticket is completed
+      if (isNowCompleted && (ticketData.laborCost > 0 || ticketData.partsCost > 0)) {
+        setTimeout(() => {
+          generateServiceInvoice(newTicket.id);
+        }, 100);
+      }
+      
+      return newTicket; // Return the new ticket for receipt generation
     }
     handleCloseForm();
   };
@@ -52,6 +74,8 @@ export function ServiceCenter() {
             onEdit={handleEdit}
           />
         );
+      case 'payments':
+        return <ServicePaymentManagement />;
       case 'technicians':
         return <TechnicianManagement />;
       case 'invoices':

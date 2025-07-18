@@ -28,6 +28,7 @@ export function InventoryProvider({ children }) {
   const [paymentVouchers, setPaymentVouchers] = useLocalStorage('paymentVouchers', []);
   const [attendanceRecords, setAttendanceRecords] = useLocalStorage('attendanceRecords', []);
   const [attendanceSessions, setAttendanceSessions] = useLocalStorage('attendanceSessions', []);
+  const [servicePayments, setServicePayments] = useLocalStorage('servicePayments', []);
 
   // Initialize with sample data if empty
   useEffect(() => {
@@ -218,6 +219,7 @@ export function InventoryProvider({ children }) {
       totalPurchases: 0
     };
     setCustomers([...customers, newCustomer]);
+    return newCustomer;
   };
 
   const addSupplier = (supplierData) => {
@@ -335,6 +337,7 @@ export function InventoryProvider({ children }) {
       updatedAt: new Date()
     };
     setServiceTickets([...serviceTickets, newTicket]);
+    return newTicket; // Return the new ticket
   };
 
   const updateServiceTicket = (id, ticketData) => {
@@ -724,6 +727,21 @@ export function InventoryProvider({ children }) {
       return session;
     }));
   };
+  const addServicePayment = (paymentData) => {
+    const newPayment = {
+      ...paymentData,
+      id: generateId(),
+      createdAt: new Date()
+    };
+    setServicePayments([...servicePayments, newPayment]);
+    return newPayment;
+  };
+
+  const updateServicePayment = (id, paymentData) => {
+    setServicePayments(servicePayments.map(payment => 
+      payment.id === id ? { ...payment, ...paymentData } : payment
+    ));
+  };
 
   const value = {
     products,
@@ -744,6 +762,7 @@ export function InventoryProvider({ children }) {
     paymentVouchers,
     attendanceRecords,
     attendanceSessions,
+    servicePayments,
     addProduct,
     updateProduct,
     deleteProduct,
@@ -777,7 +796,9 @@ export function InventoryProvider({ children }) {
     deleteCoursePayment,
     generatePaymentVoucher,
     addAttendanceSession,
-    updateAttendanceRecord
+    updateAttendanceRecord,
+    addServicePayment,
+    updateServicePayment
   };
 
   return (

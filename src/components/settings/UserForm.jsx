@@ -92,6 +92,7 @@ export function UserForm({ isOpen, onClose, user, onSubmit }) {
             onChange={(e) => handleChange('role', e.target.value)}
           >
             <option value="operator">Operator</option>
+            <option value="instructor">Instructor</option>
             <option value="admin">Administrator</option>
           </Select>
         </div>

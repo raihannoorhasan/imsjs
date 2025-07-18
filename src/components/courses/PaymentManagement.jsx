@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
 import { useInventory } from '../../contexts/InventoryContext';
 import { useAuth } from '../../contexts/AuthContext';
-import { Plus, DollarSign } from 'lucide-react';
+import { Plus, DollarSign, Search, Filter } from 'lucide-react';
 import { Button } from '../common/Button';
+import { SearchInput } from '../common/SearchInput';
+import { Select } from '../common/Select';
+import { Card } from '../common/Card';
 import { PaymentList } from './PaymentList';
 import { PaymentForm } from './PaymentForm';
 import { PaymentVoucher } from './PaymentVoucher';
@@ -20,6 +23,9 @@ export function PaymentManagement() {
     courseBatches 
   } = useInventory();
   const { currentUser } = useAuth();
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [paymentTypeFilter, setPaymentTypeFilter] = useState('all');
   const [showPaymentForm, setShowPaymentForm] = useState(false);
   const [showVoucher, setShowVoucher] = useState(false);
   const [showApprovalModal, setShowApprovalModal] = useState(false);
@@ -85,23 +91,96 @@ export function PaymentManagement() {
     return { student, enrollment, course, batch };
   };
 
-  return (
-    <div>
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl font-semibold text-gray-900">Payment Management</h2>
-        <Button onClick={() => setShowPaymentForm(true)}>
-          <Plus size={20} className="mr-2" />
-          Record Payment
-        </Button>
-      </div>
+  const filteredPayments = coursePayments.filter(payment => {
+    const { student, course, batch } = getPaymentDetails(payment);
+    
+    const matchesSearch = 
+      student?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      student?.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      course?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      batch?.batchName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      payment.voucherNumber.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesStatus = statusFilter === 'all' || payment.status === statusFilter;
+    const matchesType = paymentTypeFilter === 'all' || payment.paymentType === paymentTypeFilter;
+    
+    return matchesSearch && matchesStatus && matchesType;
+  });
 
-      <PaymentList 
-        payments={coursePayments}
-        onViewVoucher={handleViewVoucher}
-        onEditPayment={handleEditPayment}
-        onApprovePayment={handleApprovePayment}
-        onDeclinePayment={handleDeclinePayment}
-      />
+  return (
+    <div className="space-y-6">
+      {/* Header with Search */}
+      <Card className="p-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
+          <div>
+            <h2 className="text-2xl font-bold text-gray-900">Payment Management</h2>
+            <p className="text-gray-600 mt-1">Track and manage course payments and vouchers</p>
+          </div>
+          <Button 
+            onClick={() => setShowPaymentForm(true)}
+            className="bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200"
+          >
+            <DollarSign size={20} className="mr-2" />
+            Record Payment
+          </Button>
+        </div>
+        
+        {/* Search and Filters */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="sm:col-span-1">
+            <SearchInput
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              onClear={() => setSearchTerm('')}
+              placeholder="Search payments..."
+              className="w-full"
+            />
+          </div>
+          <div>
+            <Select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="w-full"
+            >
+              <option value="all">All Status</option>
+              <option value="pending">Pending</option>
+              <option value="approved">Approved</option>
+              <option value="declined">Declined</option>
+            </Select>
+          </div>
+          <div>
+            <Select
+              value={paymentTypeFilter}
+              onChange={(e) => setPaymentTypeFilter(e.target.value)}
+              className="w-full"
+            >
+              <option value="all">All Types</option>
+              <option value="enrollment">Course Fee</option>
+              <option value="admission">Admission Fee</option>
+              <option value="registration">Registration Fee</option>
+              <option value="exam">Exam Fee</option>
+            </Select>
+          </div>
+        </div>
+      </Card>
+
+      {/* Results Summary */}
+      {(searchTerm || statusFilter !== 'all' || paymentTypeFilter !== 'all') && (
+        <div className="text-sm text-gray-600 px-1">
+          Found {filteredPayments.length} payment{filteredPayments.length !== 1 ? 's' : ''} 
+          {searchTerm && ` matching "${searchTerm}"`}
+        </div>
+      )}
+
+      <div className="bg-white rounded-lg shadow-sm border">
+        <PaymentList 
+          payments={filteredPayments}
+          onViewVoucher={handleViewVoucher}
+          onEditPayment={handleEditPayment}
+          onApprovePayment={handleApprovePayment}
+          onDeclinePayment={handleDeclinePayment}
+        />
+      </div>
 
       <PaymentForm
         isOpen={showPaymentForm}

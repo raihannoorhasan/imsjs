@@ -104,8 +104,45 @@ export function LoginForm() {
             </Button>
           </form>
 
-          {/* Demo Credentials 
+          {/* Demo Credentials */}
           <div className="mt-6 p-4 bg-gray-50 rounded-lg">
+            <h3 className="text-sm font-medium text-gray-700 mb-2">Demo Credentials:</h3>
+            <div className="space-y-2">
+              <div className="flex justify-between items-center text-sm">
+                <span className="font-medium text-gray-600">Admin:</span>
+                <div className="text-gray-500">
+                  <span className="mr-2">admin</span>
+                  <span>/ admin1234</span>
+                </div>
+              </div>
+              <div className="flex justify-between items-center text-sm">
+                <span className="font-medium text-gray-600">Operator:</span>
+                <div className="text-gray-500">
+                  <span className="mr-2">operator</span>
+                  <span>/ operator1234</span>
+                </div>
+              </div>
+              <div className="flex justify-between items-center text-sm">
+                <span className="font-medium text-gray-600">Instructor:</span>
+                <div className="text-gray-500">
+                  <span className="mr-2">instructor</span>
+                  <span>/ instructor1234</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Role Descriptions */}
+          <div className="mt-4 p-4 bg-blue-50 rounded-lg">
+            <h3 className="text-sm font-medium text-blue-700 mb-2">Role Access:</h3>
+            <div className="space-y-1 text-xs text-blue-600">
+              <div>• <strong>Admin:</strong> Full system access</div>
+              <div>• <strong>Operator:</strong> Limited management access</div>
+              <div>• <strong>Instructor:</strong> Attendance management only</div>
+            </div>
+          </div>
+
+          {/* <div className="mt-6 p-4 bg-gray-50 rounded-lg">
             <h3 className="text-sm font-medium text-gray-700 mb-2">Demo Credentials:</h3>
             <div className="space-y-2">
               {demoCredentials.map((cred, index) => (
@@ -118,16 +155,18 @@ export function LoginForm() {
                 </div>
               ))}
             </div>
-          </div>
+          </div> */}
         </div>
-*/}
+
         {/* Footer */}
         <div className="text-center mt-6">
           <p className="text-gray-500 text-sm">
-            © 2024 Hi Tech Computer. All rights reserved.
+            © 2024 Hi Tech Computer. All rights reserved R.
           </p>
         </div>
       </div>
     </div>
   );
 }
+
+        

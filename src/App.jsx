@@ -32,6 +32,16 @@ function AppContent() {
     return <LoginForm />;
   }
 
+  // For instructors, redirect directly to courses
+  const { currentUser } = useAuth();
+  const isInstructor = currentUser?.role === 'instructor';
+  
+  React.useEffect(() => {
+    if (isInstructor && activeTab !== 'courses') {
+      setActiveTab('courses');
+    }
+  }, [isInstructor, activeTab]);
+
   const renderContent = () => {
     switch (activeTab) {
       case 'dashboard':

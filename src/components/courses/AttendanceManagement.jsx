@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useInventory } from '../../contexts/InventoryContext';
-import { Plus, Calendar, Users, Clock, CheckCircle } from 'lucide-react';
+import { Plus, Calendar, Users, Clock, CheckCircle, Search, Filter } from 'lucide-react';
 import { Button } from '../common/Button';
 import { Card } from '../common/Card';
 import { SearchInput } from '../common/SearchInput';
@@ -64,90 +64,112 @@ export function AttendanceManagement() {
   ).length;
 
   return (
-    <div>
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl font-semibold text-gray-900">Attendance Management</h2>
-        <Button onClick={() => setShowSessionForm(true)}>
-          <Plus size={20} className="mr-2" />
-          Create Session
-        </Button>
-      </div>
+    <div className="space-y-6">
+      {/* Header */}
+      <Card className="p-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+          <div>
+            <h2 className="text-2xl font-bold text-gray-900">Attendance Management</h2>
+            <p className="text-gray-600 mt-1">Track and manage student attendance across all sessions</p>
+          </div>
+          <Button 
+            onClick={() => setShowSessionForm(true)}
+            className="bg-gradient-to-r from-orange-600 to-orange-700 hover:from-orange-700 hover:to-orange-800 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200"
+          >
+            <Plus size={20} className="mr-2" />
+            Create Session
+          </Button>
+        </div>
+        
+        {/* Search and Filters */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div>
+            <SearchInput
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              onClear={() => setSearchTerm('')}
+              placeholder="Search by topic, course, or batch..."
+              className="w-full"
+            />
+          </div>
+          <div>
+            <Select
+              value={selectedBatch}
+              onChange={(e) => setSelectedBatch(e.target.value)}
+              className="w-full"
+            >
+              <option value="all">All Batches</option>
+              {courseBatches.map(batch => {
+                const course = courses.find(c => c.id === batch.courseId);
+                return (
+                  <option key={batch.id} value={batch.id}>
+                    {course?.name} - {batch.batchName}
+                  </option>
+                );
+              })}
+            </Select>
+          </div>
+          <div>
+            <Select
+              value={dateFilter}
+              onChange={(e) => setDateFilter(e.target.value)}
+              className="w-full"
+            >
+              <option value="all">All Dates</option>
+              <option value="today">Today</option>
+              <option value="yesterday">Yesterday</option>
+              <option value="week">This Week</option>
+            </Select>
+          </div>
+        </div>
+      </Card>
 
       {/* Statistics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-        <Card>
+        <Card className="p-6 bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Total Sessions</p>
-              <p className="text-2xl font-bold text-gray-900">{totalSessions}</p>
+              <p className="text-sm font-medium text-blue-700">Total Sessions</p>
+              <p className="text-3xl font-bold text-blue-900">{totalSessions}</p>
             </div>
-            <div className="bg-blue-100 p-3 rounded-lg">
-              <Calendar className="w-6 h-6 text-blue-600" />
+            <div className="bg-blue-200 p-3 rounded-full">
+              <Calendar className="w-8 h-8 text-blue-700" />
             </div>
           </div>
         </Card>
 
-        <Card>
+        <Card className="p-6 bg-gradient-to-br from-green-50 to-green-100 border-green-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Today's Sessions</p>
-              <p className="text-2xl font-bold text-gray-900">{todaySessions}</p>
+              <p className="text-sm font-medium text-green-700">Today's Sessions</p>
+              <p className="text-3xl font-bold text-green-900">{todaySessions}</p>
             </div>
-            <div className="bg-green-100 p-3 rounded-lg">
-              <Clock className="w-6 h-6 text-green-600" />
+            <div className="bg-green-200 p-3 rounded-full">
+              <Clock className="w-8 h-8 text-green-700" />
             </div>
           </div>
         </Card>
 
-        <Card>
+        <Card className="p-6 bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Completed Sessions</p>
-              <p className="text-2xl font-bold text-gray-900">{completedSessions}</p>
+              <p className="text-sm font-medium text-purple-700">Completed Sessions</p>
+              <p className="text-3xl font-bold text-purple-900">{completedSessions}</p>
             </div>
-            <div className="bg-purple-100 p-3 rounded-lg">
-              <CheckCircle className="w-6 h-6 text-purple-600" />
+            <div className="bg-purple-200 p-3 rounded-full">
+              <CheckCircle className="w-8 h-8 text-purple-700" />
             </div>
           </div>
         </Card>
       </div>
 
-      {/* Filters */}
-      <Card className="mb-6" padding="p-4">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <SearchInput
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            onClear={() => setSearchTerm('')}
-            placeholder="Search by topic, course, or batch..."
-          />
-          
-          <Select
-            value={selectedBatch}
-            onChange={(e) => setSelectedBatch(e.target.value)}
-          >
-            <option value="all">All Batches</option>
-            {courseBatches.map(batch => {
-              const course = courses.find(c => c.id === batch.courseId);
-              return (
-                <option key={batch.id} value={batch.id}>
-                  {course?.name} - {batch.batchName}
-                </option>
-              );
-            })}
-          </Select>
-          
-          <Select
-            value={dateFilter}
-            onChange={(e) => setDateFilter(e.target.value)}
-          >
-            <option value="all">All Dates</option>
-            <option value="today">Today</option>
-            <option value="yesterday">Yesterday</option>
-            <option value="week">This Week</option>
-          </Select>
+      {/* Results Summary */}
+      {(searchTerm || selectedBatch !== 'all' || dateFilter !== 'all') && (
+        <div className="text-sm text-gray-600 px-1">
+          Found {filteredSessions.length} session{filteredSessions.length !== 1 ? 's' : ''} 
+          {searchTerm && ` matching "${searchTerm}"`}
         </div>
-      </Card>
+      )}
 
       <AttendanceList sessions={filteredSessions} />
 

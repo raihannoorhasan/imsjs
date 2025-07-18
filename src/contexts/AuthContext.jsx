@@ -27,6 +27,17 @@ const defaultUsers = [
     status: 'active',
     createdAt: new Date(),
     lastLogin: null
+  },
+  {
+    id: '3',
+    username: 'instructor',
+    password: 'instructor1234',
+    email: 'instructor@hitech.com',
+    name: 'Course Instructor',
+    role: 'instructor',
+    status: 'active',
+    createdAt: new Date(),
+    lastLogin: null
   }
 ];
 
@@ -55,6 +66,19 @@ const rolePermissions = {
     courses: { read: true, write: true },
     invoices: { read: true, write: false },
     reports: { read: true, write: false },
+    settings: { read: false, write: false },
+    users: { read: false, write: false }
+  },
+  instructor: {
+    dashboard: { read: false, write: false },
+    inventory: { read: false, write: false },
+    sales: { read: false, write: false },
+    service: { read: false, write: false },
+    customers: { read: false, write: false },
+    suppliers: { read: false, write: false },
+    courses: { read: true, write: true },
+    invoices: { read: false, write: false },
+    reports: { read: false, write: false },
     settings: { read: false, write: false },
     users: { read: false, write: false }
   }

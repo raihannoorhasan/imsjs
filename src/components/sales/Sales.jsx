@@ -323,13 +323,13 @@ export function Sales() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 px-6 py-4">
+      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Point of Sale</h1>
-            <p className="text-gray-600">Fast and efficient checkout system</p>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Point of Sale</h1>
+            <p className="text-gray-600 dark:text-gray-400">Fast and efficient checkout system</p>
           </div>
           <div className="flex items-center space-x-4">
             <div className="flex space-x-1 bg-gray-100 p-1 rounded-lg">
@@ -341,8 +341,8 @@ export function Sales() {
                     onClick={() => setActiveTab(tab.id)}
                     className={`flex items-center space-x-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
                       activeTab === tab.id
-                        ? 'bg-white text-blue-600 shadow-sm'
-                        : 'text-gray-600 hover:text-gray-900'
+                        ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm'
+                        : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
                     }`}
                   >
                     <Icon size={16} />
@@ -445,21 +445,21 @@ export function Sales() {
         </div>
 
         {/* Right Panel - Cart & Checkout */}
-        <div className="w-96 bg-white border-l border-gray-200 flex flex-col">
+        <div className="w-96 bg-white dark:bg-gray-800 border-l border-gray-200 dark:border-gray-700 flex flex-col">
           {/* Cart Header */}
-          <div className="p-6 border-b border-gray-200">
+          <div className="p-6 border-b border-gray-200 dark:border-gray-700">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
-                <ShoppingCart className="w-5 h-5 text-gray-600" />
-                <h2 className="text-lg font-semibold text-gray-900">Cart</h2>
-                <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-1 rounded-full">
+                <ShoppingCart className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Cart</h2>
+                <span className="bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400 text-xs font-medium px-2 py-1 rounded-full">
                   {cart.length}
                 </span>
               </div>
               {cart.length > 0 && (
                 <button
                   onClick={clearCart}
-                  className="text-red-600 hover:text-red-800 text-sm font-medium"
+                  className="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 text-sm font-medium"
                 >
                   Clear All
                 </button>
@@ -471,8 +471,8 @@ export function Sales() {
           <div className="flex-1 overflow-y-auto p-6">
             {cart.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-full text-gray-500">
-                <ShoppingCart className="w-16 h-16 mb-4 text-gray-300" />
-                <p className="text-lg font-medium">Cart is empty</p>
+                <ShoppingCart className="w-16 h-16 mb-4 text-gray-300 dark:text-gray-600" />
+                <p className="text-lg font-medium dark:text-gray-400">Cart is empty</p>
                 <p className="text-sm">Add products to get started</p>
               </div>
             ) : (
@@ -482,16 +482,16 @@ export function Sales() {
                   if (!product) return null;
                   
                   return (
-                    <div key={item.productId} className="bg-gray-50 rounded-lg p-4">
+                    <div key={item.productId} className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
                       <div className="flex items-start justify-between mb-2">
                         <div className="flex-1">
-                          <h3 className="font-medium text-gray-900 text-sm">{product.name}</h3>
-                          <p className="text-xs text-gray-500">SKU: {product.sku}</p>
+                          <h3 className="font-medium text-gray-900 dark:text-white text-sm">{product.name}</h3>
+                          <p className="text-xs text-gray-500 dark:text-gray-400">SKU: {product.sku}</p>
                           <p className="text-sm text-green-600 font-medium">${item.unitPrice.toFixed(2)} each</p>
                         </div>
                         <button
                           onClick={() => removeFromCart(item.productId)}
-                          className="text-red-500 hover:text-red-700 p-1"
+                          className="text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 p-1"
                         >
                           <X size={16} />
                         </button>
@@ -501,21 +501,21 @@ export function Sales() {
                         <div className="flex items-center space-x-2">
                           <button
                             onClick={() => updateQuantity(item.productId, item.quantity - 1)}
-                            className="w-8 h-8 rounded-full bg-white border border-gray-300 flex items-center justify-center hover:bg-gray-100"
+                            className="w-8 h-8 rounded-full bg-white dark:bg-gray-600 border border-gray-300 dark:border-gray-500 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-500"
                           >
                             -
                           </button>
-                          <span className="font-medium text-gray-900 min-w-[30px] text-center">
+                          <span className="font-medium text-gray-900 dark:text-white min-w-[30px] text-center">
                             {item.quantity}
                           </span>
                           <button
                             onClick={() => updateQuantity(item.productId, item.quantity + 1)}
-                            className="w-8 h-8 rounded-full bg-white border border-gray-300 flex items-center justify-center hover:bg-gray-100"
+                            className="w-8 h-8 rounded-full bg-white dark:bg-gray-600 border border-gray-300 dark:border-gray-500 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-500"
                           >
                             +
                           </button>
                         </div>
-                        <span className="font-bold text-gray-900">${item.total.toFixed(2)}</span>
+                        <span className="font-bold text-gray-900 dark:text-white">${item.total.toFixed(2)}</span>
                       </div>
                     </div>
                   );
@@ -526,15 +526,15 @@ export function Sales() {
 
           {/* Checkout Section */}
           {cart.length > 0 && (
-            <div className="border-t border-gray-200 p-6 space-y-4">
+            <div className="border-t border-gray-200 dark:border-gray-700 p-6 space-y-4">
               {/* Customer Selection */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Customer</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Customer</label>
                 <div className="flex space-x-2">
                   <select
                     value={selectedCustomer}
                     onChange={(e) => setSelectedCustomer(e.target.value)}
-                    className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   >
                     <option value="">Select Customer</option>
                     {customers.map(customer => (
@@ -553,7 +553,7 @@ export function Sales() {
 
               {/* Payment Method */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Payment Method</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Payment Method</label>
                 <div className="grid grid-cols-2 gap-2">
                   {[
                     { id: 'cash', label: 'Cash', icon: DollarSign },
@@ -566,10 +566,10 @@ export function Sales() {
                       <button
                         key={method.id}
                         onClick={() => setPaymentMethod(method.id)}
-                        className={`flex flex-col items-center justify-center py-3 px-2 rounded-lg text-xs font-medium transition-colors ${
+                        className={`flex flex-col items-center justify-center py-3 px-2 rounded-lg text-xs font-medium transition-all duration-200 ${
                           paymentMethod === method.id 
-                            ? 'bg-blue-100 text-blue-700 border-2 border-blue-300' 
-                            : 'bg-gray-100 text-gray-700 border-2 border-transparent hover:bg-gray-200'
+                            ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 border-2 border-blue-300 dark:border-blue-600' 
+                            : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-2 border-transparent hover:bg-gray-200 dark:hover:bg-gray-600'
                         }`}
                       >
                         <Icon size={16} className="mb-1" />
@@ -642,31 +642,31 @@ export function Sales() {
               )}
 
               {/* Totals */}
-              <div className="bg-gray-50 rounded-lg p-4 space-y-2">
+              <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 space-y-2">
                 <div className="flex justify-between text-sm">
-                  <span>Subtotal:</span>
+                  <span className="text-gray-600 dark:text-gray-400">Subtotal:</span>
                   <span>${subtotal.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span>Tax (10%):</span>
+                  <span className="text-gray-600 dark:text-gray-400">Tax (10%):</span>
                   <span>${tax.toFixed(2)}</span>
                 </div>
                 {discountAmount > 0 && (
-                  <div className="flex justify-between text-sm text-green-600">
+                  <div className="flex justify-between text-sm text-green-600 dark:text-green-400">
                     <span>Discount:</span>
                     <span>-${discountAmount.toFixed(2)}</span>
                   </div>
                 )}
-                <div className="border-t pt-2">
+                <div className="border-t border-gray-200 dark:border-gray-600 pt-2">
                   <div className="flex justify-between text-lg font-bold">
-                    <span>Total:</span>
+                    <span className="text-gray-900 dark:text-white">Total:</span>
                     <span>${total.toFixed(2)}</span>
                   </div>
                 </div>
                 {paymentMethod === 'cash' && amountReceived > 0 && (
                   <div className="flex justify-between text-sm">
-                    <span>Change:</span>
-                    <span className={change >= 0 ? 'text-green-600' : 'text-red-600'}>
+                    <span className="text-gray-600 dark:text-gray-400">Change:</span>
+                    <span className={change >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}>
                       ${Math.abs(change).toFixed(2)}
                     </span>
                   </div>
@@ -687,7 +687,7 @@ export function Sales() {
               </Button>
               
               {!selectedCustomer && (
-                <p className="text-xs text-gray-500 text-center mt-2">
+                <p className="text-xs text-gray-500 dark:text-gray-400 text-center mt-2">
                   {paymentMethod === 'service_payment' 
                     ? 'Customer selection required for service payments'
                     : 'No customer selected - sale will be processed as guest purchase'
@@ -696,8 +696,8 @@ export function Sales() {
               )}
               
               {paymentMethod === 'service_payment' && (
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mt-2">
-                  <p className="text-xs text-blue-700">
+                <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3 mt-2">
+                  <p className="text-xs text-blue-700 dark:text-blue-400">
                     💡 This sale will be marked as pending and linked to the service ticket. 
                     Payment will be completed when the customer pays through the service system.
                   </p>

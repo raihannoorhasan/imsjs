@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { ThemeProvider } from './contexts/ThemeContext';
 import { InventoryProvider } from './contexts/InventoryContext';
 import { LoginForm } from './components/auth/LoginForm';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
@@ -129,11 +130,13 @@ function AppContent() {
 
 function App() {
   return (
-    <AuthProvider>
-      <InventoryProvider>
-        <AppContent />
-      </InventoryProvider>
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <InventoryProvider>
+          <AppContent />
+        </InventoryProvider>
+      </AuthProvider>
+    </ThemeProvider>
   );
 }
 

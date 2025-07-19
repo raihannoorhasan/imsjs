@@ -1,6 +1,6 @@
 import React from 'react';
 import { useInventory } from '../../contexts/InventoryContext';
-import { Wrench, Clock, CheckCircle, DollarSign } from 'lucide-react';
+import { Wrench, Clock, CheckCircle, DollarSign, Target } from 'lucide-react';
 import { Card } from '../common/Card';
 import { formatCurrency, formatDate } from '../../utils/helpers';
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import { useInventory } from '../../contexts/InventoryContext';
-import { DollarSign, TrendingUp, ShoppingCart, Users } from 'lucide-react';
+import { DollarSign, TrendingUp, ShoppingCart, Users, Package } from 'lucide-react';
 import { Card } from '../common/Card';
 import { formatCurrency, formatDate } from '../../utils/helpers';
 

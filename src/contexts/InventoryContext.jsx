@@ -880,6 +880,9 @@ export function InventoryProvider({ children }) {
     updateAttendanceRecord,
     addServicePayment,
     updateServicePayment,
+    deleteServicePayment: (id) => {
+      setServicePayments(servicePayments.filter(payment => payment.id !== id));
+    },
     deleteServiceTicket
   };
 

@@ -21,7 +21,7 @@ import {
 import { generateId, formatCurrency } from '../../utils/helpers';
 
 export function ServicePaymentForm({ isOpen, onClose, onSubmit, preSelectedTicket }) {
-  const { customers, serviceTickets, sales, products, updateStock, technicians } = useInventory();
+  const { customers, serviceTickets, sales, products, updateStock, technicians, servicePayments } = useInventory();
   const [formData, setFormData] = useState({
     customerId: '',
     serviceTicketId: '',
@@ -38,6 +38,7 @@ export function ServicePaymentForm({ isOpen, onClose, onSubmit, preSelectedTicke
   });
   const [selectedSale, setSelectedSale] = useState(null);
   const [pendingSalesTotal, setPendingSalesTotal] = useState(0);
+  const [advancePaymentInfo, setAdvancePaymentInfo] = useState(null);
 
   // Pre-select ticket if provided
   React.useEffect(() => {
@@ -59,7 +60,7 @@ export function ServicePaymentForm({ isOpen, onClose, onSubmit, preSelectedTicke
       // Calculate advance payment info
       calculateAdvancePaymentInfo(preSelectedTicket);
     }
-  }, [preSelectedTicket, isOpen, sales]);
+  }, [preSelectedTicket, isOpen, sales, servicePayments]);
 
   const calculateAdvancePaymentInfo = (ticket) => {
     // Get all approved advance payments for this ticket
@@ -82,7 +83,6 @@ export function ServicePaymentForm({ isOpen, onClose, onSubmit, preSelectedTicke
       isFullyPaid: remainingBalance <= 0
     });
   };
-  const [advancePaymentInfo, setAdvancePaymentInfo] = useState(null);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -192,6 +192,9 @@ export function ServicePaymentForm({ isOpen, onClose, onSubmit, preSelectedTicke
         // For advance payment, suggest remaining balance if available
         if (advancePaymentInfo && advancePaymentInfo.remainingBalance > 0) {
           setFormData(prev => ({ ...prev, amount: advancePaymentInfo.remainingBalance }));
+        } else {
+          // Reset amount for advance payment
+          setFormData(prev => ({ ...prev, amount: 0 }));
         }
       }
     }
@@ -385,6 +388,100 @@ export function ServicePaymentForm({ isOpen, onClose, onSubmit, preSelectedTicke
                     </div>
                     <p className="text-green-700 text-sm mt-1">
                       Payment type set to "Parts Payment" and amount auto-filled to {formatCurrency(pendingSalesTotal)}
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Advance Payment Information */}
+        {formData.serviceTicketId && advancePaymentInfo && (
+          <div className="bg-gradient-to-r from-emerald-50 to-green-50 border-2 border-emerald-200 rounded-xl p-6">
+            <div className="flex items-start space-x-4">
+              <div className="flex-shrink-0">
+                <div className="bg-emerald-100 p-2 rounded-lg">
+                  <DollarSign className="w-6 h-6 text-emerald-600" />
+                </div>
+              </div>
+              <div className="flex-1">
+                <h3 className="text-lg font-semibold text-emerald-900 mb-3">Advance Payment Status</h3>
+                
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                  <div className="bg-white border border-emerald-200 rounded-lg p-4 text-center">
+                    <p className="text-sm text-emerald-700">Total Service Cost</p>
+                    <p className="text-2xl font-bold text-emerald-900">{formatCurrency(advancePaymentInfo.totalServiceCost)}</p>
+                  </div>
+                  <div className="bg-white border border-emerald-200 rounded-lg p-4 text-center">
+                    <p className="text-sm text-emerald-700">Advance Paid</p>
+                    <p className="text-2xl font-bold text-blue-600">{formatCurrency(advancePaymentInfo.totalAdvance)}</p>
+                  </div>
+                  <div className="bg-white border border-emerald-200 rounded-lg p-4 text-center">
+                    <p className="text-sm text-emerald-700">
+                      {advancePaymentInfo.remainingBalance > 0 ? 'Remaining Balance' : 
+                       advancePaymentInfo.remainingBalance < 0 ? 'Refund Due' : 'Fully Paid'}
+                    </p>
+                    <p className={`text-2xl font-bold ${
+                      advancePaymentInfo.remainingBalance > 0 ? 'text-red-600' :
+                      advancePaymentInfo.remainingBalance < 0 ? 'text-orange-600' :
+                      'text-green-600'
+                    }`}>
+                      {formatCurrency(Math.abs(advancePaymentInfo.remainingBalance))}
+                    </p>
+                  </div>
+                </div>
+                
+                {/* Payment Status Messages */}
+                {advancePaymentInfo.isFullyPaid && (
+                  <div className="bg-green-100 border border-green-300 rounded-lg p-4 mb-4">
+                    <div className="flex items-center space-x-2">
+                      <CheckCircle className="w-5 h-5 text-green-600" />
+                      <p className="text-green-800 font-medium">Service Fully Paid</p>
+                    </div>
+                    <p className="text-green-700 text-sm mt-1">
+                      {advancePaymentInfo.needsRefund 
+                        ? `Customer has overpaid by ${formatCurrency(Math.abs(advancePaymentInfo.remainingBalance))}. Refund may be required.`
+                        : 'All service charges have been paid in advance.'
+                      }
+                    </p>
+                  </div>
+                )}
+                
+                {advancePaymentInfo.hasAdvance && !advancePaymentInfo.isFullyPaid && (
+                  <div className="bg-blue-100 border border-blue-300 rounded-lg p-4 mb-4">
+                    <div className="flex items-center space-x-2">
+                      <Info className="w-5 h-5 text-blue-600" />
+                      <p className="text-blue-800 font-medium">Partial Advance Payment</p>
+                    </div>
+                    <p className="text-blue-700 text-sm mt-1">
+                      Customer has paid {formatCurrency(advancePaymentInfo.totalAdvance)} in advance. 
+                      Remaining balance: {formatCurrency(advancePaymentInfo.remainingBalance)}
+                    </p>
+                  </div>
+                )}
+                
+                {!advancePaymentInfo.hasAdvance && advancePaymentInfo.totalServiceCost > 0 && (
+                  <div className="bg-yellow-100 border border-yellow-300 rounded-lg p-4 mb-4">
+                    <div className="flex items-center space-x-2">
+                      <AlertCircle className="w-5 h-5 text-yellow-600" />
+                      <p className="text-yellow-800 font-medium">No Advance Payment</p>
+                    </div>
+                    <p className="text-yellow-700 text-sm mt-1">
+                      Full service cost of {formatCurrency(advancePaymentInfo.totalServiceCost)} is pending payment.
+                    </p>
+                  </div>
+                )}
+                
+                {/* Auto-suggest amount for advance payment */}
+                {formData.paymentType === 'advance_payment' && advancePaymentInfo.remainingBalance > 0 && (
+                  <div className="bg-emerald-100 border border-emerald-300 rounded-lg p-4">
+                    <div className="flex items-center space-x-2">
+                      <CheckCircle className="w-5 h-5 text-emerald-600" />
+                      <p className="text-emerald-800 font-medium">Suggested Amount</p>
+                    </div>
+                    <p className="text-emerald-700 text-sm mt-1">
+                      Amount auto-filled to remaining balance: {formatCurrency(advancePaymentInfo.remainingBalance)}
                     </p>
                   </div>
                 )}

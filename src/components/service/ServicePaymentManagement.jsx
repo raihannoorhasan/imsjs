@@ -11,6 +11,7 @@ import { StatusBadge } from '../common/StatusBadge';
 import { ServicePaymentForm } from './ServicePaymentForm';
 import { ServicePaymentView } from './ServicePaymentView';
 import { ServicePaymentApproval } from './ServicePaymentApproval';
+import { ServicePaymentEditForm } from './ServicePaymentEditForm';
 import { formatCurrency, formatDate } from '../../utils/helpers';
 
 export function ServicePaymentManagement() {
@@ -18,6 +19,7 @@ export function ServicePaymentManagement() {
     servicePayments, 
     addServicePayment, 
     updateServicePayment,
+    deleteServicePayment,
     customers, 
     serviceTickets,
     sales,
@@ -29,6 +31,7 @@ export function ServicePaymentManagement() {
   const [showPaymentForm, setShowPaymentForm] = useState(false);
   const [showPaymentView, setShowPaymentView] = useState(false);
   const [showApprovalModal, setShowApprovalModal] = useState(false);
+  const [showEditForm, setShowEditForm] = useState(false);
   const [selectedPayment, setSelectedPayment] = useState(null);
   const [approvalAction, setApprovalAction] = useState('');
 
@@ -42,6 +45,23 @@ export function ServicePaymentManagement() {
   const handleViewPayment = (payment) => {
     setSelectedPayment(payment);
     setShowPaymentView(true);
+  };
+
+  const handleEditPayment = (payment) => {
+    setSelectedPayment(payment);
+    setShowEditForm(true);
+  };
+
+  const handleUpdatePayment = (paymentData) => {
+    updateServicePayment(selectedPayment.id, paymentData);
+    setShowEditForm(false);
+    setSelectedPayment(null);
+  };
+
+  const handleDeletePayment = (paymentId) => {
+    if (window.confirm('Are you sure you want to delete this payment record?')) {
+      deleteServicePayment(paymentId);
+    }
   };
 
   const handleApprovePayment = (payment) => {
@@ -293,6 +313,26 @@ export function ServicePaymentManagement() {
                         {isAdmin && payment.status === 'pending' && (
                           <>
                             <button
+                              onClick={() => handleEditPayment(payment)}
+                              className="text-gray-600 hover:text-gray-800 p-1 rounded hover:bg-gray-50"
+                              title="Edit Payment"
+                            >
+                              <Edit2 size={16} />
+                            </button>
+                            <button
+                              onClick={() => handleDeletePayment(payment.id)}
+                              className="text-red-600 hover:text-red-800 p-1 rounded hover:bg-red-50"
+                              title="Delete Payment"
+                            >
+                              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
+                              </svg>
+                            </button>
+                          </>
+                        )}
+                        {isAdmin && payment.status === 'pending' && (
+                          <>
+                            <button
                               onClick={() => handleApprovePayment(payment)}
                               className="text-green-600 hover:text-green-800 p-1 rounded hover:bg-green-50"
                               title="Approve Payment"
@@ -332,6 +372,18 @@ export function ServicePaymentManagement() {
             setSelectedPayment(null);
           }}
           payment={selectedPayment}
+        />
+      )}
+
+      {isAdmin && selectedPayment && (
+        <ServicePaymentEditForm
+          isOpen={showEditForm}
+          onClose={() => {
+            setShowEditForm(false);
+            setSelectedPayment(null);
+          }}
+          payment={selectedPayment}
+          onSubmit={handleUpdatePayment}
         />
       )}
 

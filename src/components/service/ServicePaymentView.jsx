@@ -292,6 +292,46 @@ export function ServicePaymentView({ isOpen, onClose, payment }) {
           </div>
         )}
 
+        {payment.paymentType === 'advance_payment' && (
+          <div className="bg-emerald-50 border border-emerald-200 p-4 rounded-lg">
+            <h3 className="font-medium text-gray-900 mb-3 flex items-center">
+              <DollarSign className="w-5 h-5 mr-2 text-emerald-600" />
+              Advance Payment Information
+            </h3>
+            <div className="space-y-2 text-sm">
+              <p><span className="font-medium">Advance Amount:</span> {formatCurrency(payment.amount)}</p>
+              <p><span className="font-medium">Payment Status:</span> 
+                <span className={`ml-2 px-2 py-1 rounded-full text-xs font-medium ${
+                  payment.status === 'approved' ? 'bg-green-100 text-green-800' :
+                  payment.status === 'declined' ? 'bg-red-100 text-red-800' :
+                  'bg-yellow-100 text-yellow-800'
+                }`}>
+                  {payment.status.charAt(0).toUpperCase() + payment.status.slice(1)}
+                </span>
+              </p>
+              {ticket && (
+                <>
+                  <p><span className="font-medium">Total Service Cost:</span> {formatCurrency(ticket.laborCost + ticket.partsCost)}</p>
+                  {payment.status === 'approved' && (
+                    <p><span className="font-medium">Remaining Balance:</span> 
+                      <span className="ml-2 font-bold text-red-600">
+                        {formatCurrency(Math.max(0, (ticket.laborCost + ticket.partsCost) - payment.amount))}
+                      </span>
+                    </p>
+                  )}
+                </>
+              )}
+            </div>
+            {payment.status === 'approved' && (
+              <div className="mt-3 p-3 bg-emerald-100 border border-emerald-300 rounded">
+                <p className="text-emerald-800 text-sm font-medium">
+                  ✅ This advance payment has been applied to the service ticket
+                </p>
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Payment Details */}
         <div className="bg-green-50 border border-green-200 p-4 rounded-lg">
           <h3 className="font-medium text-gray-900 mb-3 flex items-center">

@@ -1,5 +1,6 @@
 import React from 'react';
 import { useInventory } from '../../contexts/InventoryContext';
+import { useAuth } from '../../contexts/AuthContext';
 import { Edit2, Smartphone, Laptop, Monitor, Tablet, Search, Filter, Eye, Plus, Wrench, FileText, CheckCircle, Truck, DollarSign, Trash2 } from 'lucide-react';
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '../common/Table';
 import { StatusBadge } from '../common/StatusBadge';
@@ -12,6 +13,7 @@ import { formatCurrency, formatDate, getPriorityColor } from '../../utils/helper
 
 export function ServiceTicketList({ tickets, onEdit, onMakePayment, onDelete }) {
   const { customers, technicians, generateServiceInvoice, serviceInvoices, updateServiceTicket } = useInventory();
+  const { canModify } = useAuth();
   const [searchTerm, setSearchTerm] = React.useState('');
   const [statusFilter, setStatusFilter] = React.useState('all');
   const [priorityFilter, setPriorityFilter] = React.useState('all');

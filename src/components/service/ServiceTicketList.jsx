@@ -1,6 +1,6 @@
 import React from 'react';
 import { useInventory } from '../../contexts/InventoryContext';
-import { Edit2, Smartphone, Laptop, Monitor, Tablet, Search, Filter, Eye, Plus, Wrench, FileText, CheckCircle, Truck } from 'lucide-react';
+import { Edit2, Smartphone, Laptop, Monitor, Tablet, Search, Filter, Eye, Plus, Wrench, FileText, CheckCircle, Truck, DollarSign, Trash2 } from 'lucide-react';
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '../common/Table';
 import { StatusBadge } from '../common/StatusBadge';
 import { Card } from '../common/Card';
@@ -10,7 +10,7 @@ import { Select } from '../common/Select';
 import { DeliveryForm } from './DeliveryForm';
 import { formatCurrency, formatDate, getPriorityColor } from '../../utils/helpers';
 
-export function ServiceTicketList({ tickets, onEdit }) {
+export function ServiceTicketList({ tickets, onEdit, onMakePayment, onDelete }) {
   const { customers, technicians, generateServiceInvoice, serviceInvoices, updateServiceTicket } = useInventory();
   const [searchTerm, setSearchTerm] = React.useState('');
   const [statusFilter, setStatusFilter] = React.useState('all');
@@ -286,6 +286,24 @@ export function ServiceTicketList({ tickets, onEdit }) {
                           title="Mark as Delivered"
                         >
                           <Truck size={16} />
+                        </button>
+                      )}
+                      {onMakePayment && (
+                      <button
+                          onClick={() => onMakePayment(ticket)}
+                        className="text-green-600 hover:text-green-800 p-1 rounded hover:bg-green-50"
+                        title="Record Payment"
+                      >
+                        <DollarSign size={16} />
+                      </button>
+                      )}
+                      {onDelete && canModify('service') && (
+                        <button
+                          onClick={() => onDelete(ticket.id)}
+                          className="text-red-600 hover:text-red-800 p-1 rounded hover:bg-red-50"
+                          title="Delete Ticket"
+                        >
+                          <Trash2 size={16} />
                         </button>
                       )}
                     </div>

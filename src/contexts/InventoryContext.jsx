@@ -423,6 +423,10 @@ export function InventoryProvider({ children }) {
     setCourseBatches(courseBatches.filter(batch => batch.id !== id));
   };
 
+  const deleteServiceTicket = (id) => {
+    setServiceTickets(serviceTickets.filter(ticket => ticket.id !== id));
+  };
+
   const addStudent = (studentData) => {
     const newStudent = {
       ...studentData,
@@ -755,11 +759,25 @@ export function InventoryProvider({ children }) {
             ? { 
                 ...ticket, 
                 partsCost: (ticket.partsCost || 0) + totalPartsCost,
+                advancePayments: ticket.advancePayments || [],
                 updatedAt: new Date()
               }
             : ticket
         ));
       }
+    }
+    
+    // Handle advance payments
+    if (paymentData.paymentType === 'advance_payment' && paymentData.serviceTicketId) {
+      setServiceTickets(serviceTickets.map(ticket => 
+        ticket.id === paymentData.serviceTicketId
+          ? { 
+              ...ticket, 
+              advancePayments: [...(ticket.advancePayments || []), newPayment.id],
+              updatedAt: new Date()
+            }
+          : ticket
+      ));
     }
     
     return newPayment;
@@ -861,7 +879,8 @@ export function InventoryProvider({ children }) {
     addAttendanceSession,
     updateAttendanceRecord,
     addServicePayment,
-    updateServicePayment
+    updateServicePayment,
+    deleteServiceTicket
   };
 
   return (

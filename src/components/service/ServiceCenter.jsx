@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useInventory } from '../../contexts/InventoryContext';
-import { Plus, Wrench, Users, FileText, Search, Filter, BarChart3, CreditCard } from 'lucide-react';
+import { useAuth } from '../../contexts/AuthContext';
+import { Plus, Wrench, Users, FileText, Search, Filter, BarChart3, CreditCard, DollarSign } from 'lucide-react';
 import { Button } from '../common/Button';
 import { Card } from '../common/Card';
 import { ServiceTicketList } from './ServiceTicketList';
@@ -9,12 +10,16 @@ import { TechnicianManagement } from './TechnicianManagement';
 import { ServiceInvoices } from './ServiceInvoices';
 import { ServiceDashboard } from './ServiceDashboard';
 import { ServicePaymentManagement } from './ServicePaymentManagement';
+import { ServicePaymentForm } from './ServicePaymentForm';
 
 export function ServiceCenter() {
-  const { serviceTickets, addServiceTicket, updateServiceTicket, customers, generateServiceInvoice } = useInventory();
+  const { serviceTickets, addServiceTicket, updateServiceTicket, deleteServiceTicket, customers, generateServiceInvoice, addServicePayment } = useInventory();
+  const { canModify } = useAuth();
   const [activeTab, setActiveTab] = useState('dashboard');
   const [showTicketForm, setShowTicketForm] = useState(false);
+  const [showPaymentForm, setShowPaymentForm] = useState(false);
   const [editingTicket, setEditingTicket] = useState(null);
+  const [selectedTicketForPayment, setSelectedTicketForPayment] = useState(null);
 
   const tabs = [
     { id: 'dashboard', label: 'Dashboard', icon: BarChart3 },
@@ -29,9 +34,31 @@ export function ServiceCenter() {
     setShowTicketForm(true);
   };
 
+  const handleMakePayment = (ticket) => {
+    setSelectedTicketForPayment(ticket);
+    setShowPaymentForm(true);
+  };
+
+  const handleDelete = (ticketId) => {
+    if (window.confirm('Are you sure you want to delete this service ticket?')) {
+      deleteServiceTicket(ticketId);
+    }
+  };
+
   const handleCloseForm = () => {
     setShowTicketForm(false);
     setEditingTicket(null);
+  };
+
+  const handleClosePaymentForm = () => {
+    setShowPaymentForm(false);
+    setSelectedTicketForPayment(null);
+  };
+
+  const handlePaymentSubmit = (paymentData) => {
+    addServicePayment(paymentData);
+    setShowPaymentForm(false);
+    setSelectedTicketForPayment(null);
   };
 
   const handleSubmit = (ticketData) => {
@@ -72,6 +99,8 @@ export function ServiceCenter() {
           <ServiceTicketList
             tickets={serviceTickets}
             onEdit={handleEdit}
+            onMakePayment={handleMakePayment}
+            onDelete={canModify('service') ? handleDelete : null}
           />
         );
       case 'payments':
@@ -143,6 +172,13 @@ export function ServiceCenter() {
         onClose={handleCloseForm}
         ticket={editingTicket}
         onSubmit={handleSubmit}
+      />
+
+      <ServicePaymentForm
+        isOpen={showPaymentForm}
+        onClose={handleClosePaymentForm}
+        onSubmit={handlePaymentSubmit}
+        preSelectedTicket={selectedTicketForPayment}
       />
     </div>
   );

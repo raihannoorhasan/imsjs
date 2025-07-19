@@ -20,8 +20,8 @@ import {
 } from 'lucide-react';
 import { generateId, formatCurrency } from '../../utils/helpers';
 
-export function ServicePaymentForm({ isOpen, onClose, onSubmit }) {
-  const { customers, serviceTickets, sales, products, updateStock } = useInventory();
+export function ServicePaymentForm({ isOpen, onClose, onSubmit, preSelectedTicket }) {
+  const { customers, serviceTickets, sales, products, updateStock, technicians } = useInventory();
   const [formData, setFormData] = useState({
     customerId: '',
     serviceTicketId: '',
@@ -38,6 +38,51 @@ export function ServicePaymentForm({ isOpen, onClose, onSubmit }) {
   });
   const [selectedSale, setSelectedSale] = useState(null);
   const [pendingSalesTotal, setPendingSalesTotal] = useState(0);
+
+  // Pre-select ticket if provided
+  React.useEffect(() => {
+    if (preSelectedTicket && isOpen) {
+      setFormData(prev => ({
+        ...prev,
+        customerId: preSelectedTicket.customerId,
+        serviceTicketId: preSelectedTicket.id
+      }));
+      
+      // Calculate pending sales for this ticket
+      const pendingSales = sales.filter(s => 
+        s.serviceTicketId === preSelectedTicket.id && 
+        s.status === 'pending'
+      );
+      const total = pendingSales.reduce((sum, sale) => sum + sale.total, 0);
+      setPendingSalesTotal(total);
+      
+      // Calculate advance payment info
+      calculateAdvancePaymentInfo(preSelectedTicket);
+    }
+  }, [preSelectedTicket, isOpen, sales]);
+
+  const calculateAdvancePaymentInfo = (ticket) => {
+    // Get all approved advance payments for this ticket
+    const advancePayments = servicePayments.filter(p => 
+      p.serviceTicketId === ticket.id && 
+      p.paymentType === 'advance_payment' && 
+      p.status === 'approved'
+    );
+    
+    const totalAdvance = advancePayments.reduce((sum, p) => sum + p.amount, 0);
+    const totalServiceCost = ticket.laborCost + ticket.partsCost;
+    const remainingBalance = totalServiceCost - totalAdvance;
+    
+    setAdvancePaymentInfo({
+      totalAdvance,
+      totalServiceCost,
+      remainingBalance,
+      hasAdvance: totalAdvance > 0,
+      needsRefund: remainingBalance < 0,
+      isFullyPaid: remainingBalance <= 0
+    });
+  };
+  const [advancePaymentInfo, setAdvancePaymentInfo] = useState(null);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -138,6 +183,16 @@ export function ServicePaymentForm({ isOpen, onClose, onSubmit }) {
         if (ticket && ticket.partsCost > 0 && !formData.autoFillFromPendingSales) {
           setFormData(prev => ({ ...prev, amount: ticket.partsCost }));
         }
+      } else if (value === 'labor_payment' && formData.serviceTicketId) {
+        const ticket = serviceTickets.find(t => t.id === formData.serviceTicketId);
+        if (ticket && ticket.laborCost > 0) {
+          setFormData(prev => ({ ...prev, amount: ticket.laborCost }));
+        }
+      } else if (value === 'advance_payment' && formData.serviceTicketId) {
+        // For advance payment, suggest remaining balance if available
+        if (advancePaymentInfo && advancePaymentInfo.remainingBalance > 0) {
+          setFormData(prev => ({ ...prev, amount: advancePaymentInfo.remainingBalance }));
+        }
       }
     }
   };
@@ -148,10 +203,16 @@ export function ServicePaymentForm({ isOpen, onClose, onSubmit }) {
   );
   
   // Get sales for the selected customer (for parts payment)
-  const customerSales = sales.filter(s => 
-    s.customerId === formData.customerId && 
-    (s.status === 'completed' || s.status === 'pending')
-  );
+  const customerSales = sales.filter(s => {
+    // For parts payment, only show sales linked to this specific service ticket
+    if (formData.paymentType === 'parts_payment') {
+      return s.serviceTicketId === formData.serviceTicketId && 
+             (s.status === 'completed' || s.status === 'pending');
+    }
+    // For other payment types, show all customer sales
+    return s.customerId === formData.customerId && 
+           (s.status === 'completed' || s.status === 'pending');
+  });
   
   // Get pending sales linked to the selected service ticket
   const pendingSalesForTicket = sales.filter(s => 
@@ -170,6 +231,10 @@ export function ServicePaymentForm({ isOpen, onClose, onSubmit }) {
     const productName = firstItem ? getProductName(firstItem.productId) : 'Unknown';
     const statusText = sale.status === 'pending' ? ' [PENDING]' : '';
     return `Sale #${sale.id.slice(-6)} - ${productName}${itemCount > 1 ? ` +${itemCount - 1} more` : ''} ($${sale.total.toFixed(2)})${statusText}`;
+  };
+
+  const getTicketInfo = () => {
+    return serviceTickets.find(t => t.id === formData.serviceTicketId);
   };
 
   const paymentMethods = [
@@ -548,28 +613,33 @@ export function ServicePaymentForm({ isOpen, onClose, onSubmit }) {
         </div>
 
         {/* Service Ticket Info Display */}
-        {formData.paymentType === 'parts_payment' && formData.serviceTicketId && (
+        {(formData.paymentType === 'parts_payment' || formData.paymentType === 'labor_payment') && formData.serviceTicketId && (
           <div className="bg-gradient-to-r from-blue-50 to-cyan-50 border-2 border-blue-200 rounded-xl p-6">
             <div className="flex items-start space-x-4">
               <div className="bg-blue-100 p-2 rounded-lg">
                 <Info className="w-6 h-6 text-blue-600" />
               </div>
               <div className="flex-1">
-                <h3 className="font-semibold text-blue-900 mb-2">Parts Payment Information</h3>
+                <h3 className="font-semibold text-blue-900 mb-2">
+                  {formData.paymentType === 'parts_payment' ? 'Parts Payment Information' : 'Labor Payment Information'}
+                </h3>
                 <div className="space-y-2">
                   {(() => {
                     const ticket = serviceTickets.find(t => t.id === formData.serviceTicketId);
-                    if (ticket && ticket.partsCost > 0) {
+                    const cost = formData.paymentType === 'parts_payment' ? ticket?.partsCost : ticket?.laborCost;
+                    const costType = formData.paymentType === 'parts_payment' ? 'parts' : 'labor';
+                    
+                    if (ticket && cost > 0) {
                       return (
                         <p className="text-blue-800">
-                          Service ticket has existing parts cost of{' '}
-                          <span className="font-bold">${ticket.partsCost.toFixed(2)}</span>
+                          Service ticket has existing {costType} cost of{' '}
+                          <span className="font-bold">${cost.toFixed(2)}</span>
                         </p>
                       );
                     }
                     return (
                       <p className="text-blue-800">
-                        Recording payment for parts used in this service
+                        Recording payment for {costType} {formData.paymentType === 'parts_payment' ? 'used in this service' : 'charges'}
                       </p>
                     );
                   })()}
@@ -602,6 +672,7 @@ export function ServicePaymentForm({ isOpen, onClose, onSubmit }) {
             <Button 
               type="submit"
               className="px-8 py-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200"
+              disabled={formData.paymentType === 'parts_payment' && customerSales.length === 0}
             >
               <DollarSign className="w-5 h-5 mr-2" />
               Record Payment

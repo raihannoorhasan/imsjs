@@ -1,0 +1,338 @@
+import React from 'react';
+import { useInventory } from '../../contexts/InventoryContext';
+import { 
+  DollarSign, 
+  TrendingUp, 
+  Users, 
+  Package, 
+  Wrench, 
+  BookOpen, 
+  Calendar,
+  Target,
+  BarChart3,
+  PieChart
+} from 'lucide-react';
+import { Card } from '../common/Card';
+import { formatCurrency, formatDate } from '../../utils/helpers';
+
+export function DashboardReport({ timeRange }) {
+  const { 
+    sales, 
+    products, 
+    customers, 
+    serviceTickets, 
+    courses, 
+    enrollments, 
+    coursePayments,
+    serviceInvoices 
+  } = useInventory();
+
+  // Helper function to filter data by time range
+  const filterByTimeRange = (data, dateField = 'createdAt') => {
+    const now = new Date();
+    const startDate = new Date();
+    
+    switch (timeRange) {
+      case 'daily':
+        startDate.setHours(0, 0, 0, 0);
+        break;
+      case 'weekly':
+        startDate.setDate(now.getDate() - 7);
+        break;
+      case 'monthly':
+        startDate.setMonth(now.getMonth() - 1);
+        break;
+      case 'yearly':
+        startDate.setFullYear(now.getFullYear() - 1);
+        break;
+      default:
+        startDate.setMonth(now.getMonth() - 1);
+    }
+    
+    return data.filter(item => new Date(item[dateField]) >= startDate);
+  };
+
+  // Calculate metrics for the selected time range
+  const filteredSales = filterByTimeRange(sales);
+  const filteredServiceTickets = filterByTimeRange(serviceTickets);
+  const filteredEnrollments = filterByTimeRange(enrollments, 'enrollmentDate');
+  const filteredPayments = filterByTimeRange(coursePayments, 'paymentDate');
+
+  // Sales metrics
+  const salesRevenue = filteredSales.reduce((sum, sale) => sum + sale.total, 0);
+  const salesCount = filteredSales.length;
+  const averageOrderValue = salesCount > 0 ? salesRevenue / salesCount : 0;
+
+  // Service metrics
+  const serviceRevenue = serviceInvoices
+    .filter(invoice => filterByTimeRange([invoice]).length > 0)
+    .reduce((sum, invoice) => sum + invoice.total, 0);
+  const completedTickets = filteredServiceTickets.filter(t => t.status === 'completed').length;
+  const activeTickets = filteredServiceTickets.filter(t => 
+    ['received', 'diagnosed', 'in_progress'].includes(t.status)
+  ).length;
+
+  // Course metrics
+  const courseRevenue = filteredPayments
+    .filter(p => p.status === 'approved')
+    .reduce((sum, payment) => sum + payment.amount, 0);
+  const newEnrollments = filteredEnrollments.length;
+
+  // Overall metrics
+  const totalRevenue = salesRevenue + serviceRevenue + courseRevenue;
+  const totalCustomers = customers.length;
+  const totalProducts = products.length;
+
+  // Department performance
+  const departmentData = [
+    {
+      name: 'Sales Department',
+      revenue: salesRevenue,
+      transactions: salesCount,
+      icon: DollarSign,
+      color: 'text-green-600',
+      bgColor: 'bg-green-100',
+      percentage: totalRevenue > 0 ? (salesRevenue / totalRevenue) * 100 : 0
+    },
+    {
+      name: 'Service Center',
+      revenue: serviceRevenue,
+      transactions: completedTickets,
+      icon: Wrench,
+      color: 'text-orange-600',
+      bgColor: 'bg-orange-100',
+      percentage: totalRevenue > 0 ? (serviceRevenue / totalRevenue) * 100 : 0
+    },
+    {
+      name: 'Course Department',
+      revenue: courseRevenue,
+      transactions: newEnrollments,
+      icon: BookOpen,
+      color: 'text-blue-600',
+      bgColor: 'bg-blue-100',
+      percentage: totalRevenue > 0 ? (courseRevenue / totalRevenue) * 100 : 0
+    }
+  ];
+
+  const getTimeRangeLabel = () => {
+    switch (timeRange) {
+      case 'daily': return 'Today';
+      case 'weekly': return 'This Week';
+      case 'monthly': return 'This Month';
+      case 'yearly': return 'This Year';
+      default: return 'This Month';
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Time Range Header */}
+      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-2xl font-bold text-blue-900">Business Overview - {getTimeRangeLabel()}</h2>
+            <p className="text-blue-700 mt-1">Comprehensive performance metrics across all departments</p>
+          </div>
+          <div className="bg-blue-100 p-3 rounded-full">
+            <BarChart3 className="w-8 h-8 text-blue-600" />
+          </div>
+        </div>
+      </div>
+
+      {/* Key Performance Indicators */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <Card className="p-6 bg-gradient-to-br from-green-50 to-emerald-100 border-green-200">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-green-700">Total Revenue</p>
+              <p className="text-3xl font-bold text-green-900">{formatCurrency(totalRevenue)}</p>
+              <p className="text-sm text-green-600 mt-1">All departments</p>
+            </div>
+            <div className="bg-green-200 p-3 rounded-full">
+              <DollarSign className="w-8 h-8 text-green-700" />
+            </div>
+          </div>
+        </Card>
+
+        <Card className="p-6 bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-blue-700">Total Transactions</p>
+              <p className="text-3xl font-bold text-blue-900">{salesCount + completedTickets + newEnrollments}</p>
+              <p className="text-sm text-blue-600 mt-1">Sales + Service + Courses</p>
+            </div>
+            <div className="bg-blue-200 p-3 rounded-full">
+              <TrendingUp className="w-8 h-8 text-blue-700" />
+            </div>
+          </div>
+        </Card>
+
+        <Card className="p-6 bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-purple-700">Active Customers</p>
+              <p className="text-3xl font-bold text-purple-900">{totalCustomers}</p>
+              <p className="text-sm text-purple-600 mt-1">Customer base</p>
+            </div>
+            <div className="bg-purple-200 p-3 rounded-full">
+              <Users className="w-8 h-8 text-purple-700" />
+            </div>
+          </div>
+        </Card>
+
+        <Card className="p-6 bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-orange-700">Active Services</p>
+              <p className="text-3xl font-bold text-orange-900">{activeTickets}</p>
+              <p className="text-sm text-orange-600 mt-1">In progress</p>
+            </div>
+            <div className="bg-orange-200 p-3 rounded-full">
+              <Wrench className="w-8 h-8 text-orange-700" />
+            </div>
+          </div>
+        </Card>
+      </div>
+
+      {/* Department Performance */}
+      <Card className="p-6">
+        <div className="flex items-center justify-between mb-6">
+          <h3 className="text-xl font-semibold text-gray-900">Department Performance</h3>
+          <PieChart className="w-6 h-6 text-gray-500" />
+        </div>
+        
+        <div className="space-y-4">
+          {departmentData.map((dept, index) => {
+            const Icon = dept.icon;
+            return (
+              <div key={index} className="bg-gray-50 rounded-lg p-4">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center space-x-3">
+                    <div className={`${dept.bgColor} p-2 rounded-lg`}>
+                      <Icon className={`w-5 h-5 ${dept.color}`} />
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-gray-900">{dept.name}</h4>
+                      <p className="text-sm text-gray-600">{dept.transactions} transactions</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-xl font-bold text-gray-900">{formatCurrency(dept.revenue)}</p>
+                    <p className="text-sm text-gray-600">{dept.percentage.toFixed(1)}% of total</p>
+                  </div>
+                </div>
+                
+                {/* Progress Bar */}
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div 
+                    className={`h-2 rounded-full ${dept.color.replace('text-', 'bg-')}`}
+                    style={{ width: `${dept.percentage}%` }}
+                  ></div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </Card>
+
+      {/* Quick Stats Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Sales Quick Stats */}
+        <Card className="p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-gray-900">Sales Performance</h3>
+            <DollarSign className="w-5 h-5 text-green-600" />
+          </div>
+          <div className="space-y-3">
+            <div className="flex justify-between">
+              <span className="text-gray-600">Revenue:</span>
+              <span className="font-semibold text-green-600">{formatCurrency(salesRevenue)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-600">Orders:</span>
+              <span className="font-semibold">{salesCount}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-600">Average Order:</span>
+              <span className="font-semibold">{formatCurrency(averageOrderValue)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-600">Products Sold:</span>
+              <span className="font-semibold">
+                {filteredSales.reduce((sum, sale) => sum + sale.items.reduce((itemSum, item) => itemSum + item.quantity, 0), 0)}
+              </span>
+            </div>
+          </div>
+        </Card>
+
+        {/* Service Quick Stats */}
+        <Card className="p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-gray-900">Service Performance</h3>
+            <Wrench className="w-5 h-5 text-orange-600" />
+          </div>
+          <div className="space-y-3">
+            <div className="flex justify-between">
+              <span className="text-gray-600">Service Revenue:</span>
+              <span className="font-semibold text-orange-600">{formatCurrency(serviceRevenue)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-600">Completed Tickets:</span>
+              <span className="font-semibold">{completedTickets}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-600">Active Tickets:</span>
+              <span className="font-semibold text-yellow-600">{activeTickets}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-600">Total Tickets:</span>
+              <span className="font-semibold">{filteredServiceTickets.length}</span>
+            </div>
+          </div>
+        </Card>
+      </div>
+
+      {/* Course Performance */}
+      <Card className="p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-semibold text-gray-900">Course Department Performance</h3>
+          <BookOpen className="w-5 h-5 text-blue-600" />
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="bg-blue-50 p-4 rounded-lg text-center">
+            <p className="text-sm text-blue-700">Course Revenue</p>
+            <p className="text-2xl font-bold text-blue-900">{formatCurrency(courseRevenue)}</p>
+          </div>
+          <div className="bg-green-50 p-4 rounded-lg text-center">
+            <p className="text-sm text-green-700">New Enrollments</p>
+            <p className="text-2xl font-bold text-green-900">{newEnrollments}</p>
+          </div>
+          <div className="bg-purple-50 p-4 rounded-lg text-center">
+            <p className="text-sm text-purple-700">Active Courses</p>
+            <p className="text-2xl font-bold text-purple-900">{courses.filter(c => c.status === 'active').length}</p>
+          </div>
+          <div className="bg-orange-50 p-4 rounded-lg text-center">
+            <p className="text-sm text-orange-700">Payment Rate</p>
+            <p className="text-2xl font-bold text-orange-900">
+              {filteredPayments.length > 0 ? 
+                ((filteredPayments.filter(p => p.status === 'approved').length / filteredPayments.length) * 100).toFixed(1) : 0}%
+            </p>
+          </div>
+        </div>
+      </Card>
+
+      {/* Performance Trends */}
+      <Card className="p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-semibold text-gray-900">Performance Trends</h3>
+          <Target className="w-5 h-5 text-gray-500" />
+        </div>
+        <div className="text-center py-8 text-gray-500">
+          <BarChart3 className="w-16 h-16 mx-auto mb-4 text-gray-300" />
+          <p className="text-lg font-medium">Advanced Analytics Coming Soon</p>
+          <p className="text-sm">Interactive charts and trend analysis will be available in the next update</p>
+        </div>
+      </Card>
+    </div>
+  );
+}

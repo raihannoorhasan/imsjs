@@ -58,8 +58,8 @@ export function UserManagement() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-2xl font-semibold text-gray-900">User Management</h2>
-          <p className="text-gray-600 mt-1">Manage system users and their roles</p>
+          <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">User Management</h2>
+          <p className="text-gray-600 dark:text-gray-400 mt-1">Manage system users and their roles</p>
         </div>
         <Button onClick={() => setShowUserForm(true)}>
           <Plus size={20} className="mr-2" />
@@ -67,7 +67,7 @@ export function UserManagement() {
         </Button>
       </div>
 
-      <div className="bg-white rounded-lg shadow-sm border">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm dark:shadow-lg border border-gray-200 dark:border-gray-700">
         <Table>
           <TableHeader>
             <TableRow>
@@ -84,18 +84,18 @@ export function UserManagement() {
               <TableRow key={user.id}>
                 <TableCell>
                   <div className="flex items-center space-x-3">
-                    <div className="flex items-center justify-center w-10 h-10 bg-gray-100 rounded-full">
-                      <User className="w-5 h-5 text-gray-600" />
+                    <div className="flex items-center justify-center w-10 h-10 bg-gray-100 dark:bg-gray-700 rounded-full">
+                      <User className="w-5 h-5 text-gray-600 dark:text-gray-400" />
                     </div>
                     <div>
-                      <p className="font-medium text-gray-900">{user.name}</p>
-                      <p className="text-sm text-gray-600">@{user.username}</p>
-                      <p className="text-sm text-gray-500">{user.email}</p>
+                      <p className="font-medium text-gray-900 dark:text-white">{user.name}</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">@{user.username}</p>
+                      <p className="text-sm text-gray-500 dark:text-gray-500">{user.email}</p>
                     </div>
                   </div>
                 </TableCell>
                 <TableCell>
-                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize ${getRoleBadgeColor(user.role)}`}>
+                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize ${getRoleBadgeColor(user.role)} dark:bg-opacity-20`}>
                     <Shield className="w-3 h-3 mr-1" />
                     {user.role}
                   </span>
@@ -104,12 +104,12 @@ export function UserManagement() {
                   <StatusBadge status={user.status} />
                 </TableCell>
                 <TableCell>
-                  <span className="text-sm text-gray-600">
+                  <span className="text-sm text-gray-600 dark:text-gray-400">
                     {user.lastLogin ? formatDate(user.lastLogin) : 'Never'}
                   </span>
                 </TableCell>
                 <TableCell>
-                  <span className="text-sm text-gray-600">
+                  <span className="text-sm text-gray-600 dark:text-gray-400">
                     {formatDate(user.createdAt)}
                   </span>
                 </TableCell>
@@ -117,7 +117,7 @@ export function UserManagement() {
                   <div className="flex space-x-2">
                     <button
                       onClick={() => handleEdit(user)}
-                      className="text-blue-600 hover:text-blue-800"
+                      className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
                       title="Edit User"
                     >
                       <Edit2 size={16} />
@@ -125,7 +125,7 @@ export function UserManagement() {
                     {user.id !== currentUser?.id && (
                       <button
                         onClick={() => handleDelete(user.id)}
-                        className="text-red-600 hover:text-red-800"
+                        className="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300"
                         title="Delete User"
                       >
                         <Trash2 size={16} />

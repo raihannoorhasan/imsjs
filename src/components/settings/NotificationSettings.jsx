@@ -26,13 +26,13 @@ export function NotificationSettings() {
   const NotificationToggle = ({ label, description, field }) => (
     <div className="flex items-center justify-between py-3">
       <div>
-        <p className="font-medium text-gray-900">{label}</p>
-        <p className="text-sm text-gray-600">{description}</p>
+        <p className="font-medium text-gray-900 dark:text-white">{label}</p>
+        <p className="text-sm text-gray-600 dark:text-gray-400">{description}</p>
       </div>
       <button
         onClick={() => handleToggle(field)}
         className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-          notifications[field] ? 'bg-blue-600' : 'bg-gray-200'
+          notifications[field] ? 'bg-blue-600 dark:bg-blue-500' : 'bg-gray-200 dark:bg-gray-700'
         }`}
       >
         <span
@@ -47,9 +47,9 @@ export function NotificationSettings() {
   return (
     <div className="space-y-6">
       <Card>
-        <h2 className="text-xl font-semibold text-gray-900 mb-6">Alert Preferences</h2>
+        <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">Alert Preferences</h2>
         
-        <div className="divide-y divide-gray-200">
+        <div className="divide-y divide-gray-200 dark:divide-gray-700">
           <NotificationToggle
             label="Low Stock Alerts"
             description="Get notified when products are running low"
@@ -79,9 +79,9 @@ export function NotificationSettings() {
       </Card>
 
       <Card>
-        <h2 className="text-xl font-semibold text-gray-900 mb-6">Delivery Methods</h2>
+        <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">Delivery Methods</h2>
         
-        <div className="divide-y divide-gray-200">
+        <div className="divide-y divide-gray-200 dark:divide-gray-700">
           <NotificationToggle
             label="Email Notifications"
             description="Receive notifications via email"

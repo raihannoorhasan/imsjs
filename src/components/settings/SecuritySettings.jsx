@@ -40,13 +40,13 @@ export function SecuritySettings() {
   const SecurityToggle = ({ label, description, field }) => (
     <div className="flex items-center justify-between py-3">
       <div>
-        <p className="font-medium text-gray-900">{label}</p>
-        <p className="text-sm text-gray-600">{description}</p>
+        <p className="font-medium text-gray-900 dark:text-white">{label}</p>
+        <p className="text-sm text-gray-600 dark:text-gray-400">{description}</p>
       </div>
       <button
         onClick={() => handleSecurityChange(field, !securitySettings[field])}
         className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-          securitySettings[field] ? 'bg-blue-600' : 'bg-gray-200'
+          securitySettings[field] ? 'bg-blue-600 dark:bg-blue-500' : 'bg-gray-200 dark:bg-gray-700'
         }`}
       >
         <span
@@ -61,7 +61,7 @@ export function SecuritySettings() {
   return (
     <div className="space-y-6">
       <Card>
-        <h2 className="text-xl font-semibold text-gray-900 mb-6">Change Password</h2>
+        <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">Change Password</h2>
         
         <form onSubmit={handlePasswordSubmit} className="space-y-4">
           <Input
@@ -97,10 +97,10 @@ export function SecuritySettings() {
       </Card>
 
       <Card>
-        <h2 className="text-xl font-semibold text-gray-900 mb-6">Security Preferences</h2>
+        <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">Security Preferences</h2>
         
         <div className="space-y-6">
-          <div className="divide-y divide-gray-200">
+          <div className="divide-y divide-gray-200 dark:divide-gray-700">
             <SecurityToggle
               label="Two-Factor Authentication"
               description="Add an extra layer of security to your account"

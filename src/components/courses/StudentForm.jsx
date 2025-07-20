@@ -132,11 +132,11 @@ export function StudentForm({ isOpen, onClose, student, onSubmit }) {
               className="w-24 h-24 rounded-full object-cover border-4 border-white shadow-lg"
             />
           ) : (
-            <div className="w-24 h-24 rounded-full bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center border-4 border-white shadow-lg">
-              <User className="w-10 h-10 text-blue-600" />
+            <div className="w-24 h-24 rounded-full bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-900 dark:to-blue-800 flex items-center justify-center border-4 border-white dark:border-gray-700 shadow-lg">
+              <User className="w-10 h-10 text-blue-600 dark:text-blue-400" />
             </div>
           )}
-          <label className="absolute bottom-0 right-0 bg-blue-600 text-white p-2 rounded-full cursor-pointer hover:bg-blue-700 transition-colors shadow-lg">
+          <label className="absolute bottom-0 right-0 bg-blue-600 dark:bg-blue-700 text-white p-2 rounded-full cursor-pointer hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors shadow-lg">
             <Upload size={14} />
             <input
               type="file"
@@ -146,7 +146,7 @@ export function StudentForm({ isOpen, onClose, student, onSubmit }) {
             />
           </label>
         </div>
-        <p className="text-sm text-gray-600">Upload profile picture (optional)</p>
+        <p className="text-sm text-gray-600 dark:text-gray-400">Upload profile picture (optional)</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -247,7 +247,7 @@ export function StudentForm({ isOpen, onClose, student, onSubmit }) {
     <div className="space-y-6">
       {/* Primary Contact */}
       <div className="bg-blue-50 p-4 rounded-lg">
-        <h3 className="font-medium text-blue-900 mb-4 flex items-center">
+        <h3 className="font-medium text-blue-900 dark:text-blue-200 mb-4 flex items-center">
           <Mail className="w-5 h-5 mr-2" />
           Primary Contact Information
         </h3>
@@ -271,7 +271,7 @@ export function StudentForm({ isOpen, onClose, student, onSubmit }) {
 
       {/* Address */}
       <div className="bg-green-50 p-4 rounded-lg">
-        <h3 className="font-medium text-green-900 mb-4 flex items-center">
+        <h3 className="font-medium text-green-900 dark:text-green-200 mb-4 flex items-center">
           <MapPin className="w-5 h-5 mr-2" />
           Address Information
         </h3>
@@ -310,7 +310,7 @@ export function StudentForm({ isOpen, onClose, student, onSubmit }) {
 
       {/* Emergency Contact */}
       <div className="bg-red-50 p-4 rounded-lg">
-        <h3 className="font-medium text-red-900 mb-4 flex items-center">
+        <h3 className="font-medium text-red-900 dark:text-red-200 mb-4 flex items-center">
           <Phone className="w-5 h-5 mr-2" />
           Emergency Contact
         </h3>
@@ -347,7 +347,7 @@ export function StudentForm({ isOpen, onClose, student, onSubmit }) {
 
       {/* Guardian Information (for minors) */}
       <div className="bg-purple-50 p-4 rounded-lg">
-        <h3 className="font-medium text-purple-900 mb-4 flex items-center">
+        <h3 className="font-medium text-purple-900 dark:text-purple-200 mb-4 flex items-center">
           <Users className="w-5 h-5 mr-2" />
           Guardian Information (if applicable)
         </h3>
@@ -373,22 +373,22 @@ export function StudentForm({ isOpen, onClose, student, onSubmit }) {
   const renderAdditionalInfo = () => (
     <div className="space-y-4">
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">Medical Conditions</label>
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Medical Conditions</label>
         <textarea
           value={formData.medicalConditions}
           onChange={(e) => handleChange('medicalConditions', e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-colors duration-200"
           rows={3}
           placeholder="Any medical conditions or allergies we should be aware of..."
         />
       </div>
       
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">Special Needs or Accommodations</label>
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Special Needs or Accommodations</label>
         <textarea
           value={formData.specialNeeds}
           onChange={(e) => handleChange('specialNeeds', e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-colors duration-200"
           rows={3}
           placeholder="Any special accommodations or learning needs..."
         />
@@ -429,7 +429,7 @@ export function StudentForm({ isOpen, onClose, student, onSubmit }) {
     >
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Tab Navigation */}
-        <div className="border-b border-gray-200">
+        <div className="border-b border-gray-200 dark:border-gray-600">
           <nav className="flex space-x-1">
             {tabs.map((tab) => {
               const Icon = tab.icon;
@@ -440,8 +440,8 @@ export function StudentForm({ isOpen, onClose, student, onSubmit }) {
                   onClick={() => setActiveTab(tab.id)}
                   className={`flex items-center space-x-2 px-4 py-3 font-medium text-sm rounded-t-lg transition-all duration-200 ${
                     activeTab === tab.id
-                      ? 'bg-blue-50 text-blue-700 border-b-2 border-blue-500'
-                      : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                      ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 border-b-2 border-blue-500'
+                      : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700'
                   }`}
                 >
                   <Icon size={16} />
@@ -458,8 +458,8 @@ export function StudentForm({ isOpen, onClose, student, onSubmit }) {
         </div>
 
         {/* Form Actions */}
-        <div className="flex justify-between items-center pt-6 border-t border-gray-200">
-          <div className="text-sm text-gray-500">
+        <div className="flex justify-between items-center pt-6 border-t border-gray-200 dark:border-gray-600">
+          <div className="text-sm text-gray-500 dark:text-gray-400">
             {activeTab !== 'additional' && (
               <span>Complete all required fields to continue</span>
             )}

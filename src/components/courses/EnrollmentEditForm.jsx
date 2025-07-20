@@ -164,18 +164,18 @@ export function EnrollmentEditForm({ isOpen, onClose, enrollment, onSubmit }) {
           />
         </div>
         
-        <div className="bg-gray-50 p-4 rounded-lg">
-          <h3 className="font-medium text-gray-900 mb-2">Calculated Values</h3>
+        <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg border border-gray-200 dark:border-gray-600">
+          <h3 className="font-medium text-gray-900 dark:text-white mb-2">Calculated Values</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
             <div>
-              <span className="text-gray-600">Remaining Amount:</span>
-              <span className="ml-2 font-medium text-red-600">
+              <span className="text-gray-600 dark:text-gray-400">Remaining Amount:</span>
+              <span className="ml-2 font-medium text-red-600 dark:text-red-400">
                 ${formData.remainingAmount.toFixed(2)}
               </span>
             </div>
             <div>
-              <span className="text-gray-600">Payment Progress:</span>
-              <span className="ml-2 font-medium text-blue-600">
+              <span className="text-gray-600 dark:text-gray-400">Payment Progress:</span>
+              <span className="ml-2 font-medium text-blue-600 dark:text-blue-400">
                 {formData.totalAmount > 0 ? ((formData.paidAmount / formData.totalAmount) * 100).toFixed(1) : 0}%
               </span>
             </div>

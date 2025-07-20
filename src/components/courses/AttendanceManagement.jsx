@@ -69,8 +69,8 @@ export function AttendanceManagement() {
       <Card className="p-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900">Attendance Management</h2>
-            <p className="text-gray-600 mt-1">Track and manage student attendance across all sessions</p>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Attendance Management</h2>
+            <p className="text-gray-600 dark:text-gray-400 mt-1">Track and manage student attendance across all sessions</p>
           </div>
           <Button 
             onClick={() => setShowSessionForm(true)}
@@ -126,38 +126,38 @@ export function AttendanceManagement() {
 
       {/* Statistics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-        <Card className="p-6 bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
+        <Card className="p-6 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 border-blue-200 dark:border-blue-800">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-blue-700">Total Sessions</p>
-              <p className="text-3xl font-bold text-blue-900">{totalSessions}</p>
+              <p className="text-sm font-medium text-blue-700 dark:text-blue-400">Total Sessions</p>
+              <p className="text-3xl font-bold text-blue-900 dark:text-blue-200">{totalSessions}</p>
             </div>
-            <div className="bg-blue-200 p-3 rounded-full">
-              <Calendar className="w-8 h-8 text-blue-700" />
+            <div className="bg-blue-200 dark:bg-blue-800/50 p-3 rounded-full">
+              <Calendar className="w-8 h-8 text-blue-700 dark:text-blue-400" />
             </div>
           </div>
         </Card>
 
-        <Card className="p-6 bg-gradient-to-br from-green-50 to-green-100 border-green-200">
+        <Card className="p-6 bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 border-green-200 dark:border-green-800">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-green-700">Today's Sessions</p>
-              <p className="text-3xl font-bold text-green-900">{todaySessions}</p>
+              <p className="text-sm font-medium text-green-700 dark:text-green-400">Today's Sessions</p>
+              <p className="text-3xl font-bold text-green-900 dark:text-green-200">{todaySessions}</p>
             </div>
-            <div className="bg-green-200 p-3 rounded-full">
-              <Clock className="w-8 h-8 text-green-700" />
+            <div className="bg-green-200 dark:bg-green-800/50 p-3 rounded-full">
+              <Clock className="w-8 h-8 text-green-700 dark:text-green-400" />
             </div>
           </div>
         </Card>
 
-        <Card className="p-6 bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200">
+        <Card className="p-6 bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 border-purple-200 dark:border-purple-800">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-purple-700">Completed Sessions</p>
-              <p className="text-3xl font-bold text-purple-900">{completedSessions}</p>
+              <p className="text-sm font-medium text-purple-700 dark:text-purple-400">Completed Sessions</p>
+              <p className="text-3xl font-bold text-purple-900 dark:text-purple-200">{completedSessions}</p>
             </div>
-            <div className="bg-purple-200 p-3 rounded-full">
-              <CheckCircle className="w-8 h-8 text-purple-700" />
+            <div className="bg-purple-200 dark:bg-purple-800/50 p-3 rounded-full">
+              <CheckCircle className="w-8 h-8 text-purple-700 dark:text-purple-400" />
             </div>
           </div>
         </Card>
@@ -165,7 +165,7 @@ export function AttendanceManagement() {
 
       {/* Results Summary */}
       {(searchTerm || selectedBatch !== 'all' || dateFilter !== 'all') && (
-        <div className="text-sm text-gray-600 px-1">
+        <div className="text-sm text-gray-600 dark:text-gray-400 px-1">
           Found {filteredSessions.length} session{filteredSessions.length !== 1 ? 's' : ''} 
           {searchTerm && ` matching "${searchTerm}"`}
         </div>

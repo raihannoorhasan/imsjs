@@ -55,9 +55,9 @@ export function AttendanceList({ sessions }) {
   if (sessions.length === 0) {
     return (
       <Card className="text-center py-12">
-        <Calendar className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-        <h3 className="text-lg font-medium text-gray-900 mb-2">No Sessions Found</h3>
-        <p className="text-gray-600 mb-4">Create your first attendance session to get started.</p>
+        <Calendar className="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
+        <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">No Sessions Found</h3>
+        <p className="text-gray-600 dark:text-gray-400 mb-4">Create your first attendance session to get started.</p>
       </Card>
     );
   }
@@ -73,30 +73,30 @@ export function AttendanceList({ sessions }) {
           const isToday = new Date(session.date).toDateString() === new Date().toDateString();
           
           return (
-            <Card key={session.id} className={`p-6 ${isToday ? 'border-l-4 border-l-blue-500' : ''}`}>
+            <Card key={session.id} className={`p-6 ${isToday ? 'border-l-4 border-l-blue-500 dark:border-l-blue-400' : ''}`}>
               <div className="flex items-start justify-between">
                 <div className="flex-1 space-y-3">
                   {/* Header */}
                   <div className="flex items-center space-x-3">
-                    <Calendar size={16} className="text-gray-500" />
+                    <Calendar size={16} className="text-gray-500 dark:text-gray-400" />
                     <div>
                       <div className="flex items-center space-x-2">
-                        <span className="font-semibold text-gray-900">
+                        <span className="font-semibold text-gray-900 dark:text-white">
                           {formatDate(session.date)}
                         </span>
                         {isToday && (
-                          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400">
                             Today
                           </span>
                         )}
                         {isCompleted && (
-                          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400">
                             <CheckCircle size={12} className="mr-1" />
                             Completed
                           </span>
                         )}
                       </div>
-                      <p className="text-sm text-gray-600 mt-1">
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
                         {course?.name} - {batch?.batchName}
                       </p>
                     </div>
@@ -104,47 +104,47 @@ export function AttendanceList({ sessions }) {
                   
                   {/* Topic */}
                   <div>
-                    <p className="font-medium text-gray-900">{session.topic}</p>
+                    <p className="font-medium text-gray-900 dark:text-white">{session.topic}</p>
                     {session.notes && (
-                      <p className="text-sm text-gray-600 mt-1">{session.notes}</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{session.notes}</p>
                     )}
                   </div>
                   
                   {/* Attendance Statistics */}
                   <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-sm">
                     <div className="flex items-center space-x-2">
-                      <CheckCircle size={14} className="text-green-500" />
+                      <CheckCircle size={14} className="text-green-500 dark:text-green-400" />
                       <div>
-                        <p className="font-medium text-green-700">{stats.present}</p>
-                        <p className="text-xs text-gray-500">Present</p>
+                        <p className="font-medium text-green-700 dark:text-green-400">{stats.present}</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">Present</p>
                       </div>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <XCircle size={14} className="text-red-500" />
+                      <XCircle size={14} className="text-red-500 dark:text-red-400" />
                       <div>
-                        <p className="font-medium text-red-700">{stats.absent}</p>
-                        <p className="text-xs text-gray-500">Absent</p>
+                        <p className="font-medium text-red-700 dark:text-red-400">{stats.absent}</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">Absent</p>
                       </div>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <Clock size={14} className="text-yellow-500" />
+                      <Clock size={14} className="text-yellow-500 dark:text-yellow-400" />
                       <div>
-                        <p className="font-medium text-yellow-700">{stats.late}</p>
-                        <p className="text-xs text-gray-500">Late</p>
+                        <p className="font-medium text-yellow-700 dark:text-yellow-400">{stats.late}</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">Late</p>
                       </div>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <AlertCircle size={14} className="text-blue-500" />
+                      <AlertCircle size={14} className="text-blue-500 dark:text-blue-400" />
                       <div>
-                        <p className="font-medium text-blue-700">{stats.excused}</p>
-                        <p className="text-xs text-gray-500">Excused</p>
+                        <p className="font-medium text-blue-700 dark:text-blue-400">{stats.excused}</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">Excused</p>
                       </div>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <Users size={14} className="text-gray-500" />
+                      <Users size={14} className="text-gray-500 dark:text-gray-400" />
                       <div>
-                        <p className="font-medium text-gray-700">{stats.totalMarked}/{stats.totalEnrolled}</p>
-                        <p className="text-xs text-gray-500">Marked</p>
+                        <p className="font-medium text-gray-700 dark:text-gray-300">{stats.totalMarked}/{stats.totalEnrolled}</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">Marked</p>
                       </div>
                     </div>
                   </div>
@@ -152,7 +152,7 @@ export function AttendanceList({ sessions }) {
                   {/* Attendance Rate */}
                   {isCompleted && (
                     <div className="flex items-center space-x-2">
-                      <div className="flex-1 bg-gray-200 rounded-full h-2">
+                      <div className="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                         <div 
                           className={`h-2 rounded-full ${
                             attendancePercentage >= 80 ? 'bg-green-500' : 
@@ -161,7 +161,7 @@ export function AttendanceList({ sessions }) {
                           style={{ width: `${attendancePercentage}%` }}
                         ></div>
                       </div>
-                      <span className="text-sm font-medium text-gray-700">
+                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                         {attendancePercentage}%
                       </span>
                     </div>

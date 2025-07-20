@@ -47,43 +47,44 @@ export function PaymentList({ payments, onViewVoucher, onEditPayment, onApproveP
           <TableHead>Actions</TableHead>
         </TableRow>
       </TableHeader>
-      <TableBody>
-        {payments.map((payment) => {
+                <p className="font-medium text-gray-900 dark:text-white">{student?.name || 'Unknown'}</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{student?.email}</p>
           const { student, course, batch } = getPaymentDetails(payment);
           
           return (
             <TableRow key={payment.id}>
-              <TableCell>
-                <div>
+                <p className="text-sm text-gray-900 dark:text-white">{course?.name || 'N/A'}</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{batch?.batchName || 'N/A'}</p>
+              <div>
                   <p className="font-medium text-gray-900">{student?.name || 'Unknown'}</p>
                   <p className="text-sm text-gray-600">{student?.email}</p>
                 </div>
-              </TableCell>
+              <span className="capitalize text-sm font-medium text-gray-900 dark:text-white">
               <TableCell>
                 <div>
                   <p className="text-sm text-gray-900">{course?.name || 'N/A'}</p>
                   <p className="text-sm text-gray-600">{batch?.batchName || 'N/A'}</p>
-                </div>
+              <div className="flex items-center text-green-600 dark:text-green-400">
               </TableCell>
               <TableCell>
                 <span className="capitalize text-sm font-medium text-gray-900">
                   {payment.paymentType ? payment.paymentType.replace('_', ' ') : 'N/A'}
                 </span>
-              </TableCell>
+              <span className="capitalize text-sm text-gray-600 dark:text-gray-400">{payment.paymentMethod}</span>
               <TableCell>
                 <div className="flex items-center text-green-600">
-                  <DollarSign size={14} className="mr-1" />
+              <span className="text-sm text-gray-600 dark:text-gray-400">
                   <span className="font-medium">{formatCurrency(payment.amount)}</span>
                 </div>
               </TableCell>
               <TableCell>
-                <span className="capitalize text-sm text-gray-600">{payment.paymentMethod}</span>
+              <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
               </TableCell>
               <TableCell>
                 <span className="text-sm text-gray-600">
                   {formatDate(payment.paymentDate)}
                 </span>
-              </TableCell>
+              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(payment.status)} dark:bg-opacity-20`}>
               <TableCell>
                 <div className="flex items-center text-sm text-gray-600">
                   <Receipt size={14} className="mr-1" />
@@ -91,7 +92,7 @@ export function PaymentList({ payments, onViewVoucher, onEditPayment, onApproveP
                 </div>
               </TableCell>
               <TableCell>
-                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(payment.status)}`}>
+                  className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
                   {payment.status || 'pending'}
                 </span>
               </TableCell>
@@ -100,7 +101,7 @@ export function PaymentList({ payments, onViewVoucher, onEditPayment, onApproveP
                   <button
                     onClick={() => onViewVoucher(payment)}
                     className="text-blue-600 hover:text-blue-800"
-                    title="View Voucher"
+                      className="text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200"
                   >
                     <Eye size={16} />
                   </button>
@@ -108,7 +109,7 @@ export function PaymentList({ payments, onViewVoucher, onEditPayment, onApproveP
                     <>
                       <button
                         onClick={() => onEditPayment(payment)}
-                        className="text-gray-600 hover:text-gray-800"
+                        className="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300"
                         title="Edit Payment"
                       >
                         <Edit2 size={16} />
@@ -141,4 +142,6 @@ export function PaymentList({ payments, onViewVoucher, onEditPayment, onApproveP
       </TableBody>
     </Table>
   );
+}
+  )
 }

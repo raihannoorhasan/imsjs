@@ -60,19 +60,19 @@ export function AttendanceMarking({ session, viewMode = 'mark', onClose }) {
       size="xl"
     >
       {/* Session Info Header */}
-      <div className="bg-gray-50 p-4 rounded-lg mb-6">
+      <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg mb-6 border border-gray-200 dark:border-gray-600">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <h3 className="font-medium text-gray-900">{currentSession.topic}</h3>
-            <p className="text-sm text-gray-600">{course?.name} - {batch?.batchName}</p>
-            <p className="text-sm text-gray-500">{formatDateTime(currentSession.date)}</p>
+            <h3 className="font-medium text-gray-900 dark:text-white">{currentSession.topic}</h3>
+            <p className="text-sm text-gray-600 dark:text-gray-400">{course?.name} - {batch?.batchName}</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">{formatDateTime(currentSession.date)}</p>
           </div>
           <div className="flex flex-wrap gap-2">
             {getStatusStats().map(stat => (
-              <div key={stat.id} className="flex items-center space-x-1 bg-white px-2 py-1 rounded text-sm">
+              <div key={stat.id} className="flex items-center space-x-1 bg-white dark:bg-gray-800 px-2 py-1 rounded text-sm border border-gray-200 dark:border-gray-600">
                 <stat.icon size={14} className={stat.color} />
                 <span className="capitalize">{stat.label}:</span>
-                <span className="font-medium">{stat.count}</span>
+                <span className="font-medium text-gray-900 dark:text-white">{stat.count}</span>
               </div>
             ))}
           </div>
@@ -88,16 +88,16 @@ export function AttendanceMarking({ session, viewMode = 'mark', onClose }) {
           if (!student) return null;
           
           return (
-            <div key={enrollment.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50">
+            <div key={enrollment.id} className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200">
               <div className="flex items-center space-x-3">
-                <div className="flex items-center justify-center w-10 h-10 bg-gray-100 rounded-full">
-                  <User className="w-5 h-5 text-gray-600" />
+                <div className="flex items-center justify-center w-10 h-10 bg-gray-100 dark:bg-gray-700 rounded-full">
+                  <User className="w-5 h-5 text-gray-600 dark:text-gray-400" />
                 </div>
                 <div>
-                  <p className="font-medium text-gray-900">{student.name}</p>
-                  <p className="text-sm text-gray-600">{student.email}</p>
+                  <p className="font-medium text-gray-900 dark:text-white">{student.name}</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">{student.email}</p>
                   {attendance && attendance.notes && (
-                    <p className="text-xs text-gray-500 mt-1">Note: {attendance.notes}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Note: {attendance.notes}</p>
                   )}
                 </div>
               </div>
@@ -117,7 +117,7 @@ export function AttendanceMarking({ session, viewMode = 'mark', onClose }) {
                           ? `bg-gray-100 ${option.color} border-2 border-current`
                           : viewMode === 'view' 
                             ? 'text-gray-400 cursor-not-allowed'
-                            : 'text-gray-500 hover:bg-gray-50 border-2 border-transparent'
+                            : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 border-2 border-transparent'
                       } ${viewMode === 'mark' ? 'hover:scale-105' : ''}`}
                     >
                       <Icon size={16} />
@@ -133,13 +133,13 @@ export function AttendanceMarking({ session, viewMode = 'mark', onClose }) {
       
       {batchEnrollments.length === 0 && (
         <div className="text-center py-8">
-          <User className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-          <p className="text-gray-500">No active students found in this batch.</p>
+          <User className="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
+          <p className="text-gray-500 dark:text-gray-400">No active students found in this batch.</p>
         </div>
       )}
       
-      <div className="flex justify-between items-center pt-6 border-t">
-        <div className="text-sm text-gray-600">
+      <div className="flex justify-between items-center pt-6 border-t border-gray-200 dark:border-gray-600">
+        <div className="text-sm text-gray-600 dark:text-gray-400">
           {viewMode === 'mark' ? 'Click status buttons to mark attendance' : 'Viewing attendance records'}
         </div>
         <div className="flex space-x-2">

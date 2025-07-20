@@ -30,21 +30,21 @@ export function BatchList({ batches, onEdit, onDelete }) {
           <TableRow key={batch.id}>
             <TableCell>
               <div>
-                <p className="font-medium text-gray-900">{batch.batchName}</p>
-                <div className="flex items-center text-sm text-gray-600 mt-1">
+                <p className="font-medium text-gray-900 dark:text-white">{batch.batchName}</p>
+                <div className="flex items-center text-sm text-gray-600 dark:text-gray-400 mt-1">
                   <Calendar size={14} className="mr-1" />
                   {formatDate(batch.startDate)} - {formatDate(batch.endDate)}
                 </div>
               </div>
             </TableCell>
             <TableCell>
-              <span className="text-sm text-gray-900">{getCourseName(batch.courseId)}</span>
+              <span className="text-sm text-gray-900 dark:text-white">{getCourseName(batch.courseId)}</span>
             </TableCell>
             <TableCell>
-              <span className="text-sm text-gray-600">{batch.schedule}</span>
+              <span className="text-sm text-gray-600 dark:text-gray-400">{batch.schedule}</span>
             </TableCell>
             <TableCell>
-              <div className="flex items-center text-sm text-gray-600">
+              <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
                 <Users size={14} className="mr-1" />
                 {batch.currentStudents}/{batch.maxStudents}
               </div>
@@ -56,13 +56,13 @@ export function BatchList({ batches, onEdit, onDelete }) {
               <div className="flex space-x-2">
                 <button
                   onClick={() => onEdit(batch)}
-                  className="text-blue-600 hover:text-blue-800"
+                  className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
                 >
                   <Edit2 size={16} />
                 </button>
                 <button
                   onClick={() => onDelete(batch.id)}
-                  className="text-red-600 hover:text-red-800"
+                  className="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300"
                 >
                   <Trash2 size={16} />
                 </button>

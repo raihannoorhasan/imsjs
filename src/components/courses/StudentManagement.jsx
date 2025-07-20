@@ -59,14 +59,14 @@ export function StudentManagement() {
       <Card className="p-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900">Student Management</h2>
-            <p className="text-gray-600 mt-1">Manage student profiles and enrollments</p>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Student Management</h2>
+            <p className="text-gray-600 dark:text-gray-400 mt-1">Manage student profiles and enrollments</p>
           </div>
           <div className="flex flex-col sm:flex-row gap-2">
             <Button 
               variant="outline" 
               onClick={() => setShowEnrollmentForm(true)}
-              className="border-purple-300 text-purple-700 hover:bg-purple-50 hover:border-purple-400"
+              className="border-purple-300 dark:border-purple-600 text-purple-700 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 hover:border-purple-400 dark:hover:border-purple-500"
             >
               <UserPlus size={20} className="mr-2" />
               Enroll Student
@@ -97,12 +97,12 @@ export function StudentManagement() {
 
       {/* Results Summary */}
       {searchTerm && (
-        <div className="text-sm text-gray-600 px-1">
+        <div className="text-sm text-gray-600 dark:text-gray-400 px-1">
           Found {filteredStudents.length} student{filteredStudents.length !== 1 ? 's' : ''} matching "{searchTerm}"
         </div>
       )}
 
-      <div className="bg-white rounded-lg shadow-sm border">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm dark:shadow-lg border border-gray-200 dark:border-gray-700 transition-colors duration-300">
         <StudentList
           students={filteredStudents}
           onEdit={handleEdit}

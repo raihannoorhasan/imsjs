@@ -43,8 +43,8 @@ export function BatchManagement() {
       <Card className="p-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900">Batch Management</h2>
-            <p className="text-gray-600 mt-1">Organize and manage course batches</p>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Batch Management</h2>
+            <p className="text-gray-600 dark:text-gray-400 mt-1">Organize and manage course batches</p>
           </div>
           <Button 
             onClick={() => setShowAddForm(true)}
@@ -71,12 +71,12 @@ export function BatchManagement() {
 
       {/* Results Summary */}
       {searchTerm && (
-        <div className="text-sm text-gray-600 px-1">
+        <div className="text-sm text-gray-600 dark:text-gray-400 px-1">
           Found {filteredBatches.length} batch{filteredBatches.length !== 1 ? 'es' : ''} matching "{searchTerm}"
         </div>
       )}
 
-      <div className="bg-white rounded-lg shadow-sm border">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm dark:shadow-lg border border-gray-200 dark:border-gray-700 transition-colors duration-300">
         <BatchList
           batches={filteredBatches}
           onEdit={handleEdit}

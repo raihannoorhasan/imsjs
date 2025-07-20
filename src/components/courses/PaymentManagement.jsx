@@ -113,8 +113,8 @@ export function PaymentManagement() {
       <Card className="p-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900">Payment Management</h2>
-            <p className="text-gray-600 mt-1">Track and manage course payments and vouchers</p>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Payment Management</h2>
+            <p className="text-gray-600 dark:text-gray-400 mt-1">Track and manage course payments and vouchers</p>
           </div>
           <Button 
             onClick={() => setShowPaymentForm(true)}
@@ -166,13 +166,13 @@ export function PaymentManagement() {
 
       {/* Results Summary */}
       {(searchTerm || statusFilter !== 'all' || paymentTypeFilter !== 'all') && (
-        <div className="text-sm text-gray-600 px-1">
+        <div className="text-sm text-gray-600 dark:text-gray-400 px-1">
           Found {filteredPayments.length} payment{filteredPayments.length !== 1 ? 's' : ''} 
           {searchTerm && ` matching "${searchTerm}"`}
         </div>
       )}
 
-      <div className="bg-white rounded-lg shadow-sm border">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm dark:shadow-lg border border-gray-200 dark:border-gray-700 transition-colors duration-300">
         <PaymentList 
           payments={filteredPayments}
           onViewVoucher={handleViewVoucher}

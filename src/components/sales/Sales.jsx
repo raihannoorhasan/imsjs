@@ -352,6 +352,7 @@ export function Sales() {
               })}
             </div>
             <QuickActions onClearCart={clearCart} />
+            <QuickActions onClearCart={clearCart} hasItems={cart.length > 0} />
           </div>
         </div>
       </div>
@@ -402,25 +403,40 @@ export function Sales() {
             </div>
 
             {/* Products Grid */}
-            <div className="flex-1 overflow-y-auto">
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+            <div className="flex-1 overflow-y-auto pb-6">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-3 md:gap-4">
                 {filteredProducts.map(product => (
                   <div
                     key={product.id}
                     onClick={() => addToCart(product.id)}
-                    className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm dark:shadow-lg border border-gray-200 dark:border-gray-700 hover:shadow-md dark:hover:shadow-xl hover:border-blue-300 dark:hover:border-blue-600 cursor-pointer transition-all duration-200 transform hover:-translate-y-1"
+                    className="bg-white dark:bg-gray-800 rounded-xl p-3 md:p-4 shadow-sm dark:shadow-lg border border-gray-200 dark:border-gray-700 hover:shadow-lg dark:hover:shadow-xl hover:border-blue-300 dark:hover:border-blue-600 cursor-pointer transition-all duration-200 transform hover:-translate-y-1 hover:scale-105 group min-h-[180px] md:min-h-[200px] flex flex-col"
                   >
-                    <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-900 dark:to-blue-800 rounded-lg mb-3 mx-auto">
-                      <Package className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+                    <div className="flex items-center justify-center w-12 h-12 md:w-14 md:h-14 bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-900 dark:to-blue-800 rounded-xl mb-3 md:mb-4 mx-auto group-hover:scale-110 transition-transform duration-200">
+                      <Package className="w-6 h-6 md:w-7 md:h-7 text-blue-600 dark:text-blue-400" />
                     </div>
-                    <h3 className="font-semibold text-gray-900 dark:text-white text-sm mb-1 line-clamp-2">{product.name}</h3>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">SKU: {product.sku}</p>
-                    <div className="flex items-center justify-between">
-                      <span className="text-lg font-bold text-green-600 dark:text-green-400">${product.sellingPrice.toFixed(2)}</span>
-                      <span className="text-xs text-gray-500 dark:text-gray-400">Stock: {product.stock}</span>
+                    <div className="text-center mb-3 flex-1 flex flex-col justify-between">
+                      <div>
+                        <h3 className="font-semibold text-gray-900 dark:text-white text-xs md:text-sm mb-2 line-clamp-2 min-h-[2rem] md:min-h-[2.5rem] leading-tight">{product.name}</h3>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">SKU: {product.sku}</p>
+                      </div>
                     </div>
-                    <div className="mt-2">
-                      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium capitalize ${
+                    
+                    <div className="space-y-2 md:space-y-3 mt-auto">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm md:text-lg font-bold text-green-600 dark:text-green-400">${product.sellingPrice.toFixed(2)}</span>
+                        <div className="text-right">
+                          <span className="text-xs text-gray-500 dark:text-gray-400 block">Stock</span>
+                          <span className={`text-sm font-semibold ${
+                            product.stock <= product.minStock 
+                              ? 'text-red-600 dark:text-red-400' 
+                              : 'text-gray-700 dark:text-gray-300'
+                          }`}>
+                            {product.stock}
+                          </span>
+                        </div>
+                      </div>
+                      
+                      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium capitalize w-full justify-center ${
                         product.category === 'laptop' ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-400' :
                         product.category === 'component' ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400' :
                         product.category === 'course' ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400' :
@@ -428,13 +444,19 @@ export function Sales() {
                       }`}>
                         {product.category}
                       </span>
+                      
+                      {product.stock <= product.minStock && (
+                        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-1 md:p-2">
+                          <p className="text-xs text-red-600 dark:text-red-400 font-medium text-center">Low Stock!</p>
+                        </div>
+                      )}
                     </div>
                   </div>
                 ))}
               </div>
               
               {filteredProducts.length === 0 && (
-                <div className="flex flex-col items-center justify-center h-64 text-gray-500">
+                <div className="flex flex-col items-center justify-center h-64 text-gray-500 pb-6">
                   <Package className="w-16 h-16 mb-4 text-gray-300 dark:text-gray-600" />
                   <p className="text-lg font-medium text-gray-500 dark:text-gray-400">No products found</p>
                   <p className="text-sm text-gray-400 dark:text-gray-500">Try adjusting your search or filters</p>
@@ -461,7 +483,7 @@ export function Sales() {
               {cart.length > 0 && (
                 <button
                   onClick={clearCart}
-                  className="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 text-sm font-medium px-3 py-1 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                  className="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 text-sm font-medium px-3 py-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors border border-red-200 dark:border-red-800"
                 >
                   Clear All
                 </button>
@@ -470,7 +492,7 @@ export function Sales() {
           </div>
 
           {/* Cart Items */}
-          <div className="flex-1 overflow-y-auto p-6">
+          <div className="flex-1 overflow-y-auto p-4">
             {cart.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-full text-gray-500">
                 <ShoppingCart className="w-16 h-16 mb-4 text-gray-300 dark:text-gray-600" />
@@ -484,40 +506,64 @@ export function Sales() {
                   if (!product) return null;
                   
                   return (
-                    <div key={item.productId} className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4 border border-gray-100 dark:border-gray-600/50 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200">
-                      <div className="flex items-start justify-between mb-2">
-                        <div className="flex-1">
-                          <h3 className="font-medium text-gray-900 dark:text-white text-sm">{product.name}</h3>
-                          <p className="text-xs text-gray-500 dark:text-gray-400">SKU: {product.sku}</p>
-                          <p className="text-sm text-green-600 dark:text-green-400 font-medium">${item.unitPrice.toFixed(2)} each</p>
+                    <div key={item.productId} className="bg-gray-50 dark:bg-gray-700 rounded-xl p-4 border border-gray-200 dark:border-gray-600 shadow-sm hover:shadow-md dark:hover:shadow-lg transition-all duration-200">
+                      <div className="flex items-start space-x-3 mb-4">
+                        <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-900 dark:to-blue-800 rounded-xl flex-shrink-0">
+                          <Package className="w-6 h-6 text-blue-600 dark:text-blue-400" />
                         </div>
-                        <button
-                          onClick={() => removeFromCart(item.productId)}
-                          className="text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 p-1 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
-                        >
-                          <X size={16} />
-                        </button>
+                        <div className="flex-1">
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1 min-w-0">
+                              <h3 className="font-semibold text-gray-900 dark:text-white text-base leading-tight mb-1">{product.name}</h3>
+                              <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">SKU: {product.sku}</p>
+                              <div className="flex items-center space-x-2 mb-2">
+                                <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium capitalize ${
+                                  product.category === 'laptop' ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-400' :
+                                  product.category === 'component' ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400' :
+                                  product.category === 'course' ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400' :
+                                  'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300'
+                                }`}>
+                                  {product.category}
+                                </span>
+                                <p className="text-sm text-green-600 dark:text-green-400 font-semibold">${item.unitPrice.toFixed(2)} each</p>
+                              </div>
+                            </div>
+                            <button
+                              onClick={() => removeFromCart(item.productId)}
+                              className="text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 p-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors flex-shrink-0"
+                            >
+                              <X size={18} />
+                            </button>
+                          </div>
+                        </div>
                       </div>
                       
-                      <div className="flex items-center justify-between">
+                      <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-600">
                         <div className="flex items-center space-x-2">
                           <button
                             onClick={() => updateQuantity(item.productId, item.quantity - 1)}
-                            className="w-8 h-8 rounded-full bg-white dark:bg-gray-600 border border-gray-300 dark:border-gray-500 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-500 transition-colors shadow-sm"
+                            className="w-8 h-8 rounded-lg bg-white dark:bg-gray-600 border border-gray-300 dark:border-gray-500 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-500 transition-colors shadow-sm"
                           >
-                            <span className="text-gray-600 dark:text-gray-300 font-medium">-</span>
+                            <span className="text-gray-600 dark:text-gray-300 font-bold">-</span>
                           </button>
-                          <span className="font-medium text-gray-900 dark:text-white min-w-[30px] text-center">
+                          <div className="bg-white dark:bg-gray-600 px-3 py-1 rounded-lg min-w-[45px] text-center border border-gray-200 dark:border-gray-500">
+                            <span className="font-bold text-gray-900 dark:text-white">
                             {item.quantity}
-                          </span>
+                            </span>
+                          </div>
                           <button
                             onClick={() => updateQuantity(item.productId, item.quantity + 1)}
-                            className="w-8 h-8 rounded-full bg-white dark:bg-gray-600 border border-gray-300 dark:border-gray-500 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-500 transition-colors shadow-sm"
+                            className="w-8 h-8 rounded-lg bg-white dark:bg-gray-600 border border-gray-300 dark:border-gray-500 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-500 transition-colors shadow-sm"
                           >
-                            <span className="text-gray-600 dark:text-gray-300 font-medium">+</span>
+                            <span className="text-gray-600 dark:text-gray-300 font-bold">+</span>
                           </button>
                         </div>
-                        <span className="font-bold text-gray-900 dark:text-white text-lg">${item.total.toFixed(2)}</span>
+                        <div className="text-right">
+                          <span className="font-bold text-gray-900 dark:text-white text-lg">${item.total.toFixed(2)}</span>
+                          <p className="text-xs text-gray-500 dark:text-gray-400">
+                            {item.quantity} × ${item.unitPrice.toFixed(2)}
+                          </p>
+                        </div>
                       </div>
                     </div>
                   );
@@ -528,7 +574,7 @@ export function Sales() {
 
           {/* Checkout Section */}
           {cart.length > 0 && (
-            <div className="border-t border-gray-200 dark:border-gray-700 p-6 space-y-6 bg-gradient-to-b from-white to-gray-50 dark:from-gray-800 dark:to-gray-900">
+            <div className="border-t border-gray-200 dark:border-gray-700 p-4 space-y-4 bg-gradient-to-b from-white to-gray-50 dark:from-gray-800 dark:to-gray-900">
               {/* Customer Selection */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Customer</label>

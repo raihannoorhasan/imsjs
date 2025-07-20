@@ -127,68 +127,68 @@ export function DashboardReport({ timeRange }) {
   return (
     <div className="space-y-6">
       {/* Time Range Header */}
-      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-6">
+      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30 border border-blue-200 dark:border-blue-800 rounded-xl p-6 transition-colors duration-300">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-bold text-blue-900">Business Overview - {getTimeRangeLabel()}</h2>
-            <p className="text-blue-700 mt-1">Comprehensive performance metrics across all departments</p>
+            <h2 className="text-2xl font-bold text-blue-900 dark:text-blue-100">Business Overview - {getTimeRangeLabel()}</h2>
+            <p className="text-blue-700 dark:text-blue-300 mt-1">Comprehensive performance metrics across all departments</p>
           </div>
-          <div className="bg-blue-100 p-3 rounded-full">
-            <BarChart3 className="w-8 h-8 text-blue-600" />
+          <div className="bg-blue-100 dark:bg-blue-800/50 p-3 rounded-full">
+            <BarChart3 className="w-8 h-8 text-blue-600 dark:text-blue-400" />
           </div>
         </div>
       </div>
 
       {/* Key Performance Indicators */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card className="p-6 bg-gradient-to-br from-green-50 to-emerald-100 border-green-200">
+        <Card className="p-6 bg-gradient-to-br from-green-50 to-emerald-100 dark:from-green-900/30 dark:to-emerald-800/30 border-green-200 dark:border-green-800">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-green-700">Total Revenue</p>
-              <p className="text-3xl font-bold text-green-900">{formatCurrency(totalRevenue)}</p>
-              <p className="text-sm text-green-600 mt-1">All departments</p>
+              <p className="text-sm font-medium text-green-700 dark:text-green-400">Total Revenue</p>
+              <p className="text-3xl font-bold text-green-900 dark:text-green-100">{formatCurrency(totalRevenue)}</p>
+              <p className="text-sm text-green-600 dark:text-green-400 mt-1">All departments</p>
             </div>
-            <div className="bg-green-200 p-3 rounded-full">
-              <DollarSign className="w-8 h-8 text-green-700" />
+            <div className="bg-green-200 dark:bg-green-800/50 p-3 rounded-full">
+              <DollarSign className="w-8 h-8 text-green-700 dark:text-green-400" />
             </div>
           </div>
         </Card>
 
-        <Card className="p-6 bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
+        <Card className="p-6 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/30 dark:to-blue-800/30 border-blue-200 dark:border-blue-800">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-blue-700">Total Transactions</p>
-              <p className="text-3xl font-bold text-blue-900">{salesCount + completedTickets + newEnrollments}</p>
-              <p className="text-sm text-blue-600 mt-1">Sales + Service + Courses</p>
+              <p className="text-sm font-medium text-blue-700 dark:text-blue-400">Total Transactions</p>
+              <p className="text-3xl font-bold text-blue-900 dark:text-blue-100">{salesCount + completedTickets + newEnrollments}</p>
+              <p className="text-sm text-blue-600 dark:text-blue-400 mt-1">Sales + Service + Courses</p>
             </div>
-            <div className="bg-blue-200 p-3 rounded-full">
-              <TrendingUp className="w-8 h-8 text-blue-700" />
+            <div className="bg-blue-200 dark:bg-blue-800/50 p-3 rounded-full">
+              <TrendingUp className="w-8 h-8 text-blue-700 dark:text-blue-400" />
             </div>
           </div>
         </Card>
 
-        <Card className="p-6 bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200">
+        <Card className="p-6 bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/30 dark:to-purple-800/30 border-purple-200 dark:border-purple-800">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-purple-700">Active Customers</p>
-              <p className="text-3xl font-bold text-purple-900">{totalCustomers}</p>
-              <p className="text-sm text-purple-600 mt-1">Customer base</p>
+              <p className="text-sm font-medium text-purple-700 dark:text-purple-400">Active Customers</p>
+              <p className="text-3xl font-bold text-purple-900 dark:text-purple-100">{totalCustomers}</p>
+              <p className="text-sm text-purple-600 dark:text-purple-400 mt-1">Customer base</p>
             </div>
-            <div className="bg-purple-200 p-3 rounded-full">
-              <Users className="w-8 h-8 text-purple-700" />
+            <div className="bg-purple-200 dark:bg-purple-800/50 p-3 rounded-full">
+              <Users className="w-8 h-8 text-purple-700 dark:text-purple-400" />
             </div>
           </div>
         </Card>
 
-        <Card className="p-6 bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200">
+        <Card className="p-6 bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-900/30 dark:to-orange-800/30 border-orange-200 dark:border-orange-800">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-orange-700">Active Services</p>
-              <p className="text-3xl font-bold text-orange-900">{activeTickets}</p>
-              <p className="text-sm text-orange-600 mt-1">In progress</p>
+              <p className="text-sm font-medium text-orange-700 dark:text-orange-400">Active Services</p>
+              <p className="text-3xl font-bold text-orange-900 dark:text-orange-100">{activeTickets}</p>
+              <p className="text-sm text-orange-600 dark:text-orange-400 mt-1">In progress</p>
             </div>
-            <div className="bg-orange-200 p-3 rounded-full">
-              <Wrench className="w-8 h-8 text-orange-700" />
+            <div className="bg-orange-200 dark:bg-orange-800/50 p-3 rounded-full">
+              <Wrench className="w-8 h-8 text-orange-700 dark:text-orange-400" />
             </div>
           </div>
         </Card>
@@ -197,35 +197,35 @@ export function DashboardReport({ timeRange }) {
       {/* Department Performance */}
       <Card className="p-6">
         <div className="flex items-center justify-between mb-6">
-          <h3 className="text-xl font-semibold text-gray-900">Department Performance</h3>
-          <PieChart className="w-6 h-6 text-gray-500" />
+          <h3 className="text-xl font-semibold text-gray-900 dark:text-white">Department Performance</h3>
+          <PieChart className="w-6 h-6 text-gray-500 dark:text-gray-400" />
         </div>
         
         <div className="space-y-4">
           {departmentData.map((dept, index) => {
             const Icon = dept.icon;
             return (
-              <div key={index} className="bg-gray-50 rounded-lg p-4">
+              <div key={index} className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center space-x-3">
-                    <div className={`${dept.bgColor} p-2 rounded-lg`}>
+                    <div className={`${dept.bgColor} dark:bg-opacity-20 p-2 rounded-lg`}>
                       <Icon className={`w-5 h-5 ${dept.color}`} />
                     </div>
                     <div>
-                      <h4 className="font-semibold text-gray-900">{dept.name}</h4>
-                      <p className="text-sm text-gray-600">{dept.transactions} transactions</p>
+                      <h4 className="font-semibold text-gray-900 dark:text-white">{dept.name}</h4>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">{dept.transactions} transactions</p>
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="text-xl font-bold text-gray-900">{formatCurrency(dept.revenue)}</p>
-                    <p className="text-sm text-gray-600">{dept.percentage.toFixed(1)}% of total</p>
+                    <p className="text-xl font-bold text-gray-900 dark:text-white">{formatCurrency(dept.revenue)}</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">{dept.percentage.toFixed(1)}% of total</p>
                   </div>
                 </div>
                 
                 {/* Progress Bar */}
-                <div className="w-full bg-gray-200 rounded-full h-2">
+                <div className="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2">
                   <div 
-                    className={`h-2 rounded-full ${dept.color.replace('text-', 'bg-')}`}
+                    className={`h-2 rounded-full ${dept.color.replace('text-', 'bg-').replace('600', '500')}`}
                     style={{ width: `${dept.percentage}%` }}
                   ></div>
                 </div>
@@ -240,25 +240,25 @@ export function DashboardReport({ timeRange }) {
         {/* Sales Quick Stats */}
         <Card className="p-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900">Sales Performance</h3>
-            <DollarSign className="w-5 h-5 text-green-600" />
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Sales Performance</h3>
+            <DollarSign className="w-5 h-5 text-green-600 dark:text-green-400" />
           </div>
           <div className="space-y-3">
             <div className="flex justify-between">
-              <span className="text-gray-600">Revenue:</span>
-              <span className="font-semibold text-green-600">{formatCurrency(salesRevenue)}</span>
+              <span className="text-gray-600 dark:text-gray-400">Revenue:</span>
+              <span className="font-semibold text-green-600 dark:text-green-400">{formatCurrency(salesRevenue)}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-600">Orders:</span>
-              <span className="font-semibold">{salesCount}</span>
+              <span className="text-gray-600 dark:text-gray-400">Orders:</span>
+              <span className="font-semibold text-gray-900 dark:text-white">{salesCount}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-600">Average Order:</span>
-              <span className="font-semibold">{formatCurrency(averageOrderValue)}</span>
+              <span className="text-gray-600 dark:text-gray-400">Average Order:</span>
+              <span className="font-semibold text-gray-900 dark:text-white">{formatCurrency(averageOrderValue)}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-600">Products Sold:</span>
-              <span className="font-semibold">
+              <span className="text-gray-600 dark:text-gray-400">Products Sold:</span>
+              <span className="font-semibold text-gray-900 dark:text-white">
                 {filteredSales.reduce((sum, sale) => sum + sale.items.reduce((itemSum, item) => itemSum + item.quantity, 0), 0)}
               </span>
             </div>
@@ -268,25 +268,25 @@ export function DashboardReport({ timeRange }) {
         {/* Service Quick Stats */}
         <Card className="p-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900">Service Performance</h3>
-            <Wrench className="w-5 h-5 text-orange-600" />
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Service Performance</h3>
+            <Wrench className="w-5 h-5 text-orange-600 dark:text-orange-400" />
           </div>
           <div className="space-y-3">
             <div className="flex justify-between">
-              <span className="text-gray-600">Service Revenue:</span>
-              <span className="font-semibold text-orange-600">{formatCurrency(serviceRevenue)}</span>
+              <span className="text-gray-600 dark:text-gray-400">Service Revenue:</span>
+              <span className="font-semibold text-orange-600 dark:text-orange-400">{formatCurrency(serviceRevenue)}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-600">Completed Tickets:</span>
-              <span className="font-semibold">{completedTickets}</span>
+              <span className="text-gray-600 dark:text-gray-400">Completed Tickets:</span>
+              <span className="font-semibold text-gray-900 dark:text-white">{completedTickets}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-600">Active Tickets:</span>
-              <span className="font-semibold text-yellow-600">{activeTickets}</span>
+              <span className="text-gray-600 dark:text-gray-400">Active Tickets:</span>
+              <span className="font-semibold text-yellow-600 dark:text-yellow-400">{activeTickets}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-600">Total Tickets:</span>
-              <span className="font-semibold">{filteredServiceTickets.length}</span>
+              <span className="text-gray-600 dark:text-gray-400">Total Tickets:</span>
+              <span className="font-semibold text-gray-900 dark:text-white">{filteredServiceTickets.length}</span>
             </div>
           </div>
         </Card>
@@ -295,25 +295,25 @@ export function DashboardReport({ timeRange }) {
       {/* Course Performance */}
       <Card className="p-6">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-gray-900">Course Department Performance</h3>
-          <BookOpen className="w-5 h-5 text-blue-600" />
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Course Department Performance</h3>
+          <BookOpen className="w-5 h-5 text-blue-600 dark:text-blue-400" />
         </div>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="bg-blue-50 p-4 rounded-lg text-center">
-            <p className="text-sm text-blue-700">Course Revenue</p>
-            <p className="text-2xl font-bold text-blue-900">{formatCurrency(courseRevenue)}</p>
+          <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg text-center">
+            <p className="text-sm text-blue-700 dark:text-blue-400">Course Revenue</p>
+            <p className="text-2xl font-bold text-blue-900 dark:text-blue-100">{formatCurrency(courseRevenue)}</p>
           </div>
-          <div className="bg-green-50 p-4 rounded-lg text-center">
-            <p className="text-sm text-green-700">New Enrollments</p>
-            <p className="text-2xl font-bold text-green-900">{newEnrollments}</p>
+          <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg text-center">
+            <p className="text-sm text-green-700 dark:text-green-400">New Enrollments</p>
+            <p className="text-2xl font-bold text-green-900 dark:text-green-100">{newEnrollments}</p>
           </div>
-          <div className="bg-purple-50 p-4 rounded-lg text-center">
-            <p className="text-sm text-purple-700">Active Courses</p>
-            <p className="text-2xl font-bold text-purple-900">{courses.filter(c => c.status === 'active').length}</p>
+          <div className="bg-purple-50 dark:bg-purple-900/20 p-4 rounded-lg text-center">
+            <p className="text-sm text-purple-700 dark:text-purple-400">Active Courses</p>
+            <p className="text-2xl font-bold text-purple-900 dark:text-purple-100">{courses.filter(c => c.status === 'active').length}</p>
           </div>
-          <div className="bg-orange-50 p-4 rounded-lg text-center">
-            <p className="text-sm text-orange-700">Payment Rate</p>
-            <p className="text-2xl font-bold text-orange-900">
+          <div className="bg-orange-50 dark:bg-orange-900/20 p-4 rounded-lg text-center">
+            <p className="text-sm text-orange-700 dark:text-orange-400">Payment Rate</p>
+            <p className="text-2xl font-bold text-orange-900 dark:text-orange-100">
               {filteredPayments.length > 0 ? 
                 ((filteredPayments.filter(p => p.status === 'approved').length / filteredPayments.length) * 100).toFixed(1) : 0}%
             </p>
@@ -324,13 +324,13 @@ export function DashboardReport({ timeRange }) {
       {/* Performance Trends */}
       <Card className="p-6">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-gray-900">Performance Trends</h3>
-          <Target className="w-5 h-5 text-gray-500" />
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Performance Trends</h3>
+          <Target className="w-5 h-5 text-gray-500 dark:text-gray-400" />
         </div>
-        <div className="text-center py-8 text-gray-500">
-          <BarChart3 className="w-16 h-16 mx-auto mb-4 text-gray-300" />
-          <p className="text-lg font-medium">Advanced Analytics Coming Soon</p>
-          <p className="text-sm">Interactive charts and trend analysis will be available in the next update</p>
+        <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+          <BarChart3 className="w-16 h-16 mx-auto mb-4 text-gray-300 dark:text-gray-600" />
+          <p className="text-lg font-medium text-gray-700 dark:text-gray-300">Advanced Analytics Coming Soon</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">Interactive charts and trend analysis will be available in the next update</p>
         </div>
       </Card>
     </div>

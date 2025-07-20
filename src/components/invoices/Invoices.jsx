@@ -51,12 +51,13 @@ export function Invoices() {
     !invoices.some(invoice => invoice.saleId === sale.id)
   );
   return (
-    <div className="p-6">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+      <div className="p-6">
       <div className="mb-6">
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Invoice Management</h1>
-            <p className="text-gray-600 mt-2">Track and manage customer invoices and payments</p>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Invoice Management</h1>
+            <p className="text-gray-600 dark:text-gray-400 mt-2">Track and manage customer invoices and payments</p>
           </div>
           <div className="flex space-x-2">
             {salesWithoutInvoices.length > 0 && (
@@ -71,53 +72,53 @@ export function Invoices() {
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-        <div className="bg-white rounded-lg shadow-sm border p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm dark:shadow-lg border border-gray-200 dark:border-gray-700 p-6 transition-colors duration-300">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Total Invoices</p>
-              <p className="text-2xl font-bold text-gray-900">{filteredInvoices.length}</p>
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Invoices</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">{filteredInvoices.length}</p>
             </div>
-            <div className="bg-blue-100 p-3 rounded-lg">
-              <FileText className="w-6 h-6 text-blue-600" />
+            <div className="bg-blue-100 dark:bg-blue-900/30 p-3 rounded-lg">
+              <FileText className="w-6 h-6 text-blue-600 dark:text-blue-400" />
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm border p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm dark:shadow-lg border border-gray-200 dark:border-gray-700 p-6 transition-colors duration-300">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Total Value</p>
-              <p className="text-2xl font-bold text-gray-900">${totalAmount.toFixed(2)}</p>
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Value</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">${totalAmount.toFixed(2)}</p>
             </div>
-            <div className="bg-green-100 p-3 rounded-lg">
-              <DollarSign className="w-6 h-6 text-green-600" />
+            <div className="bg-green-100 dark:bg-green-900/30 p-3 rounded-lg">
+              <DollarSign className="w-6 h-6 text-green-600 dark:text-green-400" />
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm border p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm dark:shadow-lg border border-gray-200 dark:border-gray-700 p-6 transition-colors duration-300">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Paid Amount</p>
-              <p className="text-2xl font-bold text-green-600">${paidAmount.toFixed(2)}</p>
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Paid Amount</p>
+              <p className="text-2xl font-bold text-green-600 dark:text-green-400">${paidAmount.toFixed(2)}</p>
             </div>
-            <div className="bg-green-100 p-3 rounded-lg">
-              <DollarSign className="w-6 h-6 text-green-600" />
+            <div className="bg-green-100 dark:bg-green-900/30 p-3 rounded-lg">
+              <DollarSign className="w-6 h-6 text-green-600 dark:text-green-400" />
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm border p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm dark:shadow-lg border border-gray-200 dark:border-gray-700 p-6 transition-colors duration-300">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Outstanding</p>
-              <p className="text-2xl font-bold text-gray-900">${pendingAmount.toFixed(2)}</p>
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Outstanding</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">${pendingAmount.toFixed(2)}</p>
               {overdueAmount > 0 && (
-                <p className="text-sm text-red-600">${overdueAmount.toFixed(2)} overdue</p>
+                <p className="text-sm text-red-600 dark:text-red-400">${overdueAmount.toFixed(2)} overdue</p>
               )}
             </div>
-            <div className="bg-orange-100 p-3 rounded-lg">
-              <Calendar className="w-6 h-6 text-orange-600" />
+            <div className="bg-orange-100 dark:bg-orange-900/30 p-3 rounded-lg">
+              <Calendar className="w-6 h-6 text-orange-600 dark:text-orange-400" />
             </div>
           </div>
         </div>
@@ -125,13 +126,13 @@ export function Invoices() {
 
       {/* Alert for sales without invoices */}
       {salesWithoutInvoices.length > 0 && (
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+        <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4 mb-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-yellow-800 font-medium">
+              <p className="text-yellow-800 dark:text-yellow-200 font-medium">
                 {salesWithoutInvoices.length} sale(s) don't have invoices yet
               </p>
-              <p className="text-yellow-700 text-sm">
+              <p className="text-yellow-700 dark:text-yellow-300 text-sm">
                 Create invoices for completed sales to track payments
               </p>
             </div>
@@ -172,6 +173,7 @@ export function Invoices() {
           invoice={selectedInvoice}
         />
       )}
+      </div>
     </div>
   );
 }

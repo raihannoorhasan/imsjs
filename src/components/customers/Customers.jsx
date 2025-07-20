@@ -23,11 +23,12 @@ export function Customers() {
   };
 
   return (
-    <div className="p-6">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+      <div className="p-6">
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Customer Management</h1>
-          <p className="text-gray-600 mt-2">Manage your customer database and relationships</p>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Customer Management</h1>
+          <p className="text-gray-600 dark:text-gray-400 mt-2">Manage your customer database and relationships</p>
         </div>
         <Button onClick={() => setShowAddForm(true)}>
           <Plus size={20} className="mr-2" />
@@ -47,6 +48,7 @@ export function Customers() {
         onClose={() => setShowAddForm(false)}
         onSubmit={handleAddCustomer}
       />
+      </div>
     </div>
   );
 }

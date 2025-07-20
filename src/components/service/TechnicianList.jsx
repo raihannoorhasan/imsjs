@@ -8,9 +8,9 @@ export function TechnicianList({ technicians }) {
   if (technicians.length === 0) {
     return (
       <div className="text-center py-12">
-        <User className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-        <h3 className="text-lg font-medium text-gray-900 mb-2">No technicians found</h3>
-        <p className="text-gray-600 mb-4">Add your first technician to get started with service management.</p>
+        <User className="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
+        <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">No technicians found</h3>
+        <p className="text-gray-600 dark:text-gray-400 mb-4">Add your first technician to get started with service management.</p>
       </div>
     );
   }
@@ -29,15 +29,15 @@ export function TechnicianList({ technicians }) {
       </TableHeader>
       <TableBody>
         {technicians.map((technician) => (
-          <TableRow key={technician.id} className="hover:bg-gray-50">
+          <TableRow key={technician.id} className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200">
             <TableCell>
               <div className="flex items-center space-x-3">
-                <div className="flex items-center justify-center w-10 h-10 bg-blue-100 rounded-full">
-                  <Wrench className="w-5 h-5 text-blue-600" />
+                <div className="flex items-center justify-center w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-full">
+                  <Wrench className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                 </div>
                 <div>
-                  <p className="font-medium text-gray-900">{technician.name}</p>
-                  <div className="flex items-center text-sm text-gray-600 mt-1">
+                  <p className="font-medium text-gray-900 dark:text-white">{technician.name}</p>
+                  <div className="flex items-center text-sm text-gray-600 dark:text-gray-400 mt-1">
                     <Mail size={14} className="mr-1" />
                     {technician.email}
                   </div>
@@ -45,7 +45,7 @@ export function TechnicianList({ technicians }) {
               </div>
             </TableCell>
             <TableCell>
-              <div className="flex items-center text-sm text-gray-600">
+              <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
                 <Phone size={14} className="mr-1" />
                 <span>{technician.phone}</span>
               </div>
@@ -55,7 +55,7 @@ export function TechnicianList({ technicians }) {
                 {technician.specializations.map((spec, index) => (
                   <span
                     key={index}
-                    className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800"
+                    className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-400"
                   >
                     {spec}
                   </span>
@@ -63,11 +63,11 @@ export function TechnicianList({ technicians }) {
               </div>
             </TableCell>
             <TableCell>
-              <div className="flex items-center text-green-600">
+              <div className="flex items-center text-green-600 dark:text-green-400">
                 <DollarSign size={14} className="mr-1" />
                 <div>
                   <span className="font-medium">{formatCurrency(technician.hourlyRate)}</span>
-                  <span className="text-xs text-gray-500 ml-1">per hour</span>
+                  <span className="text-xs text-gray-500 dark:text-gray-500 ml-1">per hour</span>
                 </div>
               </div>
             </TableCell>
@@ -75,13 +75,13 @@ export function TechnicianList({ technicians }) {
               <div className="space-y-2">
                 <div className="flex items-center text-sm">
                   <CheckCircle size={14} className="mr-1" />
-                  <span className="text-gray-900 font-medium">{technician.totalTicketsCompleted}</span>
-                  <span className="text-gray-500 ml-1">completed</span>
+                  <span className="text-gray-900 dark:text-white font-medium">{technician.totalTicketsCompleted}</span>
+                  <span className="text-gray-500 dark:text-gray-500 ml-1">completed</span>
                 </div>
                 <div className="flex items-center text-sm">
-                  <Award size={14} className="mr-1 text-yellow-500" />
-                  <span className="text-gray-900 font-medium">{technician.averageRating.toFixed(1)}</span>
-                  <span className="text-gray-500 ml-1">rating</span>
+                  <Award size={14} className="mr-1 text-yellow-500 dark:text-yellow-400" />
+                  <span className="text-gray-900 dark:text-white font-medium">{technician.averageRating.toFixed(1)}</span>
+                  <span className="text-gray-500 dark:text-gray-500 ml-1">rating</span>
                 </div>
               </div>
             </TableCell>

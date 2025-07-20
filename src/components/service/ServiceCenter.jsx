@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useInventory } from '../../contexts/InventoryContext';
 import { useAuth } from '../../contexts/AuthContext';
+import { useTheme } from '../../contexts/ThemeContext';
 import { Plus, Wrench, Users, FileText, Search, Filter, BarChart3, CreditCard, DollarSign } from 'lucide-react';
 import { Button } from '../common/Button';
 import { Card } from '../common/Card';
@@ -15,6 +16,7 @@ import { ServicePaymentForm } from './ServicePaymentForm';
 export function ServiceCenter() {
   const { serviceTickets, addServiceTicket, updateServiceTicket, deleteServiceTicket, customers, generateServiceInvoice, addServicePayment } = useInventory();
   const { canModify } = useAuth();
+  const { isDark } = useTheme();
   const [activeTab, setActiveTab] = useState('dashboard');
   const [showTicketForm, setShowTicketForm] = useState(false);
   const [showPaymentForm, setShowPaymentForm] = useState(false);
@@ -115,13 +117,13 @@ export function ServiceCenter() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 px-6 py-8">
+      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-8 transition-colors duration-300">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Service Center</h1>
-            <p className="text-gray-600">Complete service management solution for repairs and maintenance</p>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Service Center</h1>
+            <p className="text-gray-600 dark:text-gray-400">Complete service management solution for repairs and maintenance</p>
           </div>
           {activeTab === 'tickets' && (
             <Button 
@@ -136,7 +138,7 @@ export function ServiceCenter() {
       </div>
 
       {/* Tab Navigation with Modern Design */}
-      <div className="bg-white border-b border-gray-200 px-6">
+      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 transition-colors duration-300">
         <div className="flex overflow-x-auto">
           <nav className="flex space-x-1 min-w-full">
           {tabs.map((tab) => {
@@ -147,8 +149,8 @@ export function ServiceCenter() {
                 onClick={() => setActiveTab(tab.id)}
                   className={`flex items-center space-x-2 px-6 py-4 font-medium text-sm whitespace-nowrap transition-all duration-200 border-b-2 ${
                   activeTab === tab.id
-                      ? 'border-orange-500 text-orange-600 bg-orange-50'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                      ? 'border-orange-500 text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-900/20'
+                      : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700'
                 }`}
               >
                   <Icon size={18} />

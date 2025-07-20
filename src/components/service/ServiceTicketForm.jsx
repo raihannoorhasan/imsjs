@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useInventory } from '../../contexts/InventoryContext';
+import { useTheme } from '../../contexts/ThemeContext';
 import { Plus, Printer } from 'lucide-react';
 import { Modal } from '../common/Modal';
 import { Input } from '../common/Input';
@@ -10,6 +11,7 @@ import { formatDate, formatDateTime } from '../../utils/helpers';
 
 export function ServiceTicketForm({ isOpen, onClose, ticket, onSubmit }) {
   const { customers, technicians, addCustomer, servicePayments, addServicePayment } = useInventory();
+  const { isDark } = useTheme();
   const [formData, setFormData] = useState({
     customerId: '',
     deviceType: 'laptop',
@@ -251,7 +253,7 @@ export function ServiceTicketForm({ isOpen, onClose, ticket, onSubmit }) {
                 <select
                   value={formData.customerId}
                   onChange={(e) => handleChange('customerId', e.target.value)}
-                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   required
                 >
                   <option value="">Select Customer</option>
@@ -369,33 +371,33 @@ export function ServiceTicketForm({ isOpen, onClose, ticket, onSubmit }) {
         
         {/* Cost Summary */}
         {(formData.laborCost > 0 || formData.partsCost > 0) && (
-          <div className="bg-gray-50 p-4 rounded-lg">
-            <h3 className="font-medium text-gray-900 mb-2">Cost Summary</h3>
+          <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg border border-gray-200 dark:border-gray-600">
+            <h3 className="font-medium text-gray-900 dark:text-white mb-2">Cost Summary</h3>
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
-                <span className="text-gray-600">Labor Cost:</span>
-                <span className="ml-2 font-medium text-blue-600">${formData.laborCost.toFixed(2)}</span>
+                <span className="text-gray-600 dark:text-gray-400">Labor Cost:</span>
+                <span className="ml-2 font-medium text-blue-600 dark:text-blue-400">${formData.laborCost.toFixed(2)}</span>
               </div>
               <div>
-                <span className="text-gray-600">Parts Cost:</span>
-                <span className="ml-2 font-medium text-purple-600">${formData.partsCost.toFixed(2)}</span>
+                <span className="text-gray-600 dark:text-gray-400">Parts Cost:</span>
+                <span className="ml-2 font-medium text-purple-600 dark:text-purple-400">${formData.partsCost.toFixed(2)}</span>
               </div>
               <div>
-                <span className="text-gray-600">Subtotal:</span>
-                <span className="ml-2 font-medium text-gray-900">${(formData.laborCost + formData.partsCost).toFixed(2)}</span>
+                <span className="text-gray-600 dark:text-gray-400">Subtotal:</span>
+                <span className="ml-2 font-medium text-gray-900 dark:text-white">${(formData.laborCost + formData.partsCost).toFixed(2)}</span>
               </div>
               <div>
-                <span className="text-gray-600">Total (with tax):</span>
-                <span className="ml-2 font-bold text-green-600">${((formData.laborCost + formData.partsCost) * 1.1).toFixed(2)}</span>
+                <span className="text-gray-600 dark:text-gray-400">Total (with tax):</span>
+                <span className="ml-2 font-bold text-green-600 dark:text-green-400">${((formData.laborCost + formData.partsCost) * 1.1).toFixed(2)}</span>
               </div>
             </div>
             {formData.status === 'completed' && (formData.laborCost > 0 || formData.partsCost > 0) && (
-              <div className="mt-2 p-2 bg-green-50 border border-green-200 rounded text-sm text-green-700">
+              <div className="mt-2 p-2 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded text-sm text-green-700 dark:text-green-400">
                 💡 Invoice will be automatically generated when this ticket is marked as completed
               </div>
             )}
             {formData.partsCost > 0 && (
-              <div className="mt-2 p-2 bg-purple-50 border border-purple-200 rounded text-sm text-purple-700">
+              <div className="mt-2 p-2 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded text-sm text-purple-700 dark:text-purple-400">
                 💡 Parts cost can be linked to POS sales in Service Payments section
               </div>
             )}
@@ -407,7 +409,7 @@ export function ServiceTicketForm({ isOpen, onClose, ticket, onSubmit }) {
           <textarea
             value={formData.issueDescription}
             onChange={(e) => handleChange('issueDescription', e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
             rows={3}
             required
             placeholder="Describe the issue in detail..."
@@ -416,22 +418,22 @@ export function ServiceTicketForm({ isOpen, onClose, ticket, onSubmit }) {
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Customer Notes</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Customer Notes</label>
             <textarea
               value={formData.customerNotes}
               onChange={(e) => handleChange('customerNotes', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
               rows={2}
               placeholder="Any additional notes from the customer..."
             />
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Technician Notes</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Technician Notes</label>
             <textarea
               value={formData.technicianNotes}
               onChange={(e) => handleChange('technicianNotes', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
               rows={2}
               placeholder="Technical notes and work performed..."
             />
@@ -462,22 +464,22 @@ export function ServiceTicketForm({ isOpen, onClose, ticket, onSubmit }) {
       >
         <div className="text-center space-y-6">
           <div className="flex justify-center">
-            <div className="bg-green-100 p-4 rounded-full">
-              <Printer className="w-12 h-12 text-green-600" />
+            <div className="bg-green-100 dark:bg-green-900/30 p-4 rounded-full">
+              <Printer className="w-12 h-12 text-green-600 dark:text-green-400" />
             </div>
           </div>
           
           <div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
               Ticket {generatedTicket?.ticketNumber} Created
             </h3>
-            <p className="text-gray-600">
+            <p className="text-gray-600 dark:text-gray-400">
               Would you like to print a receipt for the customer?
             </p>
           </div>
           
-          <div className="bg-gray-50 rounded-lg p-4">
-            <div className="text-sm text-gray-600">
+          <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 border border-gray-200 dark:border-gray-600">
+            <div className="text-sm text-gray-600 dark:text-gray-400">
               <p>Device: {generatedTicket?.deviceBrand} {generatedTicket?.deviceModel}</p>
               <p>Priority: {generatedTicket?.priority}</p>
               <p>Estimated Cost: ${generatedTicket?.estimatedCost?.toFixed(2) || '0.00'}</p>

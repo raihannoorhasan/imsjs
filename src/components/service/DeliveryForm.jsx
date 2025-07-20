@@ -392,22 +392,22 @@ export function DeliveryForm({ isOpen, onClose, ticket, onSubmit }) {
       >
         <div className="text-center space-y-6">
           <div className="flex justify-center">
-            <div className="bg-purple-100 p-4 rounded-full">
-              <Truck className="w-12 h-12 text-purple-600" />
+            <div className="bg-purple-100 dark:bg-purple-900/30 p-4 rounded-full">
+              <Truck className="w-12 h-12 text-purple-600 dark:text-purple-400" />
             </div>
           </div>
           
           <div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
               Delivery Completed
             </h3>
-            <p className="text-gray-600">
+            <p className="text-gray-600 dark:text-gray-400">
               Device has been successfully delivered to {formData.recipientName}
             </p>
           </div>
           
-          <div className="bg-gray-50 rounded-lg p-4">
-            <div className="text-sm text-gray-600">
+          <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 border border-gray-200 dark:border-gray-600">
+            <div className="text-sm text-gray-600 dark:text-gray-400">
               <p>Ticket: {ticket?.ticketNumber}</p>
               <p>Device: {ticket?.deviceBrand} {ticket?.deviceModel}</p>
               <p>Delivered to: {formData.recipientName}</p>

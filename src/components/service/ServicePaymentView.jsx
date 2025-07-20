@@ -1,5 +1,6 @@
 import React from 'react';
 import { useInventory } from '../../contexts/InventoryContext';
+import { useTheme } from '../../contexts/ThemeContext';
 import { Modal } from '../common/Modal';
 import { Button } from '../common/Button';
 import { DollarSign, Receipt, User, Calendar, FileText, Printer } from 'lucide-react';
@@ -7,6 +8,7 @@ import { formatCurrency, formatDate, formatDateTime } from '../../utils/helpers'
 
 export function ServicePaymentView({ isOpen, onClose, payment }) {
   const { customers, serviceTickets, sales, products } = useInventory();
+  const { isDark } = useTheme();
 
   if (!payment) return null;
 
@@ -215,10 +217,10 @@ export function ServicePaymentView({ isOpen, onClose, payment }) {
         <div className="flex justify-between items-start">
           <div>
             <div className="flex items-center space-x-2 mb-2">
-              <Receipt className="w-6 h-6 text-green-600" />
-              <h2 className="text-2xl font-bold text-gray-900">{payment.receiptNumber}</h2>
+              <Receipt className="w-6 h-6 text-green-600 dark:text-green-400" />
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{payment.receiptNumber}</h2>
             </div>
-            <div className="space-y-1 text-sm text-gray-600">
+            <div className="space-y-1 text-sm text-gray-600 dark:text-gray-400">
               <p>Payment Date: {formatDate(payment.paymentDate)}</p>
               <p>Recorded: {formatDateTime(payment.createdAt)}</p>
             </div>
@@ -227,30 +229,30 @@ export function ServicePaymentView({ isOpen, onClose, payment }) {
             <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(payment.status)}`}>
               {payment.status.charAt(0).toUpperCase() + payment.status.slice(1)}
             </span>
-            <p className="text-2xl font-bold text-green-600 mt-2">{formatCurrency(payment.amount)}</p>
+            <p className="text-2xl font-bold text-green-600 dark:text-green-400 mt-2">{formatCurrency(payment.amount)}</p>
           </div>
         </div>
 
         {/* Customer and Service Info */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-gray-50 p-4 rounded-lg">
-            <h3 className="font-medium text-gray-900 mb-3 flex items-center">
-              <User className="w-5 h-5 mr-2" />
+          <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg border border-gray-200 dark:border-gray-600">
+            <h3 className="font-medium text-gray-900 dark:text-white mb-3 flex items-center">
+              <User className="w-5 h-5 mr-2 text-gray-600 dark:text-gray-400" />
               Customer Information
             </h3>
-            <div className="space-y-2 text-sm">
+            <div className="space-y-2 text-sm text-gray-700 dark:text-gray-300">
               <p><span className="font-medium">Name:</span> {customer?.name || 'N/A'}</p>
               <p><span className="font-medium">Phone:</span> {customer?.phone || 'N/A'}</p>
               <p><span className="font-medium">Email:</span> {customer?.email || 'N/A'}</p>
             </div>
           </div>
           
-          <div className="bg-gray-50 p-4 rounded-lg">
-            <h3 className="font-medium text-gray-900 mb-3 flex items-center">
-              <FileText className="w-5 h-5 mr-2" />
+          <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg border border-gray-200 dark:border-gray-600">
+            <h3 className="font-medium text-gray-900 dark:text-white mb-3 flex items-center">
+              <FileText className="w-5 h-5 mr-2 text-gray-600 dark:text-gray-400" />
               Service Information
             </h3>
-            <div className="space-y-2 text-sm">
+            <div className="space-y-2 text-sm text-gray-700 dark:text-gray-300">
               <p><span className="font-medium">Ticket:</span> {ticket?.ticketNumber || 'N/A'}</p>
               <p><span className="font-medium">Device:</span> {ticket?.deviceBrand} {ticket?.deviceModel}</p>
               <p><span className="font-medium">Payment Type:</span> {payment.paymentType.replace('_', ' ')}</p>
@@ -263,14 +265,14 @@ export function ServicePaymentView({ isOpen, onClose, payment }) {
 
         {/* Related Sale Details */}
         {relatedSale && (
-          <div className="bg-purple-50 border border-purple-200 p-4 rounded-lg">
-            <h3 className="font-medium text-gray-900 mb-3 flex items-center">
-              <svg className="w-5 h-5 mr-2 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
+          <div className="bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 p-4 rounded-lg">
+            <h3 className="font-medium text-gray-900 dark:text-white mb-3 flex items-center">
+              <svg className="w-5 h-5 mr-2 text-purple-600 dark:text-purple-400" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z" />
               </svg>
               Related Sale Information
             </h3>
-            <div className="space-y-2 text-sm">
+            <div className="space-y-2 text-sm text-gray-700 dark:text-gray-300">
               <p><span className="font-medium">Sale ID:</span> #{relatedSale.id.slice(-6)}</p>
               <p><span className="font-medium">Sale Date:</span> {formatDate(relatedSale.createdAt)}</p>
               <p><span className="font-medium">Items:</span></p>
@@ -282,7 +284,7 @@ export function ServicePaymentView({ isOpen, onClose, payment }) {
                   </div>
                 ))}
               </div>
-              <div className="border-t pt-2 mt-2">
+              <div className="border-t border-gray-200 dark:border-gray-600 pt-2 mt-2">
                 <div className="flex justify-between font-medium">
                   <span>Sale Total:</span>
                   <span>${relatedSale.total.toFixed(2)}</span>
@@ -293,12 +295,12 @@ export function ServicePaymentView({ isOpen, onClose, payment }) {
         )}
 
         {payment.paymentType === 'advance_payment' && (
-          <div className="bg-emerald-50 border border-emerald-200 p-4 rounded-lg">
-            <h3 className="font-medium text-gray-900 mb-3 flex items-center">
-              <DollarSign className="w-5 h-5 mr-2 text-emerald-600" />
+          <div className="bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 p-4 rounded-lg">
+            <h3 className="font-medium text-gray-900 dark:text-white mb-3 flex items-center">
+              <DollarSign className="w-5 h-5 mr-2 text-emerald-600 dark:text-emerald-400" />
               Advance Payment Information
             </h3>
-            <div className="space-y-2 text-sm">
+            <div className="space-y-2 text-sm text-gray-700 dark:text-gray-300">
               <p><span className="font-medium">Advance Amount:</span> {formatCurrency(payment.amount)}</p>
               <p><span className="font-medium">Payment Status:</span> 
                 <span className={`ml-2 px-2 py-1 rounded-full text-xs font-medium ${
@@ -314,7 +316,7 @@ export function ServicePaymentView({ isOpen, onClose, payment }) {
                   <p><span className="font-medium">Total Service Cost:</span> {formatCurrency(ticket.laborCost + ticket.partsCost)}</p>
                   {payment.status === 'approved' && (
                     <p><span className="font-medium">Remaining Balance:</span> 
-                      <span className="ml-2 font-bold text-red-600">
+                      <span className="ml-2 font-bold text-red-600 dark:text-red-400">
                         {formatCurrency(Math.max(0, (ticket.laborCost + ticket.partsCost) - payment.amount))}
                       </span>
                     </p>
@@ -323,8 +325,8 @@ export function ServicePaymentView({ isOpen, onClose, payment }) {
               )}
             </div>
             {payment.status === 'approved' && (
-              <div className="mt-3 p-3 bg-emerald-100 border border-emerald-300 rounded">
-                <p className="text-emerald-800 text-sm font-medium">
+              <div className="mt-3 p-3 bg-emerald-100 dark:bg-emerald-900/30 border border-emerald-300 dark:border-emerald-700 rounded">
+                <p className="text-emerald-800 dark:text-emerald-300 text-sm font-medium">
                   ✅ This advance payment has been applied to the service ticket
                 </p>
               </div>
@@ -333,26 +335,26 @@ export function ServicePaymentView({ isOpen, onClose, payment }) {
         )}
 
         {/* Payment Details */}
-        <div className="bg-green-50 border border-green-200 p-4 rounded-lg">
-          <h3 className="font-medium text-gray-900 mb-3 flex items-center">
-            <DollarSign className="w-5 h-5 mr-2" />
+        <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 p-4 rounded-lg">
+          <h3 className="font-medium text-gray-900 dark:text-white mb-3 flex items-center">
+            <DollarSign className="w-5 h-5 mr-2 text-gray-600 dark:text-gray-400" />
             Payment Details
           </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-700 dark:text-gray-300">
             <div>
-              <span className="font-medium text-gray-700">Amount:</span>
-              <span className="ml-2 text-green-600 font-bold">{formatCurrency(payment.amount)}</span>
+              <span className="font-medium">Amount:</span>
+              <span className="ml-2 text-green-600 dark:text-green-400 font-bold">{formatCurrency(payment.amount)}</span>
             </div>
             <div>
-              <span className="font-medium text-gray-700">Method:</span>
+              <span className="font-medium">Method:</span>
               <span className="ml-2 capitalize">{payment.paymentMethod}</span>
             </div>
             <div>
-              <span className="font-medium text-gray-700">Received By:</span>
+              <span className="font-medium">Received By:</span>
               <span className="ml-2">{payment.receivedBy}</span>
             </div>
             <div>
-              <span className="font-medium text-gray-700">Date:</span>
+              <span className="font-medium">Date:</span>
               <span className="ml-2">{formatDate(payment.paymentDate)}</span>
             </div>
           </div>
@@ -360,19 +362,19 @@ export function ServicePaymentView({ isOpen, onClose, payment }) {
 
         {/* Notes */}
         {payment.notes && (
-          <div className="bg-blue-50 border border-blue-200 p-4 rounded-lg">
-            <h3 className="font-medium text-gray-900 mb-2">Payment Notes</h3>
-            <p className="text-sm text-gray-700">{payment.notes}</p>
+          <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 p-4 rounded-lg">
+            <h3 className="font-medium text-gray-900 dark:text-white mb-2">Payment Notes</h3>
+            <p className="text-sm text-gray-700 dark:text-gray-300">{payment.notes}</p>
           </div>
         )}
 
         {/* Admin Message */}
         {payment.adminMessage && (
-          <div className="bg-yellow-50 border border-yellow-200 p-4 rounded-lg">
-            <h3 className="font-medium text-gray-900 mb-2">Admin Message</h3>
-            <p className="text-sm text-gray-700">{payment.adminMessage}</p>
+          <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 p-4 rounded-lg">
+            <h3 className="font-medium text-gray-900 dark:text-white mb-2">Admin Message</h3>
+            <p className="text-sm text-gray-700 dark:text-gray-300">{payment.adminMessage}</p>
             {payment.approvedBy && (
-              <p className="text-xs text-gray-500 mt-2">
+              <p className="text-xs text-gray-500 dark:text-gray-500 mt-2">
                 By {payment.approvedBy} on {formatDateTime(payment.approvedAt)}
               </p>
             )}
@@ -380,7 +382,7 @@ export function ServicePaymentView({ isOpen, onClose, payment }) {
         )}
 
         {/* Actions */}
-        <div className="flex justify-end space-x-4 pt-4 border-t">
+        <div className="flex justify-end space-x-4 pt-4 border-t border-gray-200 dark:border-gray-600">
           <Button variant="outline" onClick={handlePrintReceipt}>
             <Printer className="w-4 h-4 mr-2" />
             Print Receipt

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useInventory } from '../../contexts/InventoryContext';
 import { useAuth } from '../../contexts/AuthContext';
+import { useTheme } from '../../contexts/ThemeContext';
 import { Plus, DollarSign, Search, CheckCircle, XCircle, Eye, Edit2 } from 'lucide-react';
 import { Button } from '../common/Button';
 import { SearchInput } from '../common/SearchInput';
@@ -26,6 +27,7 @@ export function ServicePaymentManagement() {
     products
   } = useInventory();
   const { currentUser } = useAuth();
+  const { isDark } = useTheme();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [showPaymentForm, setShowPaymentForm] = useState(false);
@@ -122,11 +124,11 @@ export function ServicePaymentManagement() {
   return (
     <div className="space-y-6">
       {/* Header with Search */}
-      <Card className="p-6">
+      <Card className="p-6 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900">Service Payment Management</h2>
-            <p className="text-gray-600 mt-1">Track and manage service payments and approvals</p>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Service Payment Management</h2>
+            <p className="text-gray-600 dark:text-gray-400 mt-1">Track and manage service payments and approvals</p>
           </div>
           <Button 
             onClick={() => setShowPaymentForm(true)}
@@ -143,14 +145,14 @@ export function ServicePaymentManagement() {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             onClear={() => setSearchTerm('')}
-            placeholder="Search payments, customers, tickets..."
+            className="w-full bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white"
             className="w-full"
           />
           
           <Select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="w-full"
+            className="w-full bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white"
           >
             <option value="all">All Status</option>
             <option value="pending">Pending</option>
@@ -162,50 +164,50 @@ export function ServicePaymentManagement() {
 
       {/* Statistics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <Card className="p-6 bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
+        <Card className="p-6 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 border-blue-200 dark:border-blue-800">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-blue-700">Total Payments</p>
-              <p className="text-3xl font-bold text-blue-900">{totalPayments}</p>
+              <p className="text-sm font-medium text-blue-700 dark:text-blue-400">Total Payments</p>
+              <p className="text-3xl font-bold text-blue-900 dark:text-blue-200">{totalPayments}</p>
             </div>
-            <div className="bg-blue-200 p-3 rounded-full">
-              <DollarSign className="w-8 h-8 text-blue-700" />
+            <div className="bg-blue-200 dark:bg-blue-800/50 p-3 rounded-full">
+              <DollarSign className="w-8 h-8 text-blue-700 dark:text-blue-400" />
             </div>
           </div>
         </Card>
 
-        <Card className="p-6 bg-gradient-to-br from-green-50 to-green-100 border-green-200">
+        <Card className="p-6 bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 border-green-200 dark:border-green-800">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-green-700">Total Amount</p>
-              <p className="text-3xl font-bold text-green-900">{formatCurrency(totalAmount)}</p>
+              <p className="text-sm font-medium text-green-700 dark:text-green-400">Total Amount</p>
+              <p className="text-3xl font-bold text-green-900 dark:text-green-200">{formatCurrency(totalAmount)}</p>
             </div>
-            <div className="bg-green-200 p-3 rounded-full">
-              <DollarSign className="w-8 h-8 text-green-700" />
+            <div className="bg-green-200 dark:bg-green-800/50 p-3 rounded-full">
+              <DollarSign className="w-8 h-8 text-green-700 dark:text-green-400" />
             </div>
           </div>
         </Card>
 
-        <Card className="p-6 bg-gradient-to-br from-emerald-50 to-emerald-100 border-emerald-200">
+        <Card className="p-6 bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-emerald-900/20 dark:to-emerald-800/20 border-emerald-200 dark:border-emerald-800">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-emerald-700">Approved</p>
-              <p className="text-3xl font-bold text-emerald-900">{approvedPayments}</p>
+              <p className="text-sm font-medium text-emerald-700 dark:text-emerald-400">Approved</p>
+              <p className="text-3xl font-bold text-emerald-900 dark:text-emerald-200">{approvedPayments}</p>
             </div>
-            <div className="bg-emerald-200 p-3 rounded-full">
-              <CheckCircle className="w-8 h-8 text-emerald-700" />
+            <div className="bg-emerald-200 dark:bg-emerald-800/50 p-3 rounded-full">
+              <CheckCircle className="w-8 h-8 text-emerald-700 dark:text-emerald-400" />
             </div>
           </div>
         </Card>
 
-        <Card className="p-6 bg-gradient-to-br from-yellow-50 to-yellow-100 border-yellow-200">
+        <Card className="p-6 bg-gradient-to-br from-yellow-50 to-yellow-100 dark:from-yellow-900/20 dark:to-yellow-800/20 border-yellow-200 dark:border-yellow-800">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-yellow-700">Pending</p>
-              <p className="text-3xl font-bold text-yellow-900">{pendingPayments}</p>
+              <p className="text-sm font-medium text-yellow-700 dark:text-yellow-400">Pending</p>
+              <p className="text-3xl font-bold text-yellow-900 dark:text-yellow-200">{pendingPayments}</p>
             </div>
-            <div className="bg-yellow-200 p-3 rounded-full">
-              <XCircle className="w-8 h-8 text-yellow-700" />
+            <div className="bg-yellow-200 dark:bg-yellow-800/50 p-3 rounded-full">
+              <XCircle className="w-8 h-8 text-yellow-700 dark:text-yellow-400" />
             </div>
           </div>
         </Card>
@@ -213,19 +215,19 @@ export function ServicePaymentManagement() {
 
       {/* Results Summary */}
       {(searchTerm || statusFilter !== 'all') && (
-        <div className="text-sm text-gray-600 px-1">
+        <div className="text-sm text-gray-600 dark:text-gray-400 px-1">
           Found {filteredPayments.length} payment{filteredPayments.length !== 1 ? 's' : ''} 
           {searchTerm && ` matching "${searchTerm}"`}
         </div>
       )}
 
       {/* Payments Table */}
-      <div className="bg-white rounded-lg shadow-sm border">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm dark:shadow-lg border border-gray-200 dark:border-gray-700">
         {filteredPayments.length === 0 ? (
           <div className="text-center py-12">
-            <DollarSign className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No payments found</h3>
-            <p className="text-gray-600 mb-4">
+            <DollarSign className="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">No payments found</h3>
+            <p className="text-gray-600 dark:text-gray-400 mb-4">
               {searchTerm || statusFilter !== 'all'
                 ? 'Try adjusting your search criteria or filters'
                 : 'Service payments will appear here when customers make payments'
@@ -252,51 +254,51 @@ export function ServicePaymentManagement() {
                 const { customer, ticket, relatedSale } = getPaymentDetails(payment);
                 
                 return (
-                  <TableRow key={payment.id} className="hover:bg-gray-50">
+                  <TableRow key={payment.id} className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200">
                     <TableCell>
                       <div>
-                        <p className="font-medium text-gray-900">{payment.receiptNumber}</p>
-                        <p className="text-sm text-gray-600">{formatDate(payment.createdAt)}</p>
+                        <p className="font-medium text-gray-900 dark:text-white">{payment.receiptNumber}</p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">{formatDate(payment.createdAt)}</p>
                       </div>
                     </TableCell>
                     <TableCell>
                       <div>
-                        <p className="text-sm font-medium text-gray-900">{customer?.name || 'Unknown'}</p>
-                        <p className="text-xs text-gray-500">{customer?.phone}</p>
+                        <p className="text-sm font-medium text-gray-900 dark:text-white">{customer?.name || 'Unknown'}</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-500">{customer?.phone}</p>
                       </div>
                     </TableCell>
                     <TableCell>
                       <div>
-                        <p className="text-sm font-medium text-gray-900">{ticket?.ticketNumber || 'N/A'}</p>
-                        <p className="text-xs text-gray-500">
+                        <p className="text-sm font-medium text-gray-900 dark:text-white">{ticket?.ticketNumber || 'N/A'}</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-500">
                           {ticket?.deviceBrand} {ticket?.deviceModel}
                           {relatedSale && (
-                            <span className="ml-2 text-purple-600">• Sale #{relatedSale.id.slice(-6)}</span>
+                            <span className="ml-2 text-purple-600 dark:text-purple-400">• Sale #{relatedSale.id.slice(-6)}</span>
                           )}
                         </p>
                       </div>
                     </TableCell>
                     <TableCell>
                       <div>
-                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800 capitalize">
+                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 capitalize">
                           {payment.paymentType.replace('_', ' ')}
                         </span>
                         {payment.paymentType === 'parts_payment' && relatedSale && (
-                          <p className="text-xs text-purple-600 mt-1">Linked to POS sale</p>
+                          <p className="text-xs text-purple-600 dark:text-purple-400 mt-1">Linked to POS sale</p>
                         )}
                       </div>
                     </TableCell>
                     <TableCell>
-                      <div className="flex items-center text-green-600">
+                      <div className="flex items-center text-green-600 dark:text-green-400">
                         <DollarSign size={14} className="mr-1" />
                         <span className="font-medium">{formatCurrency(payment.amount)}</span>
                       </div>
                     </TableCell>
                     <TableCell>
-                      <span className="capitalize text-sm text-gray-600">{payment.paymentMethod}</span>
+                      <span className="capitalize text-sm text-gray-600 dark:text-gray-400">{payment.paymentMethod}</span>
                     </TableCell>
                     <TableCell>
-                      <span className="text-sm text-gray-600">{formatDate(payment.paymentDate)}</span>
+                      <span className="text-sm text-gray-600 dark:text-gray-400">{formatDate(payment.paymentDate)}</span>
                     </TableCell>
                     <TableCell>
                       <StatusBadge status={payment.status} />
@@ -305,7 +307,7 @@ export function ServicePaymentManagement() {
                       <div className="flex space-x-2">
                         <button
                           onClick={() => handleViewPayment(payment)}
-                          className="text-blue-600 hover:text-blue-800 p-1 rounded hover:bg-blue-50"
+                          className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 p-1 rounded hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors duration-200"
                           title="View Payment"
                         >
                           <Eye size={16} />
@@ -314,14 +316,14 @@ export function ServicePaymentManagement() {
                           <>
                             <button
                               onClick={() => handleEditPayment(payment)}
-                              className="text-gray-600 hover:text-gray-800 p-1 rounded hover:bg-gray-50"
+                              className="text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 p-1 rounded hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200"
                               title="Edit Payment"
                             >
                               <Edit2 size={16} />
                             </button>
                             <button
                               onClick={() => handleDeletePayment(payment.id)}
-                              className="text-red-600 hover:text-red-800 p-1 rounded hover:bg-red-50"
+                              className="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 p-1 rounded hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors duration-200"
                               title="Delete Payment"
                             >
                               <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
@@ -334,14 +336,14 @@ export function ServicePaymentManagement() {
                           <>
                             <button
                               onClick={() => handleApprovePayment(payment)}
-                              className="text-green-600 hover:text-green-800 p-1 rounded hover:bg-green-50"
+                              className="text-green-600 dark:text-green-400 hover:text-green-800 dark:hover:text-green-300 p-1 rounded hover:bg-green-50 dark:hover:bg-green-900/20 transition-colors duration-200"
                               title="Approve Payment"
                             >
                               <CheckCircle size={16} />
                             </button>
                             <button
                               onClick={() => handleDeclinePayment(payment)}
-                              className="text-red-600 hover:text-red-800 p-1 rounded hover:bg-red-50"
+                              className="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 p-1 rounded hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors duration-200"
                               title="Decline Payment"
                             >
                               <XCircle size={16} />

@@ -274,21 +274,21 @@ export function ServicePaymentForm({ isOpen, onClose, onSubmit, preSelectedTicke
     >
       <form onSubmit={handleSubmit} className="space-y-8">
         {/* Customer & Service Selection */}
-        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-6">
+        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-6">
           <div className="flex items-center space-x-2 mb-4">
-            <User className="w-5 h-5 text-blue-600" />
-            <h3 className="text-lg font-semibold text-blue-900">Customer & Service Information</h3>
+            <User className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+            <h3 className="text-lg font-semibold text-blue-900 dark:text-blue-200">Customer & Service Information</h3>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">Customer</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Customer</label>
               <div className="relative">
-                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500" size={18} />
                 <select
                   value={formData.customerId}
                   onChange={(e) => handleChange('customerId', e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white shadow-sm"
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm"
                   required
                 >
                   <option value="">Select Customer</option>
@@ -300,13 +300,13 @@ export function ServicePaymentForm({ isOpen, onClose, onSubmit, preSelectedTicke
             </div>
             
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">Service Ticket</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Service Ticket</label>
               <div className="relative">
-                <Wrench className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                <Wrench className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500" size={18} />
                 <select
                   value={formData.serviceTicketId}
                   onChange={(e) => handleChange('serviceTicketId', e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white shadow-sm"
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm"
                   required
                   disabled={!formData.customerId}
                 >
@@ -324,11 +324,11 @@ export function ServicePaymentForm({ isOpen, onClose, onSubmit, preSelectedTicke
 
         {/* Pending Sales Auto-fill Section */}
         {pendingSalesForTicket.length > 0 && (
-          <div className="bg-gradient-to-r from-amber-50 to-yellow-50 border-2 border-amber-200 rounded-xl p-6">
+          <div className="bg-gradient-to-r from-amber-50 to-yellow-50 dark:from-amber-900/20 dark:to-yellow-900/20 border-2 border-amber-200 dark:border-amber-800 rounded-xl p-6">
             <div className="flex items-start space-x-4">
               <div className="flex-shrink-0">
-                <div className="bg-amber-100 p-2 rounded-lg">
-                  <ShoppingCart className="w-6 h-6 text-amber-600" />
+                <div className="bg-amber-100 dark:bg-amber-900/30 p-2 rounded-lg">
+                  <ShoppingCart className="w-6 h-6 text-amber-600 dark:text-amber-400" />
                 </div>
               </div>
               <div className="flex-1">
@@ -338,42 +338,42 @@ export function ServicePaymentForm({ isOpen, onClose, onSubmit, preSelectedTicke
                     id="completePendingSale"
                     checked={formData.completePendingSale}
                     onChange={(e) => handleChange('completePendingSale', e.target.checked)}
-                    className="w-5 h-5 text-amber-600 border-amber-300 rounded focus:ring-amber-500"
+                    className="w-5 h-5 text-amber-600 border-amber-300 dark:border-amber-600 rounded focus:ring-amber-500 bg-white dark:bg-gray-700"
                   />
-                  <label htmlFor="completePendingSale" className="text-lg font-semibold text-amber-900 cursor-pointer">
+                  <label htmlFor="completePendingSale" className="text-lg font-semibold text-amber-900 dark:text-amber-200 cursor-pointer">
                     Complete Pending POS Sales
                   </label>
-                  <div className="bg-amber-200 text-amber-800 px-3 py-1 rounded-full text-sm font-medium">
+                  <div className="bg-amber-200 dark:bg-amber-800/50 text-amber-800 dark:text-amber-200 px-3 py-1 rounded-full text-sm font-medium">
                     Auto-fill Payment
                   </div>
                 </div>
                 
-                <p className="text-amber-800 mb-4">
+                <p className="text-amber-800 dark:text-amber-200 mb-4">
                   This service ticket has <span className="font-semibold">{pendingSalesForTicket.length} pending POS sale(s)</span> totaling{' '}
                   <span className="font-bold text-lg">{formatCurrency(pendingSalesTotal)}</span>. 
                   Check this to automatically fill payment details and mark sales as completed when approved.
                 </p>
                 
-                <div className="bg-white border border-amber-200 rounded-lg p-4">
-                  <h4 className="font-medium text-amber-900 mb-3 flex items-center">
-                    <Package className="w-4 h-4 mr-2" />
+                <div className="bg-white dark:bg-gray-800 border border-amber-200 dark:border-amber-700 rounded-lg p-4">
+                  <h4 className="font-medium text-amber-900 dark:text-amber-200 mb-3 flex items-center">
+                    <Package className="w-4 h-4 mr-2 text-amber-600 dark:text-amber-400" />
                     Pending Sales Details
                   </h4>
                   <div className="space-y-2">
                     {pendingSalesForTicket.map(sale => (
-                      <div key={sale.id} className="flex items-center justify-between p-3 bg-amber-50 rounded-lg">
+                      <div key={sale.id} className="flex items-center justify-between p-3 bg-amber-50 dark:bg-amber-900/20 rounded-lg">
                         <div className="flex items-center space-x-3">
-                          <div className="bg-amber-100 p-1 rounded">
-                            <Receipt className="w-4 h-4 text-amber-600" />
+                          <div className="bg-amber-100 dark:bg-amber-800/50 p-1 rounded">
+                            <Receipt className="w-4 h-4 text-amber-600 dark:text-amber-400" />
                           </div>
                           <div>
-                            <p className="font-medium text-amber-900">Sale #{sale.id.slice(-6)}</p>
-                            <p className="text-sm text-amber-700">{sale.items.length} item(s)</p>
+                            <p className="font-medium text-amber-900 dark:text-amber-200">Sale #{sale.id.slice(-6)}</p>
+                            <p className="text-sm text-amber-700 dark:text-amber-300">{sale.items.length} item(s)</p>
                           </div>
                         </div>
                         <div className="text-right">
-                          <p className="font-bold text-amber-900">{formatCurrency(sale.total)}</p>
-                          <p className="text-xs text-amber-600">PENDING</p>
+                          <p className="font-bold text-amber-900 dark:text-amber-200">{formatCurrency(sale.total)}</p>
+                          <p className="text-xs text-amber-600 dark:text-amber-400">PENDING</p>
                         </div>
                       </div>
                     ))}
@@ -381,12 +381,12 @@ export function ServicePaymentForm({ isOpen, onClose, onSubmit, preSelectedTicke
                 </div>
                 
                 {formData.completePendingSale && (
-                  <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+                  <div className="mt-4 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
                     <div className="flex items-center space-x-2">
-                      <CheckCircle className="w-5 h-5 text-green-600" />
-                      <p className="text-green-800 font-medium">Auto-fill Active</p>
+                      <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400" />
+                      <p className="text-green-800 dark:text-green-200 font-medium">Auto-fill Active</p>
                     </div>
-                    <p className="text-green-700 text-sm mt-1">
+                    <p className="text-green-700 dark:text-green-300 text-sm mt-1">
                       Payment type set to "Parts Payment" and amount auto-filled to {formatCurrency(pendingSalesTotal)}
                     </p>
                   </div>
@@ -398,34 +398,34 @@ export function ServicePaymentForm({ isOpen, onClose, onSubmit, preSelectedTicke
 
         {/* Advance Payment Information */}
         {formData.serviceTicketId && advancePaymentInfo && (
-          <div className="bg-gradient-to-r from-emerald-50 to-green-50 border-2 border-emerald-200 rounded-xl p-6">
+          <div className="bg-gradient-to-r from-emerald-50 to-green-50 dark:from-emerald-900/20 dark:to-green-900/20 border-2 border-emerald-200 dark:border-emerald-800 rounded-xl p-6">
             <div className="flex items-start space-x-4">
               <div className="flex-shrink-0">
-                <div className="bg-emerald-100 p-2 rounded-lg">
-                  <DollarSign className="w-6 h-6 text-emerald-600" />
+                <div className="bg-emerald-100 dark:bg-emerald-900/30 p-2 rounded-lg">
+                  <DollarSign className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
                 </div>
               </div>
               <div className="flex-1">
-                <h3 className="text-lg font-semibold text-emerald-900 mb-3">Advance Payment Status</h3>
+                <h3 className="text-lg font-semibold text-emerald-900 dark:text-emerald-200 mb-3">Advance Payment Status</h3>
                 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                  <div className="bg-white border border-emerald-200 rounded-lg p-4 text-center">
-                    <p className="text-sm text-emerald-700">Total Service Cost</p>
-                    <p className="text-2xl font-bold text-emerald-900">{formatCurrency(advancePaymentInfo.totalServiceCost)}</p>
+                  <div className="bg-white dark:bg-gray-800 border border-emerald-200 dark:border-emerald-700 rounded-lg p-4 text-center">
+                    <p className="text-sm text-emerald-700 dark:text-emerald-400">Total Service Cost</p>
+                    <p className="text-2xl font-bold text-emerald-900 dark:text-emerald-200">{formatCurrency(advancePaymentInfo.totalServiceCost)}</p>
                   </div>
-                  <div className="bg-white border border-emerald-200 rounded-lg p-4 text-center">
-                    <p className="text-sm text-emerald-700">Advance Paid</p>
-                    <p className="text-2xl font-bold text-blue-600">{formatCurrency(advancePaymentInfo.totalAdvance)}</p>
+                  <div className="bg-white dark:bg-gray-800 border border-emerald-200 dark:border-emerald-700 rounded-lg p-4 text-center">
+                    <p className="text-sm text-emerald-700 dark:text-emerald-400">Advance Paid</p>
+                    <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">{formatCurrency(advancePaymentInfo.totalAdvance)}</p>
                   </div>
-                  <div className="bg-white border border-emerald-200 rounded-lg p-4 text-center">
-                    <p className="text-sm text-emerald-700">
+                  <div className="bg-white dark:bg-gray-800 border border-emerald-200 dark:border-emerald-700 rounded-lg p-4 text-center">
+                    <p className="text-sm text-emerald-700 dark:text-emerald-400">
                       {advancePaymentInfo.remainingBalance > 0 ? 'Remaining Balance' : 
                        advancePaymentInfo.remainingBalance < 0 ? 'Refund Due' : 'Fully Paid'}
                     </p>
                     <p className={`text-2xl font-bold ${
-                      advancePaymentInfo.remainingBalance > 0 ? 'text-red-600' :
-                      advancePaymentInfo.remainingBalance < 0 ? 'text-orange-600' :
-                      'text-green-600'
+                      advancePaymentInfo.remainingBalance > 0 ? 'text-red-600 dark:text-red-400' :
+                      advancePaymentInfo.remainingBalance < 0 ? 'text-orange-600 dark:text-orange-400' :
+                      'text-green-600 dark:text-green-400'
                     }`}>
                       {formatCurrency(Math.abs(advancePaymentInfo.remainingBalance))}
                     </p>
@@ -434,12 +434,12 @@ export function ServicePaymentForm({ isOpen, onClose, onSubmit, preSelectedTicke
                 
                 {/* Payment Status Messages */}
                 {advancePaymentInfo.isFullyPaid && (
-                  <div className="bg-green-100 border border-green-300 rounded-lg p-4 mb-4">
+                  <div className="bg-green-100 dark:bg-green-900/30 border border-green-300 dark:border-green-700 rounded-lg p-4 mb-4">
                     <div className="flex items-center space-x-2">
-                      <CheckCircle className="w-5 h-5 text-green-600" />
-                      <p className="text-green-800 font-medium">Service Fully Paid</p>
+                      <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400" />
+                      <p className="text-green-800 dark:text-green-200 font-medium">Service Fully Paid</p>
                     </div>
-                    <p className="text-green-700 text-sm mt-1">
+                    <p className="text-green-700 dark:text-green-300 text-sm mt-1">
                       {advancePaymentInfo.needsRefund 
                         ? `Customer has overpaid by ${formatCurrency(Math.abs(advancePaymentInfo.remainingBalance))}. Refund may be required.`
                         : 'All service charges have been paid in advance.'
@@ -449,12 +449,12 @@ export function ServicePaymentForm({ isOpen, onClose, onSubmit, preSelectedTicke
                 )}
                 
                 {advancePaymentInfo.hasAdvance && !advancePaymentInfo.isFullyPaid && (
-                  <div className="bg-blue-100 border border-blue-300 rounded-lg p-4 mb-4">
+                  <div className="bg-blue-100 dark:bg-blue-900/30 border border-blue-300 dark:border-blue-700 rounded-lg p-4 mb-4">
                     <div className="flex items-center space-x-2">
-                      <Info className="w-5 h-5 text-blue-600" />
-                      <p className="text-blue-800 font-medium">Partial Advance Payment</p>
+                      <Info className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                      <p className="text-blue-800 dark:text-blue-200 font-medium">Partial Advance Payment</p>
                     </div>
-                    <p className="text-blue-700 text-sm mt-1">
+                    <p className="text-blue-700 dark:text-blue-300 text-sm mt-1">
                       Customer has paid {formatCurrency(advancePaymentInfo.totalAdvance)} in advance. 
                       Remaining balance: {formatCurrency(advancePaymentInfo.remainingBalance)}
                     </p>
@@ -462,12 +462,12 @@ export function ServicePaymentForm({ isOpen, onClose, onSubmit, preSelectedTicke
                 )}
                 
                 {!advancePaymentInfo.hasAdvance && advancePaymentInfo.totalServiceCost > 0 && (
-                  <div className="bg-yellow-100 border border-yellow-300 rounded-lg p-4 mb-4">
+                  <div className="bg-yellow-100 dark:bg-yellow-900/30 border border-yellow-300 dark:border-yellow-700 rounded-lg p-4 mb-4">
                     <div className="flex items-center space-x-2">
-                      <AlertCircle className="w-5 h-5 text-yellow-600" />
-                      <p className="text-yellow-800 font-medium">No Advance Payment</p>
+                      <AlertCircle className="w-5 h-5 text-yellow-600 dark:text-yellow-400" />
+                      <p className="text-yellow-800 dark:text-yellow-200 font-medium">No Advance Payment</p>
                     </div>
-                    <p className="text-yellow-700 text-sm mt-1">
+                    <p className="text-yellow-700 dark:text-yellow-300 text-sm mt-1">
                       Full service cost of {formatCurrency(advancePaymentInfo.totalServiceCost)} is pending payment.
                     </p>
                   </div>
@@ -475,12 +475,12 @@ export function ServicePaymentForm({ isOpen, onClose, onSubmit, preSelectedTicke
                 
                 {/* Auto-suggest amount for advance payment */}
                 {formData.paymentType === 'advance_payment' && advancePaymentInfo.remainingBalance > 0 && (
-                  <div className="bg-emerald-100 border border-emerald-300 rounded-lg p-4">
+                  <div className="bg-emerald-100 dark:bg-emerald-900/30 border border-emerald-300 dark:border-emerald-700 rounded-lg p-4">
                     <div className="flex items-center space-x-2">
-                      <CheckCircle className="w-5 h-5 text-emerald-600" />
-                      <p className="text-emerald-800 font-medium">Suggested Amount</p>
+                      <CheckCircle className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                      <p className="text-emerald-800 dark:text-emerald-200 font-medium">Suggested Amount</p>
                     </div>
-                    <p className="text-emerald-700 text-sm mt-1">
+                    <p className="text-emerald-700 dark:text-emerald-300 text-sm mt-1">
                       Amount auto-filled to remaining balance: {formatCurrency(advancePaymentInfo.remainingBalance)}
                     </p>
                   </div>
@@ -491,12 +491,12 @@ export function ServicePaymentForm({ isOpen, onClose, onSubmit, preSelectedTicke
         )}
 
         {/* Payment Type Selection */}
-        <div className="bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 rounded-xl p-6">
+        <div className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 border border-purple-200 dark:border-purple-800 rounded-xl p-6">
           <div className="flex items-center space-x-2 mb-4">
-            <FileText className="w-5 h-5 text-purple-600" />
-            <h3 className="text-lg font-semibold text-purple-900">Payment Type</h3>
+            <FileText className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+            <h3 className="text-lg font-semibold text-purple-900 dark:text-purple-200">Payment Type</h3>
             {formData.autoFillFromPendingSales && (
-              <div className="bg-purple-200 text-purple-800 px-2 py-1 rounded-full text-xs font-medium">
+              <div className="bg-purple-200 dark:bg-purple-800/50 text-purple-800 dark:text-purple-200 px-2 py-1 rounded-full text-xs font-medium">
                 AUTO-FILLED
               </div>
             )}
@@ -516,19 +516,19 @@ export function ServicePaymentForm({ isOpen, onClose, onSubmit, preSelectedTicke
                   disabled={isDisabled}
                   className={`p-4 border-2 rounded-xl text-left transition-all duration-200 ${
                     isSelected
-                      ? 'border-purple-500 bg-purple-100 shadow-md transform scale-105'
+                      ? 'border-purple-500 bg-purple-100 dark:bg-purple-900/30 shadow-md transform scale-105'
                       : isDisabled
-                      ? 'border-gray-200 bg-gray-50 cursor-not-allowed opacity-60'
-                      : 'border-gray-200 hover:border-purple-300 hover:bg-purple-50 hover:shadow-sm'
+                      ? 'border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 cursor-not-allowed opacity-60'
+                      : 'border-gray-200 dark:border-gray-700 hover:border-purple-300 dark:hover:border-purple-600 hover:bg-purple-50 dark:hover:bg-purple-900/20 hover:shadow-sm'
                   }`}
                 >
                   <div className="flex items-center space-x-3 mb-2">
-                    <Icon className={`w-5 h-5 ${isSelected ? 'text-purple-600' : 'text-gray-500'}`} />
-                    <span className={`font-medium ${isSelected ? 'text-purple-900' : 'text-gray-700'}`}>
+                    <Icon className={`w-5 h-5 ${isSelected ? 'text-purple-600 dark:text-purple-400' : 'text-gray-500 dark:text-gray-400'}`} />
+                    <span className={`font-medium ${isSelected ? 'text-purple-900 dark:text-purple-200' : 'text-gray-700 dark:text-gray-300'}`}>
                       {type.label}
                     </span>
                   </div>
-                  <p className={`text-sm ${isSelected ? 'text-purple-700' : 'text-gray-500'}`}>
+                  <p className={`text-sm ${isSelected ? 'text-purple-700 dark:text-purple-300' : 'text-gray-500 dark:text-gray-400'}`}>
                     {type.description}
                   </p>
                 </button>
@@ -539,18 +539,18 @@ export function ServicePaymentForm({ isOpen, onClose, onSubmit, preSelectedTicke
 
         {/* Related Sale Selection for Parts Payment */}
         {formData.paymentType === 'parts_payment' && customerSales.length > 0 && !formData.autoFillFromPendingSales && (
-          <div className="bg-gradient-to-r from-indigo-50 to-blue-50 border border-indigo-200 rounded-xl p-6">
+          <div className="bg-gradient-to-r from-indigo-50 to-blue-50 dark:from-indigo-900/20 dark:to-blue-900/20 border border-indigo-200 dark:border-indigo-800 rounded-xl p-6">
             <div className="flex items-center space-x-2 mb-4">
-              <ShoppingCart className="w-5 h-5 text-indigo-600" />
-              <h3 className="text-lg font-semibold text-indigo-900">Related Sale (Optional)</h3>
+              <ShoppingCart className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+              <h3 className="text-lg font-semibold text-indigo-900 dark:text-indigo-200">Related Sale (Optional)</h3>
             </div>
             
             <div className="relative">
-              <Receipt className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+              <Receipt className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500" size={18} />
               <select
                 value={formData.relatedSaleId}
                 onChange={(e) => handleChange('relatedSaleId', e.target.value)}
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white shadow-sm"
+                className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm"
               >
                 <option value="">Select related sale</option>
                 {customerSales.map(sale => (
@@ -564,23 +564,23 @@ export function ServicePaymentForm({ isOpen, onClose, onSubmit, preSelectedTicke
         )}
 
         {/* Payment Details */}
-        <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-6">
+        <div className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border border-green-200 dark:border-green-800 rounded-xl p-6">
           <div className="flex items-center space-x-2 mb-6">
-            <DollarSign className="w-5 h-5 text-green-600" />
-            <h3 className="text-lg font-semibold text-green-900">Payment Details</h3>
+            <DollarSign className="w-5 h-5 text-green-600 dark:text-green-400" />
+            <h3 className="text-lg font-semibold text-green-900 dark:text-green-200">Payment Details</h3>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Amount Input */}
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                 Payment Amount
                 {formData.autoFillFromPendingSales && (
-                  <span className="ml-2 text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">AUTO-CALCULATED</span>
+                  <span className="ml-2 text-xs bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200 px-2 py-1 rounded-full">AUTO-CALCULATED</span>
                 )}
               </label>
               <div className="relative">
-                <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500" size={18} />
                 <input
                   type="number"
                   step="0.01"
@@ -589,15 +589,15 @@ export function ServicePaymentForm({ isOpen, onClose, onSubmit, preSelectedTicke
                   disabled={formData.autoFillFromPendingSales}
                   className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent shadow-sm text-lg font-semibold ${
                     formData.autoFillFromPendingSales 
-                      ? 'bg-green-50 border-green-200 text-green-800' 
-                      : 'bg-white border-gray-300'
+                      ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800 text-green-800 dark:text-green-200' 
+                      : 'bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white'
                   }`}
                   placeholder="0.00"
                   required
                 />
               </div>
               {formData.autoFillFromPendingSales && (
-                <p className="text-sm text-green-600 flex items-center">
+                <p className="text-sm text-green-600 dark:text-green-400 flex items-center">
                   <Info className="w-4 h-4 mr-1" />
                   Amount calculated from pending POS sales
                 </p>
@@ -606,14 +606,14 @@ export function ServicePaymentForm({ isOpen, onClose, onSubmit, preSelectedTicke
 
             {/* Payment Date */}
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">Payment Date</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Payment Date</label>
               <div className="relative">
-                <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500" size={18} />
                 <input
                   type="date"
                   value={formData.paymentDate}
                   onChange={(e) => handleChange('paymentDate', e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white shadow-sm"
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm"
                   required
                 />
               </div>
@@ -622,10 +622,10 @@ export function ServicePaymentForm({ isOpen, onClose, onSubmit, preSelectedTicke
         </div>
 
         {/* Payment Method Selection */}
-        <div className="bg-gradient-to-r from-slate-50 to-gray-50 border border-slate-200 rounded-xl p-6">
+        <div className="bg-gradient-to-r from-slate-50 to-gray-50 dark:from-slate-900/20 dark:to-gray-900/20 border border-slate-200 dark:border-slate-800 rounded-xl p-6">
           <div className="flex items-center space-x-2 mb-4">
-            <CreditCard className="w-5 h-5 text-slate-600" />
-            <h3 className="text-lg font-semibold text-slate-900">Payment Method</h3>
+            <CreditCard className="w-5 h-5 text-slate-600 dark:text-slate-400" />
+            <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-200">Payment Method</h3>
           </div>
           
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -640,12 +640,12 @@ export function ServicePaymentForm({ isOpen, onClose, onSubmit, preSelectedTicke
                   onClick={() => handleChange('paymentMethod', method.id)}
                   className={`p-4 border-2 rounded-xl text-center transition-all duration-200 ${
                     isSelected
-                      ? `${method.bgColor} border-current shadow-md transform scale-105`
-                      : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50 hover:shadow-sm'
+                      ? `${method.bgColor} dark:bg-opacity-20 border-current shadow-md transform scale-105`
+                      : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 hover:shadow-sm'
                   }`}
                 >
-                  <Icon className={`w-6 h-6 mx-auto mb-2 ${isSelected ? method.color : 'text-gray-500'}`} />
-                  <span className={`text-sm font-medium ${isSelected ? method.color : 'text-gray-700'}`}>
+                  <Icon className={`w-6 h-6 mx-auto mb-2 ${isSelected ? method.color : 'text-gray-500 dark:text-gray-400'}`} />
+                  <span className={`text-sm font-medium ${isSelected ? method.color : 'text-gray-700 dark:text-gray-300'}`}>
                     {method.label}
                   </span>
                 </button>
@@ -655,22 +655,22 @@ export function ServicePaymentForm({ isOpen, onClose, onSubmit, preSelectedTicke
         </div>
 
         {/* Additional Information */}
-        <div className="bg-gradient-to-r from-gray-50 to-slate-50 border border-gray-200 rounded-xl p-6">
+        <div className="bg-gradient-to-r from-gray-50 to-slate-50 dark:from-gray-900/20 dark:to-slate-900/20 border border-gray-200 dark:border-gray-800 rounded-xl p-6">
           <div className="flex items-center space-x-2 mb-4">
-            <FileText className="w-5 h-5 text-gray-600" />
-            <h3 className="text-lg font-semibold text-gray-900">Additional Information</h3>
+            <FileText className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Additional Information</h3>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">Received By</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Received By</label>
               <div className="relative">
-                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500" size={18} />
                 <input
                   type="text"
                   value={formData.receivedBy}
                   onChange={(e) => handleChange('receivedBy', e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent bg-white shadow-sm"
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm"
                   placeholder="Staff member name"
                   required
                 />
@@ -678,29 +678,29 @@ export function ServicePaymentForm({ isOpen, onClose, onSubmit, preSelectedTicke
             </div>
             
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                 Payment Notes
                 {formData.autoFillFromPendingSales && (
-                  <span className="ml-2 text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">AUTO-GENERATED</span>
+                  <span className="ml-2 text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 px-2 py-1 rounded-full">AUTO-GENERATED</span>
                 )}
               </label>
               <div className="relative">
-                <FileText className="absolute left-3 top-3 text-gray-400" size={18} />
+                <FileText className="absolute left-3 top-3 text-gray-400 dark:text-gray-500" size={18} />
                 <textarea
                   value={formData.notes}
                   onChange={(e) => handleChange('notes', e.target.value)}
                   disabled={formData.autoFillFromPendingSales}
                   className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent shadow-sm resize-none ${
                     formData.autoFillFromPendingSales 
-                      ? 'bg-blue-50 border-blue-200 text-blue-800' 
-                      : 'bg-white border-gray-300'
+                      ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 text-blue-800 dark:text-blue-200' 
+                      : 'bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white'
                   }`}
                   rows={3}
                   placeholder="Additional payment notes..."
                 />
               </div>
               {formData.autoFillFromPendingSales && (
-                <p className="text-sm text-blue-600 flex items-center">
+                <p className="text-sm text-blue-600 dark:text-blue-400 flex items-center">
                   <Info className="w-4 h-4 mr-1" />
                   Notes auto-generated from pending sales
                 </p>
@@ -711,13 +711,13 @@ export function ServicePaymentForm({ isOpen, onClose, onSubmit, preSelectedTicke
 
         {/* Service Ticket Info Display */}
         {(formData.paymentType === 'parts_payment' || formData.paymentType === 'labor_payment') && formData.serviceTicketId && (
-          <div className="bg-gradient-to-r from-blue-50 to-cyan-50 border-2 border-blue-200 rounded-xl p-6">
+          <div className="bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 border-2 border-blue-200 dark:border-blue-800 rounded-xl p-6">
             <div className="flex items-start space-x-4">
-              <div className="bg-blue-100 p-2 rounded-lg">
-                <Info className="w-6 h-6 text-blue-600" />
+              <div className="bg-blue-100 dark:bg-blue-900/30 p-2 rounded-lg">
+                <Info className="w-6 h-6 text-blue-600 dark:text-blue-400" />
               </div>
               <div className="flex-1">
-                <h3 className="font-semibold text-blue-900 mb-2">
+                <h3 className="font-semibold text-blue-900 dark:text-blue-200 mb-2">
                   {formData.paymentType === 'parts_payment' ? 'Parts Payment Information' : 'Labor Payment Information'}
                 </h3>
                 <div className="space-y-2">
@@ -728,23 +728,23 @@ export function ServicePaymentForm({ isOpen, onClose, onSubmit, preSelectedTicke
                     
                     if (ticket && cost > 0) {
                       return (
-                        <p className="text-blue-800">
+                        <p className="text-blue-800 dark:text-blue-200">
                           Service ticket has existing {costType} cost of{' '}
                           <span className="font-bold">${cost.toFixed(2)}</span>
                         </p>
                       );
                     }
                     return (
-                      <p className="text-blue-800">
+                      <p className="text-blue-800 dark:text-blue-200">
                         Recording payment for {costType} {formData.paymentType === 'parts_payment' ? 'used in this service' : 'charges'}
                       </p>
                     );
                   })()}
                   
                   {selectedSale && (
-                    <div className="bg-white border border-blue-200 rounded-lg p-3 mt-3">
-                      <p className="text-blue-900 font-medium">Linked to Sale:</p>
-                      <p className="text-blue-700">{getSaleDescription(selectedSale)}</p>
+                    <div className="bg-white dark:bg-gray-800 border border-blue-200 dark:border-blue-700 rounded-lg p-3 mt-3">
+                      <p className="text-blue-900 dark:text-blue-200 font-medium">Linked to Sale:</p>
+                      <p className="text-blue-700 dark:text-blue-300">{getSaleDescription(selectedSale)}</p>
                     </div>
                   )}
                 </div>
@@ -754,8 +754,8 @@ export function ServicePaymentForm({ isOpen, onClose, onSubmit, preSelectedTicke
         )}
 
         {/* Form Actions */}
-        <div className="flex justify-between items-center pt-6 border-t border-gray-200">
-          <div className="text-sm text-gray-500">
+        <div className="flex justify-between items-center pt-6 border-t border-gray-200 dark:border-gray-700">
+          <div className="text-sm text-gray-500 dark:text-gray-400">
             Payment will be marked as pending and require admin approval
           </div>
           <div className="flex space-x-4">

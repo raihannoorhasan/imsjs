@@ -292,11 +292,11 @@ export function Sales() {
 
   if (activeTab === 'history') {
     return (
-      <div className="min-h-screen bg-gray-50">
-        <div className="bg-white border-b border-gray-200 px-6 py-4">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+        <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4 transition-colors duration-300">
           <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-bold text-gray-900">Sales Management</h1>
-            <div className="flex space-x-1 bg-gray-100 p-1 rounded-lg">
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Sales Management</h1>
+            <div className="flex space-x-1 bg-gray-100 dark:bg-gray-700 p-1 rounded-lg">
               {tabs.map((tab) => {
                 const Icon = tab.icon;
                 return (
@@ -305,8 +305,8 @@ export function Sales() {
                     onClick={() => setActiveTab(tab.id)}
                     className={`flex items-center space-x-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
                       activeTab === tab.id
-                        ? 'bg-white text-blue-600 shadow-sm'
-                        : 'text-gray-600 hover:text-gray-900'
+                        ? 'bg-white dark:bg-gray-600 text-blue-600 dark:text-blue-400 shadow-sm'
+                        : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
                     }`}
                   >
                     <Icon size={16} />
@@ -325,14 +325,14 @@ export function Sales() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
       {/* Header */}
-      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4">
+      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-6 transition-colors duration-300">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Point of Sale</h1>
-            <p className="text-gray-600 dark:text-gray-400">Fast and efficient checkout system</p>
+            <p className="text-gray-600 dark:text-gray-400 mt-1">Fast and efficient checkout system</p>
           </div>
           <div className="flex items-center space-x-4">
-            <div className="flex space-x-1 bg-gray-100 p-1 rounded-lg">
+            <div className="flex space-x-1 bg-gray-100 dark:bg-gray-700 p-1 rounded-lg shadow-sm">
               {tabs.map((tab) => {
                 const Icon = tab.icon;
                 return (
@@ -358,24 +358,24 @@ export function Sales() {
 
       <div className="flex h-[calc(100vh-120px)]">
         {/* Left Panel - Products */}
-        <div className="flex-1 p-6 overflow-hidden">
+        <div className="flex-1 p-6 overflow-hidden bg-gray-50 dark:bg-gray-900">
           <div className="h-full flex flex-col">
             {/* Search and Filters */}
             <div className="mb-6">
               <div className="flex space-x-4 mb-4">
                 <div className="flex-1 relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500" size={20} />
                   <input
                     type="text"
                     placeholder="Search products by name or SKU..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg"
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-colors duration-200"
                   />
                   {searchTerm && (
                     <button
                       onClick={() => setSearchTerm('')}
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
                     >
                       <X size={20} />
                     </button>
@@ -391,8 +391,8 @@ export function Sales() {
                     onClick={() => setSelectedCategory(category)}
                     className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
                       selectedCategory === category
-                        ? 'bg-blue-600 text-white'
-                        : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-300'
+                        ? 'bg-blue-600 dark:bg-blue-700 text-white shadow-md'
+                        : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-300 dark:border-gray-600'
                     }`}
                   >
                     {category === 'all' ? 'All Products' : category.charAt(0).toUpperCase() + category.slice(1)}
@@ -408,23 +408,23 @@ export function Sales() {
                   <div
                     key={product.id}
                     onClick={() => addToCart(product.id)}
-                    className="bg-white rounded-xl p-4 shadow-sm border border-gray-200 hover:shadow-md hover:border-blue-300 cursor-pointer transition-all duration-200 transform hover:-translate-y-1"
+                    className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm dark:shadow-lg border border-gray-200 dark:border-gray-700 hover:shadow-md dark:hover:shadow-xl hover:border-blue-300 dark:hover:border-blue-600 cursor-pointer transition-all duration-200 transform hover:-translate-y-1"
                   >
-                    <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-blue-100 to-blue-200 rounded-lg mb-3 mx-auto">
-                      <Package className="w-6 h-6 text-blue-600" />
+                    <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-900 dark:to-blue-800 rounded-lg mb-3 mx-auto">
+                      <Package className="w-6 h-6 text-blue-600 dark:text-blue-400" />
                     </div>
-                    <h3 className="font-semibold text-gray-900 text-sm mb-1 line-clamp-2">{product.name}</h3>
-                    <p className="text-xs text-gray-500 mb-2">SKU: {product.sku}</p>
+                    <h3 className="font-semibold text-gray-900 dark:text-white text-sm mb-1 line-clamp-2">{product.name}</h3>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">SKU: {product.sku}</p>
                     <div className="flex items-center justify-between">
-                      <span className="text-lg font-bold text-green-600">${product.sellingPrice.toFixed(2)}</span>
-                      <span className="text-xs text-gray-500">Stock: {product.stock}</span>
+                      <span className="text-lg font-bold text-green-600 dark:text-green-400">${product.sellingPrice.toFixed(2)}</span>
+                      <span className="text-xs text-gray-500 dark:text-gray-400">Stock: {product.stock}</span>
                     </div>
                     <div className="mt-2">
                       <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium capitalize ${
-                        product.category === 'laptop' ? 'bg-purple-100 text-purple-800' :
-                        product.category === 'component' ? 'bg-blue-100 text-blue-800' :
-                        product.category === 'course' ? 'bg-green-100 text-green-800' :
-                        'bg-gray-100 text-gray-800'
+                        product.category === 'laptop' ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-400' :
+                        product.category === 'component' ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400' :
+                        product.category === 'course' ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400' :
+                        'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300'
                       }`}>
                         {product.category}
                       </span>
@@ -435,9 +435,9 @@ export function Sales() {
               
               {filteredProducts.length === 0 && (
                 <div className="flex flex-col items-center justify-center h-64 text-gray-500">
-                  <Package className="w-16 h-16 mb-4 text-gray-300" />
-                  <p className="text-lg font-medium">No products found</p>
-                  <p className="text-sm">Try adjusting your search or filters</p>
+                  <Package className="w-16 h-16 mb-4 text-gray-300 dark:text-gray-600" />
+                  <p className="text-lg font-medium text-gray-500 dark:text-gray-400">No products found</p>
+                  <p className="text-sm text-gray-400 dark:text-gray-500">Try adjusting your search or filters</p>
                 </div>
               )}
             </div>
@@ -447,10 +447,12 @@ export function Sales() {
         {/* Right Panel - Cart & Checkout */}
         <div className="w-96 bg-white dark:bg-gray-800 border-l border-gray-200 dark:border-gray-700 flex flex-col">
           {/* Cart Header */}
-          <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+          <div className="p-6 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-white to-gray-50 dark:from-gray-800 dark:to-gray-900">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
-                <ShoppingCart className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                <div className="bg-blue-100 dark:bg-blue-900/30 p-2 rounded-lg">
+                  <ShoppingCart className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                </div>
                 <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Cart</h2>
                 <span className="bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400 text-xs font-medium px-2 py-1 rounded-full">
                   {cart.length}
@@ -459,7 +461,7 @@ export function Sales() {
               {cart.length > 0 && (
                 <button
                   onClick={clearCart}
-                  className="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 text-sm font-medium"
+                  className="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 text-sm font-medium px-3 py-1 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
                 >
                   Clear All
                 </button>
@@ -473,7 +475,7 @@ export function Sales() {
               <div className="flex flex-col items-center justify-center h-full text-gray-500">
                 <ShoppingCart className="w-16 h-16 mb-4 text-gray-300 dark:text-gray-600" />
                 <p className="text-lg font-medium dark:text-gray-400">Cart is empty</p>
-                <p className="text-sm">Add products to get started</p>
+                <p className="text-sm text-gray-400 dark:text-gray-500">Add products to get started</p>
               </div>
             ) : (
               <div className="space-y-4">
@@ -482,16 +484,16 @@ export function Sales() {
                   if (!product) return null;
                   
                   return (
-                    <div key={item.productId} className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+                    <div key={item.productId} className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4 border border-gray-100 dark:border-gray-600/50 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200">
                       <div className="flex items-start justify-between mb-2">
                         <div className="flex-1">
                           <h3 className="font-medium text-gray-900 dark:text-white text-sm">{product.name}</h3>
                           <p className="text-xs text-gray-500 dark:text-gray-400">SKU: {product.sku}</p>
-                          <p className="text-sm text-green-600 font-medium">${item.unitPrice.toFixed(2)} each</p>
+                          <p className="text-sm text-green-600 dark:text-green-400 font-medium">${item.unitPrice.toFixed(2)} each</p>
                         </div>
                         <button
                           onClick={() => removeFromCart(item.productId)}
-                          className="text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 p-1"
+                          className="text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 p-1 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
                         >
                           <X size={16} />
                         </button>
@@ -501,21 +503,21 @@ export function Sales() {
                         <div className="flex items-center space-x-2">
                           <button
                             onClick={() => updateQuantity(item.productId, item.quantity - 1)}
-                            className="w-8 h-8 rounded-full bg-white dark:bg-gray-600 border border-gray-300 dark:border-gray-500 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-500"
+                            className="w-8 h-8 rounded-full bg-white dark:bg-gray-600 border border-gray-300 dark:border-gray-500 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-500 transition-colors shadow-sm"
                           >
-                            -
+                            <span className="text-gray-600 dark:text-gray-300 font-medium">-</span>
                           </button>
                           <span className="font-medium text-gray-900 dark:text-white min-w-[30px] text-center">
                             {item.quantity}
                           </span>
                           <button
                             onClick={() => updateQuantity(item.productId, item.quantity + 1)}
-                            className="w-8 h-8 rounded-full bg-white dark:bg-gray-600 border border-gray-300 dark:border-gray-500 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-500"
+                            className="w-8 h-8 rounded-full bg-white dark:bg-gray-600 border border-gray-300 dark:border-gray-500 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-500 transition-colors shadow-sm"
                           >
-                            +
+                            <span className="text-gray-600 dark:text-gray-300 font-medium">+</span>
                           </button>
                         </div>
-                        <span className="font-bold text-gray-900 dark:text-white">${item.total.toFixed(2)}</span>
+                        <span className="font-bold text-gray-900 dark:text-white text-lg">${item.total.toFixed(2)}</span>
                       </div>
                     </div>
                   );
@@ -526,7 +528,7 @@ export function Sales() {
 
           {/* Checkout Section */}
           {cart.length > 0 && (
-            <div className="border-t border-gray-200 dark:border-gray-700 p-6 space-y-4">
+            <div className="border-t border-gray-200 dark:border-gray-700 p-6 space-y-6 bg-gradient-to-b from-white to-gray-50 dark:from-gray-800 dark:to-gray-900">
               {/* Customer Selection */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Customer</label>
@@ -534,7 +536,7 @@ export function Sales() {
                   <select
                     value={selectedCustomer}
                     onChange={(e) => setSelectedCustomer(e.target.value)}
-                    className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm transition-colors duration-200"
                   >
                     <option value="">Select Customer</option>
                     {customers.map(customer => (
@@ -544,7 +546,7 @@ export function Sales() {
                   <Button
                     size="sm"
                     onClick={() => setShowCustomerForm(true)}
-                    className="px-3"
+                    className="px-3 bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600"
                   >
                     <User size={16} />
                   </Button>
@@ -554,7 +556,7 @@ export function Sales() {
               {/* Payment Method */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Payment Method</label>
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-2 gap-3">
                   {[
                     { id: 'cash', label: 'Cash', icon: DollarSign },
                     { id: 'card', label: 'Card', icon: CreditCard },
@@ -566,10 +568,10 @@ export function Sales() {
                       <button
                         key={method.id}
                         onClick={() => setPaymentMethod(method.id)}
-                        className={`flex flex-col items-center justify-center py-3 px-2 rounded-lg text-xs font-medium transition-all duration-200 ${
+                        className={`flex flex-col items-center justify-center py-3 px-2 rounded-xl text-xs font-medium transition-all duration-200 shadow-sm ${
                           paymentMethod === method.id 
-                            ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 border-2 border-blue-300 dark:border-blue-600' 
-                            : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-2 border-transparent hover:bg-gray-200 dark:hover:bg-gray-600'
+                            ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 border-2 border-blue-300 dark:border-blue-600 shadow-md transform scale-105' 
+                            : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-2 border-transparent hover:bg-gray-200 dark:hover:bg-gray-600 hover:shadow-md'
                         }`}
                       >
                         <Icon size={16} className="mb-1" />
@@ -582,19 +584,19 @@ export function Sales() {
 
               {/* Discount */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Discount</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Discount</label>
                 <div className="flex space-x-2">
                   <input
                     type="number"
                     step="0.01"
                     value={discount}
                     onChange={(e) => setDiscount(parseFloat(e.target.value) || 0)}
-                    className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm transition-colors duration-200"
                   />
                   <select
                     value={discountType}
                     onChange={(e) => setDiscountType(e.target.value)}
-                    className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm transition-colors duration-200"
                   >
                     <option value="amount">$</option>
                     <option value="percentage">%</option>
@@ -605,13 +607,13 @@ export function Sales() {
               {/* Amount Received (for cash payments) */}
               {paymentMethod === 'cash' && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Amount Received</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Amount Received</label>
                   <input
                     type="number"
                     step="0.01"
                     value={amountReceived}
                     onChange={(e) => setAmountReceived(parseFloat(e.target.value) || 0)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm transition-colors duration-200"
                   />
                 </div>
               )}
@@ -619,11 +621,11 @@ export function Sales() {
               {/* Service Ticket Selection (for service payments) */}
               {paymentMethod === 'service_payment' && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Service Ticket</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Service Ticket</label>
                   <select
                     value={selectedServiceTicket}
                     onChange={(e) => setSelectedServiceTicket(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm transition-colors duration-200"
                     required
                   >
                     <option value="">Select Service Ticket</option>
@@ -634,7 +636,7 @@ export function Sales() {
                     ))}
                   </select>
                   {selectedCustomer && getCustomerServiceTickets().length === 0 && (
-                    <p className="text-sm text-gray-500 mt-1">
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                       No active service tickets found for this customer
                     </p>
                   )}
@@ -642,32 +644,32 @@ export function Sales() {
               )}
 
               {/* Totals */}
-              <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 space-y-2">
+              <div className="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800 rounded-xl p-4 space-y-3 border border-gray-200 dark:border-gray-600 shadow-sm">
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-600 dark:text-gray-400">Subtotal:</span>
-                  <span>${subtotal.toFixed(2)}</span>
+                  <span className="font-medium text-gray-900 dark:text-white">${subtotal.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-600 dark:text-gray-400">Tax (10%):</span>
-                  <span>${tax.toFixed(2)}</span>
+                  <span className="font-medium text-gray-900 dark:text-white">${tax.toFixed(2)}</span>
                 </div>
                 {discountAmount > 0 && (
                   <div className="flex justify-between text-sm text-green-600 dark:text-green-400">
                     <span>Discount:</span>
-                    <span>-${discountAmount.toFixed(2)}</span>
+                    <span className="font-medium">-${discountAmount.toFixed(2)}</span>
                   </div>
                 )}
-                <div className="border-t border-gray-200 dark:border-gray-600 pt-2">
-                  <div className="flex justify-between text-lg font-bold">
+                <div className="border-t border-gray-200 dark:border-gray-600 pt-3">
+                  <div className="flex justify-between text-xl font-bold">
                     <span className="text-gray-900 dark:text-white">Total:</span>
-                    <span>${total.toFixed(2)}</span>
+                    <span className="text-green-600 dark:text-green-400">${total.toFixed(2)}</span>
                   </div>
                 </div>
                 {paymentMethod === 'cash' && amountReceived > 0 && (
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-600 dark:text-gray-400">Change:</span>
                     <span className={change >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}>
-                      ${Math.abs(change).toFixed(2)}
+                      <span className="font-medium">${Math.abs(change).toFixed(2)}</span>
                     </span>
                   </div>
                 )}
@@ -680,14 +682,14 @@ export function Sales() {
                          (paymentMethod === 'cash' && amountReceived < total) ||
                          (paymentMethod === 'service_payment' && !selectedServiceTicket)}
                 variant="success"
-                className="w-full py-3 text-lg font-semibold"
+                className="w-full py-4 text-lg font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200"
               >
                 <Receipt className="w-5 h-5 mr-2" />
                 Complete Sale
               </Button>
               
               {!selectedCustomer && (
-                <p className="text-xs text-gray-500 dark:text-gray-400 text-center mt-2">
+                <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
                   {paymentMethod === 'service_payment' 
                     ? 'Customer selection required for service payments'
                     : 'No customer selected - sale will be processed as guest purchase'
@@ -696,7 +698,7 @@ export function Sales() {
               )}
               
               {paymentMethod === 'service_payment' && (
-                <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3 mt-2">
+                <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
                   <p className="text-xs text-blue-700 dark:text-blue-400">
                     💡 This sale will be marked as pending and linked to the service ticket. 
                     Payment will be completed when the customer pays through the service system.
@@ -738,11 +740,11 @@ export function Sales() {
             </p>
           </div>
           
-          <div className="bg-gray-50 rounded-lg p-4">
+          <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
-                <p className="text-gray-600">Customer:</p>
-                <p className="font-medium">
+                <p className="text-gray-600 dark:text-gray-400">Customer:</p>
+                <p className="font-medium text-gray-900 dark:text-white">
                   {completedSale?.customerId === 'guest' 
                     ? 'Guest Customer' 
                     : customers.find(c => c.id === completedSale?.customerId)?.name || 'Unknown Customer'
@@ -750,28 +752,28 @@ export function Sales() {
                 </p>
               </div>
               <div>
-                <p className="text-gray-600">Total Amount:</p>
-                <p className="font-medium text-green-600">{formatCurrency(completedSale?.total || 0)}</p>
+                <p className="text-gray-600 dark:text-gray-400">Total Amount:</p>
+                <p className="font-medium text-green-600 dark:text-green-400">{formatCurrency(completedSale?.total || 0)}</p>
               </div>
               <div>
-                <p className="text-gray-600">Payment Method:</p>
-                <p className="font-medium capitalize">{completedSale?.paymentMethod}</p>
+                <p className="text-gray-600 dark:text-gray-400">Payment Method:</p>
+                <p className="font-medium text-gray-900 dark:text-white capitalize">{completedSale?.paymentMethod}</p>
               </div>
               <div>
-                <p className="text-gray-600">Items:</p>
-                <p className="font-medium">{completedSale?.items.length} items</p>
+                <p className="text-gray-600 dark:text-gray-400">Items:</p>
+                <p className="font-medium text-gray-900 dark:text-white">{completedSale?.items.length} items</p>
               </div>
               {completedSale?.serviceTicketId && (
                 <>
                   <div>
-                    <p className="text-gray-600">Service Ticket:</p>
-                    <p className="font-medium text-blue-600">
+                    <p className="text-gray-600 dark:text-gray-400">Service Ticket:</p>
+                    <p className="font-medium text-blue-600 dark:text-blue-400">
                       {serviceTickets.find(t => t.id === completedSale.serviceTicketId)?.ticketNumber || 'N/A'}
                     </p>
                   </div>
                   <div>
-                    <p className="text-gray-600">Status:</p>
-                    <p className="font-medium text-yellow-600">Pending Payment</p>
+                    <p className="text-gray-600 dark:text-gray-400">Status:</p>
+                    <p className="font-medium text-yellow-600 dark:text-yellow-400">Pending Payment</p>
                   </div>
                 </>
               )}
@@ -797,7 +799,7 @@ export function Sales() {
             </Button>
           </div>
           
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-gray-500 dark:text-gray-400">
             {completedSale?.status === 'pending' 
               ? 'You can track this sale in the Sales History and complete payment through Service Payments'
               : 'You can also find this invoice in the Invoices section'

@@ -23,7 +23,7 @@ export function QuickActions({ onClearCart }) {
             variant={action.variant}
             size="sm"
             onClick={action.action}
-            className="flex items-center space-x-1"
+            className="flex items-center space-x-1 shadow-sm hover:shadow-md transition-all duration-200"
           >
             <Icon size={16} />
             <span className="hidden sm:inline">{action.label}</span>

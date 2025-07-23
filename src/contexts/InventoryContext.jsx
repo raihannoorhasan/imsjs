@@ -767,13 +767,28 @@ export function InventoryProvider({ children }) {
       }
     }
     
-    // Handle advance payments
+    // Handle advance payments - track them in the service ticket
     if (paymentData.paymentType === 'advance_payment' && paymentData.serviceTicketId) {
       setServiceTickets(serviceTickets.map(ticket => 
         ticket.id === paymentData.serviceTicketId
           ? { 
               ...ticket, 
               advancePayments: [...(ticket.advancePayments || []), newPayment.id],
+              totalAdvancePaid: (ticket.totalAdvancePaid || 0) + paymentData.amount,
+              updatedAt: new Date()
+            }
+          : ticket
+      ));
+    }
+    
+    // Handle refund payments - update service ticket refund tracking
+    if (paymentData.paymentType === 'refund' && paymentData.serviceTicketId) {
+      setServiceTickets(serviceTickets.map(ticket => 
+        ticket.id === paymentData.serviceTicketId
+          ? { 
+              ...ticket, 
+              refundPayments: [...(ticket.refundPayments || []), newPayment.id],
+              totalRefundGiven: (ticket.totalRefundGiven || 0) + paymentData.amount,
               updatedAt: new Date()
             }
           : ticket
@@ -821,6 +836,32 @@ export function InventoryProvider({ children }) {
           generateInvoice(saleId);
         });
       }, 100);
+    }
+    
+    // Handle advance payment approval - update service ticket
+    if (payment && paymentData.status === 'approved' && payment.paymentType === 'advance_payment' && payment.serviceTicketId) {
+      setServiceTickets(serviceTickets.map(ticket => 
+        ticket.id === payment.serviceTicketId
+          ? { 
+              ...ticket, 
+              totalAdvancePaid: (ticket.totalAdvancePaid || 0) + payment.amount,
+              updatedAt: new Date()
+            }
+          : ticket
+      ));
+    }
+    
+    // Handle refund payment approval - update service ticket
+    if (payment && paymentData.status === 'approved' && payment.paymentType === 'refund' && payment.serviceTicketId) {
+      setServiceTickets(serviceTickets.map(ticket => 
+        ticket.id === payment.serviceTicketId
+          ? { 
+              ...ticket, 
+              totalRefundGiven: (ticket.totalRefundGiven || 0) + payment.amount,
+              updatedAt: new Date()
+            }
+          : ticket
+      ));
     }
   };
 

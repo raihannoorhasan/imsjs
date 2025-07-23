@@ -16,6 +16,12 @@ export function ServiceDashboard() {
   ).length;
   const completedTickets = serviceTickets.filter(ticket => ticket.status === 'completed').length;
   const totalRevenue = serviceInvoices.reduce((sum, invoice) => sum + invoice.total, 0);
+  const totalAdvancePayments = servicePayments
+    .filter(p => p.paymentType === 'advance_payment' && p.status === 'approved')
+    .reduce((sum, p) => sum + p.amount, 0);
+  const totalRefunds = servicePayments
+    .filter(p => p.paymentType === 'refund' && p.status === 'approved')
+    .reduce((sum, p) => sum + p.amount, 0);
 
   // Recent tickets
   const recentTickets = serviceTickets
@@ -82,6 +88,31 @@ export function ServiceDashboard() {
       changeType: 'positive'
     }
   ];
+  
+  // Add advance payments and refunds stats if they exist
+  if (totalAdvancePayments > 0) {
+    stats.push({
+      title: 'Advance Payments',
+      value: formatCurrency(totalAdvancePayments),
+      icon: TrendingUp,
+      color: 'text-blue-600',
+      bgColor: 'bg-blue-100',
+      change: 'Active',
+      changeType: 'positive'
+    });
+  }
+  
+  if (totalRefunds > 0) {
+    stats.push({
+      title: 'Total Refunds',
+      value: formatCurrency(totalRefunds),
+      icon: ArrowLeftRight,
+      color: 'text-orange-600',
+      bgColor: 'bg-orange-100',
+      change: 'Processed',
+      changeType: 'neutral'
+    });
+  }
 
   return (
     <div className="space-y-6">

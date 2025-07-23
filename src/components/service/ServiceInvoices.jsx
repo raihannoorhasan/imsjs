@@ -1,47 +1,64 @@
-import React from 'react';
-import { useInventory } from '../../contexts/InventoryContext';
-import { useTheme } from '../../contexts/ThemeContext';
-import { FileText, DollarSign, Search, Plus, Eye, Send, CheckCircle, Printer } from 'lucide-react';
-import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '../common/Table';
-import { StatusBadge } from '../common/StatusBadge';
-import { Card } from '../common/Card';
-import { Button } from '../common/Button';
-import { SearchInput } from '../common/SearchInput';
-import { Select } from '../common/Select';
-import { Modal } from '../common/Modal';
-import { formatCurrency, formatDate } from '../../utils/helpers';
+import { CheckCircle, DollarSign, Eye, FileText, Printer } from "lucide-react";
+import React from "react";
+import { useInventory } from "../../contexts/InventoryContext";
+import { useTheme } from "../../contexts/ThemeContext";
+import { formatCurrency, formatDate } from "../../utils/helpers";
+import { Button } from "../common/Button";
+import { Card } from "../common/Card";
+import { Modal } from "../common/Modal";
+import { SearchInput } from "../common/SearchInput";
+import { Select } from "../common/Select";
+import { StatusBadge } from "../common/StatusBadge";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "../common/Table";
 
 export function ServiceInvoices() {
-  const { serviceInvoices, customers, serviceTickets, technicians, updateServiceTicket, generateServiceInvoice } = useInventory();
+  const {
+    serviceInvoices,
+    customers,
+    serviceTickets,
+    technicians,
+    updateServiceTicket,
+    generateServiceInvoice,
+  } = useInventory();
   const { isDark } = useTheme();
-  const [searchTerm, setSearchTerm] = React.useState('');
-  const [statusFilter, setStatusFilter] = React.useState('all');
+  const [searchTerm, setSearchTerm] = React.useState("");
+  const [statusFilter, setStatusFilter] = React.useState("all");
   const [showInvoiceView, setShowInvoiceView] = React.useState(false);
   const [selectedInvoice, setSelectedInvoice] = React.useState(null);
 
   // Filter invoices based on search and status
-  const filteredInvoices = serviceInvoices.filter(invoice => {
-    const customer = customers.find(c => c.id === invoice.customerId);
-    const ticket = serviceTickets.find(t => t.id === invoice.serviceTicketId);
-    
-    const matchesSearch = 
+  const filteredInvoices = serviceInvoices.filter((invoice) => {
+    const customer = customers.find((c) => c.id === invoice.customerId);
+    const ticket = serviceTickets.find((t) => t.id === invoice.serviceTicketId);
+
+    const matchesSearch =
       invoice.invoiceNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (customer?.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (ticket?.ticketNumber || '').toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesStatus = statusFilter === 'all' || invoice.status === statusFilter;
-    
+      (customer?.name || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (ticket?.ticketNumber || "")
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase());
+
+    const matchesStatus =
+      statusFilter === "all" || invoice.status === statusFilter;
+
     return matchesSearch && matchesStatus;
   });
 
   const getCustomerName = (customerId) => {
-    const customer = customers.find(c => c.id === customerId);
-    return customer ? customer.name : 'Unknown Customer';
+    const customer = customers.find((c) => c.id === customerId);
+    return customer ? customer.name : "Unknown Customer";
   };
 
   const getTicketNumber = (serviceTicketId) => {
-    const ticket = serviceTickets.find(t => t.id === serviceTicketId);
-    return ticket ? ticket.ticketNumber : 'Unknown Ticket';
+    const ticket = serviceTickets.find((t) => t.id === serviceTicketId);
+    return ticket ? ticket.ticketNumber : "Unknown Ticket";
   };
 
   const handleViewInvoice = (invoice) => {
@@ -50,11 +67,13 @@ export function ServiceInvoices() {
   };
 
   const handlePrintInvoice = (invoice) => {
-    const customer = customers.find(c => c.id === invoice.customerId);
-    const ticket = serviceTickets.find(t => t.id === invoice.serviceTicketId);
-    const technician = ticket ? technicians.find(t => t.id === ticket.assignedTechnician) : null;
-    
-    const printWindow = window.open('', '_blank');
+    const customer = customers.find((c) => c.id === invoice.customerId);
+    const ticket = serviceTickets.find((t) => t.id === invoice.serviceTicketId);
+    const technician = ticket
+      ? technicians.find((t) => t.id === ticket.assignedTechnician)
+      : null;
+
+    const printWindow = window.open("", "_blank");
     printWindow.document.write(`
       <!DOCTYPE html>
       <html>
@@ -104,15 +123,15 @@ export function ServiceInvoices() {
               <h3>Customer Information</h3>
               <div class="detail-item">
                 <span class="detail-label">Name:</span>
-                <span class="detail-value">${customer?.name || 'N/A'}</span>
+                <span class="detail-value">${customer?.name || "N/A"}</span>
               </div>
               <div class="detail-item">
                 <span class="detail-label">Email:</span>
-                <span class="detail-value">${customer?.email || 'N/A'}</span>
+                <span class="detail-value">${customer?.email || "N/A"}</span>
               </div>
               <div class="detail-item">
                 <span class="detail-label">Phone:</span>
-                <span class="detail-value">${customer?.phone || 'N/A'}</span>
+                <span class="detail-value">${customer?.phone || "N/A"}</span>
               </div>
             </div>
             
@@ -120,19 +139,25 @@ export function ServiceInvoices() {
               <h3>Service Information</h3>
               <div class="detail-item">
                 <span class="detail-label">Ticket:</span>
-                <span class="detail-value">${ticket?.ticketNumber || 'N/A'}</span>
+                <span class="detail-value">${
+                  ticket?.ticketNumber || "N/A"
+                }</span>
               </div>
               <div class="detail-item">
                 <span class="detail-label">Device:</span>
-                <span class="detail-value">${ticket?.deviceBrand || ''} ${ticket?.deviceModel || ''}</span>
+                <span class="detail-value">${ticket?.deviceBrand || ""} ${
+      ticket?.deviceModel || ""
+    }</span>
               </div>
               <div class="detail-item">
                 <span class="detail-label">Technician:</span>
-                <span class="detail-value">${technician?.name || 'N/A'}</span>
+                <span class="detail-value">${technician?.name || "N/A"}</span>
               </div>
               <div class="detail-item">
                 <span class="detail-label">Date:</span>
-                <span class="detail-value">${formatDate(invoice.createdAt)}</span>
+                <span class="detail-value">${formatDate(
+                  invoice.createdAt
+                )}</span>
               </div>
             </div>
           </div>
@@ -141,29 +166,39 @@ export function ServiceInvoices() {
             <h3>Service Details</h3>
             <div class="service-box">
               <strong>Issue Description:</strong><br>
-              ${ticket?.issueDescription || 'N/A'}
+              ${ticket?.issueDescription || "N/A"}
             </div>
-            ${ticket?.technicianNotes ? `
+            ${
+              ticket?.technicianNotes
+                ? `
               <div class="service-box">
                 <strong>Technician Notes:</strong><br>
                 ${ticket.technicianNotes}
               </div>
-            ` : ''}
+            `
+                : ""
+            }
           </div>
           
           <div class="detail-section">
             <h3>Cost Breakdown</h3>
             <div class="detail-item">
               <span class="detail-label">Labor Cost:</span>
-              <span class="detail-value">${formatCurrency(invoice.laborCost)}</span>
+              <span class="detail-value">${formatCurrency(
+                invoice.laborCost
+              )}</span>
             </div>
             <div class="detail-item">
               <span class="detail-label">Parts Cost:</span>
-              <span class="detail-value">${formatCurrency(invoice.partsCost)}</span>
+              <span class="detail-value">${formatCurrency(
+                invoice.partsCost
+              )}</span>
             </div>
             <div class="detail-item">
               <span class="detail-label">Subtotal:</span>
-              <span class="detail-value">${formatCurrency(invoice.subtotal)}</span>
+              <span class="detail-value">${formatCurrency(
+                invoice.subtotal
+              )}</span>
             </div>
             <div class="detail-item">
               <span class="detail-label">Tax:</span>
@@ -202,7 +237,7 @@ export function ServiceInvoices() {
         </body>
       </html>
     `);
-    
+
     printWindow.document.close();
     printWindow.focus();
     printWindow.print();
@@ -211,9 +246,16 @@ export function ServiceInvoices() {
 
   // Calculate statistics
   const totalInvoices = filteredInvoices.length;
-  const totalRevenue = filteredInvoices.reduce((sum, invoice) => sum + invoice.total, 0);
-  const paidInvoices = filteredInvoices.filter(invoice => invoice.status === 'paid').length;
-  const pendingInvoices = filteredInvoices.filter(invoice => invoice.status === 'draft' || invoice.status === 'sent').length;
+  const totalRevenue = filteredInvoices.reduce(
+    (sum, invoice) => sum + invoice.total,
+    0
+  );
+  const paidInvoices = filteredInvoices.filter(
+    (invoice) => invoice.status === "paid"
+  ).length;
+  const pendingInvoices = filteredInvoices.filter(
+    (invoice) => invoice.status === "draft" || invoice.status === "sent"
+  ).length;
 
   return (
     <div className="space-y-6">
@@ -221,21 +263,24 @@ export function ServiceInvoices() {
       <Card className="p-6 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Service Invoices</h2>
-            <p className="text-gray-600 dark:text-gray-400 mt-1">Manage and track service billing and payments</p>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+              Service Invoices
+            </h2>
+            <p className="text-gray-600 dark:text-gray-400 mt-1">
+              Manage and track service billing and payments
+            </p>
           </div>
         </div>
-        
+
         {/* Search and Filters */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <SearchInput
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            onClear={() => setSearchTerm('')}
+            onClear={() => setSearchTerm("")}
             className="w-full bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white"
-            className="w-full"
           />
-          
+
           <Select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
@@ -255,8 +300,12 @@ export function ServiceInvoices() {
         <Card className="p-6 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 border-blue-200 dark:border-blue-800">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-blue-700 dark:text-blue-400">Total Invoices</p>
-              <p className="text-3xl font-bold text-blue-900 dark:text-blue-200">{totalInvoices}</p>
+              <p className="text-sm font-medium text-blue-700 dark:text-blue-400">
+                Total Invoices
+              </p>
+              <p className="text-3xl font-bold text-blue-900 dark:text-blue-200">
+                {totalInvoices}
+              </p>
             </div>
             <div className="bg-blue-200 dark:bg-blue-800/50 p-3 rounded-full">
               <FileText className="w-8 h-8 text-blue-700 dark:text-blue-400" />
@@ -267,8 +316,12 @@ export function ServiceInvoices() {
         <Card className="p-6 bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 border-green-200 dark:border-green-800">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-green-700 dark:text-green-400">Total Revenue</p>
-              <p className="text-3xl font-bold text-green-900 dark:text-green-200">{formatCurrency(totalRevenue)}</p>
+              <p className="text-sm font-medium text-green-700 dark:text-green-400">
+                Total Revenue
+              </p>
+              <p className="text-3xl font-bold text-green-900 dark:text-green-200">
+                {formatCurrency(totalRevenue)}
+              </p>
             </div>
             <div className="bg-green-200 dark:bg-green-800/50 p-3 rounded-full">
               <DollarSign className="w-8 h-8 text-green-700 dark:text-green-400" />
@@ -279,8 +332,12 @@ export function ServiceInvoices() {
         <Card className="p-6 bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-emerald-900/20 dark:to-emerald-800/20 border-emerald-200 dark:border-emerald-800">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-emerald-700 dark:text-emerald-400">Paid Invoices</p>
-              <p className="text-3xl font-bold text-emerald-900 dark:text-emerald-200">{paidInvoices}</p>
+              <p className="text-sm font-medium text-emerald-700 dark:text-emerald-400">
+                Paid Invoices
+              </p>
+              <p className="text-3xl font-bold text-emerald-900 dark:text-emerald-200">
+                {paidInvoices}
+              </p>
             </div>
             <div className="bg-emerald-200 dark:bg-emerald-800/50 p-3 rounded-full">
               <CheckCircle className="w-8 h-8 text-emerald-700 dark:text-emerald-400" />
@@ -291,8 +348,12 @@ export function ServiceInvoices() {
         <Card className="p-6 bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-900/20 dark:to-orange-800/20 border-orange-200 dark:border-orange-800">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-orange-700 dark:text-orange-400">Pending</p>
-              <p className="text-3xl font-bold text-orange-900 dark:text-orange-200">{pendingInvoices}</p>
+              <p className="text-sm font-medium text-orange-700 dark:text-orange-400">
+                Pending
+              </p>
+              <p className="text-3xl font-bold text-orange-900 dark:text-orange-200">
+                {pendingInvoices}
+              </p>
             </div>
             <div className="bg-orange-200 dark:bg-orange-800/50 p-3 rounded-full">
               <FileText className="w-8 h-8 text-orange-700 dark:text-orange-400" />
@@ -302,9 +363,10 @@ export function ServiceInvoices() {
       </div>
 
       {/* Results Summary */}
-      {(searchTerm || statusFilter !== 'all') && (
+      {(searchTerm || statusFilter !== "all") && (
         <div className="text-sm text-gray-600 dark:text-gray-400 px-1">
-          Found {filteredInvoices.length} invoice{filteredInvoices.length !== 1 ? 's' : ''} 
+          Found {filteredInvoices.length} invoice
+          {filteredInvoices.length !== 1 ? "s" : ""}
           {searchTerm && ` matching "${searchTerm}"`}
         </div>
       )}
@@ -314,12 +376,13 @@ export function ServiceInvoices() {
         {filteredInvoices.length === 0 ? (
           <div className="text-center py-12">
             <FileText className="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">No invoices found</h3>
+            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+              No invoices found
+            </h3>
             <p className="text-gray-600 dark:text-gray-400 mb-4">
-              {searchTerm || statusFilter !== 'all'
-                ? 'Try adjusting your search criteria or filters'
-                : 'Service invoices will appear here when tickets are completed'
-              }
+              {searchTerm || statusFilter !== "all"
+                ? "Try adjusting your search criteria or filters"
+                : "Service invoices will appear here when tickets are completed"}
             </p>
           </div>
         ) : (
@@ -339,44 +402,68 @@ export function ServiceInvoices() {
             </TableHeader>
             <TableBody>
               {filteredInvoices.map((invoice) => (
-                <TableRow key={invoice.id} className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200">
+                <TableRow
+                  key={invoice.id}
+                  className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200"
+                >
                   <TableCell>
                     <div className="flex items-center space-x-2">
-                      <FileText size={16} className="text-gray-500 dark:text-gray-400" />
+                      <FileText
+                        size={16}
+                        className="text-gray-500 dark:text-gray-400"
+                      />
                       <div>
-                        <p className="font-medium text-gray-900 dark:text-white">{invoice.invoiceNumber}</p>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">{formatDate(invoice.createdAt)}</p>
+                        <p className="font-medium text-gray-900 dark:text-white">
+                          {invoice.invoiceNumber}
+                        </p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                          {formatDate(invoice.createdAt)}
+                        </p>
                       </div>
                     </div>
                   </TableCell>
                   <TableCell>
                     <div>
-                      <p className="text-sm font-medium text-gray-900 dark:text-white">{getCustomerName(invoice.customerId)}</p>
-                      <p className="text-xs text-gray-500 dark:text-gray-500">Customer</p>
+                      <p className="text-sm font-medium text-gray-900 dark:text-white">
+                        {getCustomerName(invoice.customerId)}
+                      </p>
+                      <p className="text-xs text-gray-500 dark:text-gray-500">
+                        Customer
+                      </p>
                     </div>
                   </TableCell>
                   <TableCell>
                     <div>
-                      <p className="text-sm font-medium text-gray-900 dark:text-white">{getTicketNumber(invoice.serviceTicketId)}</p>
-                      <p className="text-xs text-gray-500 dark:text-gray-500">Service Ticket</p>
+                      <p className="text-sm font-medium text-gray-900 dark:text-white">
+                        {getTicketNumber(invoice.serviceTicketId)}
+                      </p>
+                      <p className="text-xs text-gray-500 dark:text-gray-500">
+                        Service Ticket
+                      </p>
                     </div>
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center text-blue-600 dark:text-blue-400">
                       <DollarSign size={14} className="mr-1" />
-                      <span className="font-medium">{formatCurrency(invoice.laborCost)}</span>
+                      <span className="font-medium">
+                        {formatCurrency(invoice.laborCost)}
+                      </span>
                     </div>
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center text-purple-600 dark:text-purple-400">
                       <DollarSign size={14} className="mr-1" />
-                      <span className="font-medium">{formatCurrency(invoice.partsCost)}</span>
+                      <span className="font-medium">
+                        {formatCurrency(invoice.partsCost)}
+                      </span>
                     </div>
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center text-green-600 dark:text-green-400">
                       <DollarSign size={14} className="mr-1" />
-                      <span className="font-bold text-lg">{formatCurrency(invoice.total)}</span>
+                      <span className="font-bold text-lg">
+                        {formatCurrency(invoice.total)}
+                      </span>
                     </div>
                   </TableCell>
                   <TableCell>
@@ -384,8 +471,12 @@ export function ServiceInvoices() {
                   </TableCell>
                   <TableCell>
                     <div>
-                      <p className="text-sm text-gray-900 dark:text-white">{formatDate(invoice.dueDate)}</p>
-                      <p className="text-xs text-gray-500 dark:text-gray-500">Due date</p>
+                      <p className="text-sm text-gray-900 dark:text-white">
+                        {formatDate(invoice.dueDate)}
+                      </p>
+                      <p className="text-xs text-gray-500 dark:text-gray-500">
+                        Due date
+                      </p>
                     </div>
                   </TableCell>
                   <TableCell>
@@ -433,22 +524,31 @@ export function ServiceInvoices() {
 function ServiceInvoiceView({ isOpen, onClose, invoice, onPrint }) {
   const { customers, serviceTickets, technicians } = useInventory();
   const { isDark } = useTheme();
-  
+
   if (!invoice) return null;
-  
-  const customer = customers.find(c => c.id === invoice.customerId);
-  const ticket = serviceTickets.find(t => t.id === invoice.serviceTicketId);
-  const technician = ticket ? technicians.find(t => t.id === ticket.assignedTechnician) : null;
-  
+
+  const customer = customers.find((c) => c.id === invoice.customerId);
+  const ticket = serviceTickets.find((t) => t.id === invoice.serviceTicketId);
+  const technician = ticket
+    ? technicians.find((t) => t.id === ticket.assignedTechnician)
+    : null;
+
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Service Invoice Details" size="xl">
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Service Invoice Details"
+      size="xl"
+    >
       <div className="space-y-6">
         {/* Invoice Header */}
         <div className="flex justify-between items-start">
           <div>
             <div className="flex items-center space-x-2 mb-2">
               <FileText className="w-6 h-6 text-orange-600 dark:text-orange-400" />
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{invoice.invoiceNumber}</h2>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                {invoice.invoiceNumber}
+              </h2>
             </div>
             <div className="space-y-1 text-sm text-gray-600 dark:text-gray-400">
               <p>Created: {formatDate(invoice.createdAt)}</p>
@@ -457,27 +557,51 @@ function ServiceInvoiceView({ isOpen, onClose, invoice, onPrint }) {
           </div>
           <div className="text-right">
             <StatusBadge status={invoice.status} className="mb-2" />
-            <p className="text-2xl font-bold text-green-600 dark:text-green-400">{formatCurrency(invoice.total)}</p>
+            <p className="text-2xl font-bold text-green-600 dark:text-green-400">
+              {formatCurrency(invoice.total)}
+            </p>
           </div>
         </div>
 
         {/* Customer and Service Info */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg border border-gray-200 dark:border-gray-600">
-            <h3 className="font-medium text-gray-900 dark:text-white mb-3">Customer Information</h3>
+            <h3 className="font-medium text-gray-900 dark:text-white mb-3">
+              Customer Information
+            </h3>
             <div className="space-y-2 text-sm text-gray-700 dark:text-gray-300">
-              <p><span className="font-medium">Name:</span> {customer?.name || 'N/A'}</p>
-              <p><span className="font-medium">Email:</span> {customer?.email || 'N/A'}</p>
-              <p><span className="font-medium">Phone:</span> {customer?.phone || 'N/A'}</p>
+              <p>
+                <span className="font-medium">Name:</span>{" "}
+                {customer?.name || "N/A"}
+              </p>
+              <p>
+                <span className="font-medium">Email:</span>{" "}
+                {customer?.email || "N/A"}
+              </p>
+              <p>
+                <span className="font-medium">Phone:</span>{" "}
+                {customer?.phone || "N/A"}
+              </p>
             </div>
           </div>
-          
+
           <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg border border-gray-200 dark:border-gray-600">
-            <h3 className="font-medium text-gray-900 dark:text-white mb-3">Service Information</h3>
+            <h3 className="font-medium text-gray-900 dark:text-white mb-3">
+              Service Information
+            </h3>
             <div className="space-y-2 text-sm text-gray-700 dark:text-gray-300">
-              <p><span className="font-medium">Ticket:</span> {ticket?.ticketNumber || 'N/A'}</p>
-              <p><span className="font-medium">Device:</span> {ticket?.deviceBrand} {ticket?.deviceModel}</p>
-              <p><span className="font-medium">Technician:</span> {technician?.name || 'N/A'}</p>
+              <p>
+                <span className="font-medium">Ticket:</span>{" "}
+                {ticket?.ticketNumber || "N/A"}
+              </p>
+              <p>
+                <span className="font-medium">Device:</span>{" "}
+                {ticket?.deviceBrand} {ticket?.deviceModel}
+              </p>
+              <p>
+                <span className="font-medium">Technician:</span>{" "}
+                {technician?.name || "N/A"}
+              </p>
             </div>
           </div>
         </div>
@@ -485,13 +609,17 @@ function ServiceInvoiceView({ isOpen, onClose, invoice, onPrint }) {
         {/* Service Details */}
         {ticket && (
           <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 p-4 rounded-lg">
-            <h3 className="font-medium text-gray-900 dark:text-white mb-2">Service Details</h3>
+            <h3 className="font-medium text-gray-900 dark:text-white mb-2">
+              Service Details
+            </h3>
             <p className="text-sm text-gray-700 dark:text-gray-300 mb-2">
-              <span className="font-medium">Issue:</span> {ticket.issueDescription}
+              <span className="font-medium">Issue:</span>{" "}
+              {ticket.issueDescription}
             </p>
             {ticket.technicianNotes && (
               <p className="text-sm text-gray-700 dark:text-gray-300">
-                <span className="font-medium">Notes:</span> {ticket.technicianNotes}
+                <span className="font-medium">Notes:</span>{" "}
+                {ticket.technicianNotes}
               </p>
             )}
           </div>
@@ -499,7 +627,9 @@ function ServiceInvoiceView({ isOpen, onClose, invoice, onPrint }) {
 
         {/* Cost Breakdown */}
         <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg border border-gray-200 dark:border-gray-600">
-          <h3 className="font-medium text-gray-900 dark:text-white mb-3">Cost Breakdown</h3>
+          <h3 className="font-medium text-gray-900 dark:text-white mb-3">
+            Cost Breakdown
+          </h3>
           <div className="space-y-2">
             <div className="flex justify-between text-sm text-gray-700 dark:text-gray-300">
               <span>Labor Cost:</span>
@@ -520,7 +650,9 @@ function ServiceInvoiceView({ isOpen, onClose, invoice, onPrint }) {
             <div className="border-t border-gray-200 dark:border-gray-600 pt-2">
               <div className="flex justify-between text-lg font-bold">
                 <span className="text-gray-900 dark:text-white">Total:</span>
-                <span className="text-green-600 dark:text-green-400">{formatCurrency(invoice.total)}</span>
+                <span className="text-green-600 dark:text-green-400">
+                  {formatCurrency(invoice.total)}
+                </span>
               </div>
             </div>
           </div>
@@ -532,9 +664,7 @@ function ServiceInvoiceView({ isOpen, onClose, invoice, onPrint }) {
             <Printer className="w-4 h-4 mr-2" />
             Print Invoice
           </Button>
-          <Button onClick={onClose}>
-            Close
-          </Button>
+          <Button onClick={onClose}>Close</Button>
         </div>
       </div>
     </Modal>

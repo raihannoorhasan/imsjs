@@ -3,11 +3,24 @@ import { useInventory } from '../../contexts/InventoryContext';
 import { useTheme } from '../../contexts/ThemeContext';
 import { Modal } from '../common/Modal';
 import { Button } from '../common/Button';
-import { DollarSign, Receipt, User, Calendar, FileText, Printer } from 'lucide-react';
+import { 
+  DollarSign, 
+  Receipt, 
+  User, 
+  Calendar, 
+  FileText, 
+  Printer, 
+  ArrowLeftRight, 
+  CheckCircle, 
+  TrendingUp, 
+  TrendingDown,
+  Calculator,
+  Info
+} from 'lucide-react';
 import { formatCurrency, formatDate, formatDateTime } from '../../utils/helpers';
 
 export function ServicePaymentView({ isOpen, onClose, payment }) {
-  const { customers, serviceTickets, sales, products } = useInventory();
+  const { customers, serviceTickets, sales, products, servicePayments } = useInventory();
   const { isDark } = useTheme();
 
   if (!payment) return null;
@@ -15,6 +28,33 @@ export function ServicePaymentView({ isOpen, onClose, payment }) {
   const customer = customers.find(c => c.id === payment.customerId);
   const ticket = serviceTickets.find(t => t.id === payment.serviceTicketId);
   const relatedSale = payment.relatedSaleId ? sales.find(s => s.id === payment.relatedSaleId) : null;
+  
+  // Get advance payment context for this ticket
+  const getAdvancePaymentContext = () => {
+    if (!ticket) return null;
+    
+    const advancePayments = servicePayments.filter(p => 
+      p.serviceTicketId === ticket.id && 
+      p.paymentType === 'advance_payment' && 
+      p.status === 'approved'
+    );
+    
+    const totalAdvance = advancePayments.reduce((sum, p) => sum + p.amount, 0);
+    const totalServiceCost = ticket.laborCost + ticket.partsCost;
+    const remainingBalance = totalServiceCost - totalAdvance;
+    
+    return {
+      totalAdvance,
+      totalServiceCost,
+      remainingBalance,
+      hasAdvance: totalAdvance > 0,
+      needsRefund: remainingBalance < 0,
+      refundAmount: remainingBalance < 0 ? Math.abs(remainingBalance) : 0,
+      advancePayments
+    };
+  };
+
+  const advanceContext = getAdvancePaymentContext();
   
   const getProductName = (productId) => {
     const product = products.find(p => p.id === productId);
@@ -43,6 +83,10 @@ export function ServicePaymentView({ isOpen, onClose, payment }) {
             .amount-section { background: #f0fdf4; border: 2px solid #10b981; padding: 20px; text-align: center; margin: 30px 0; }
             .amount-label { font-size: 18px; color: #4b5563; margin-bottom: 10px; }
             .amount-value { font-size: 32px; font-weight: bold; color: #059669; }
+            .refund-section { background: #fef2f2; border: 2px solid #ef4444; padding: 20px; text-align: center; margin: 30px 0; }
+            .refund-value { font-size: 32px; font-weight: bold; color: #dc2626; }
+            .advance-section { background: #eff6ff; border: 2px solid #3b82f6; padding: 15px; margin: 20px 0; border-radius: 8px; }
+            .calculation-section { background: #f8fafc; border: 1px solid #e2e8f0; padding: 15px; margin: 20px 0; border-radius: 8px; }
             .footer { margin-top: 40px; padding-top: 20px; border-top: 2px solid #e5e7eb; text-align: center; }
             .status-badge { display: inline-block; padding: 8px 16px; border-radius: 20px; font-weight: bold; text-transform: uppercase; font-size: 12px; }
             .status-approved { background: #dcfce7; color: #166534; }
@@ -60,7 +104,9 @@ export function ServicePaymentView({ isOpen, onClose, payment }) {
             </div>
           </div>
           
-          <div class="receipt-title">PAYMENT RECEIPT</div>
+          <div class="receipt-title">
+            ${payment.paymentType === 'refund' ? 'REFUND RECEIPT' : 'PAYMENT RECEIPT'}
+          </div>
           
           <div class="receipt-number">
             Receipt No: ${payment.receiptNumber}
@@ -109,6 +155,42 @@ export function ServicePaymentView({ isOpen, onClose, payment }) {
             </div>
           </div>
           
+          ${advanceContext && advanceContext.hasAdvance ? `
+            <div class="advance-section">
+              <h3 style="color: #1e40af; margin-bottom: 15px;">Advance Payment Context</h3>
+              <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; text-align: center;">
+                <div>
+                  <div style="font-weight: bold; color: #1f2937;">Total Service Cost</div>
+                  <div style="font-size: 18px; color: #059669;">${formatCurrency(advanceContext.totalServiceCost)}</div>
+                </div>
+                <div>
+                  <div style="font-weight: bold; color: #1f2937;">Total Advance Paid</div>
+                  <div style="font-size: 18px; color: #3b82f6;">${formatCurrency(advanceContext.totalAdvance)}</div>
+                </div>
+                <div>
+                  <div style="font-weight: bold; color: #1f2937;">${advanceContext.remainingBalance >= 0 ? 'Remaining Balance' : 'Overpaid Amount'}</div>
+                  <div style="font-size: 18px; color: ${advanceContext.remainingBalance >= 0 ? '#dc2626' : '#f59e0b'};">${formatCurrency(Math.abs(advanceContext.remainingBalance))}</div>
+                </div>
+              </div>
+            </div>
+          ` : ''}
+          
+          ${payment.paymentCalculation ? `
+            <div class="calculation-section">
+              <h3 style="color: #1f2937; margin-bottom: 15px;">Payment Calculation Breakdown</h3>
+              <div style="background: white; padding: 15px; border-radius: 8px;">
+                ${payment.paymentCalculation.breakdown.map(item => `
+                  <div style="display: flex; justify-content: space-between; padding: 8px 0; ${item.type === 'total' || item.type === 'refund' ? 'border-top: 1px solid #e5e7eb; margin-top: 8px; font-weight: bold;' : ''}">
+                    <span style="color: ${item.type === 'credit' ? '#059669' : item.type === 'refund' ? '#dc2626' : '#374151'};">${item.label}:</span>
+                    <span style="color: ${item.type === 'credit' ? '#059669' : item.type === 'refund' ? '#dc2626' : item.type === 'total' ? '#3b82f6' : '#1f2937'}; font-weight: ${item.type === 'total' || item.type === 'refund' ? 'bold' : 'normal'};">
+                      ${item.amount < 0 ? '-' : ''}${formatCurrency(Math.abs(item.amount))}
+                    </span>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          ` : ''}
+          
           ${relatedSale ? `
             <div class="detail-section">
               <h3>Related Sale Details</h3>
@@ -155,10 +237,17 @@ export function ServicePaymentView({ isOpen, onClose, payment }) {
             </div>
           </div>
           
-          <div class="amount-section">
-            <div class="amount-label">Amount Paid</div>
-            <div class="amount-value">${formatCurrency(payment.amount)}</div>
-          </div>
+          ${payment.paymentType === 'refund' ? `
+            <div class="refund-section">
+              <div class="amount-label">Refund Amount</div>
+              <div class="refund-value">${formatCurrency(payment.amount)}</div>
+            </div>
+          ` : `
+            <div class="amount-section">
+              <div class="amount-label">${payment.paymentType === 'advance_payment' ? 'Advance Payment' : 'Amount Paid'}</div>
+              <div class="amount-value">${formatCurrency(payment.amount)}</div>
+            </div>
+          `}
           
           ${payment.notes ? `
             <div class="detail-section">
@@ -181,7 +270,7 @@ export function ServicePaymentView({ isOpen, onClose, payment }) {
           <div class="footer">
             <div style="background: #f3f4f6; padding: 15px; border-radius: 8px; margin: 20px 0;">
               <div style="font-weight: bold; color: #1f2937; margin-bottom: 5px;">
-                Thank you for your payment!
+                ${payment.paymentType === 'refund' ? 'Refund processed successfully!' : 'Thank you for your payment!'}
               </div>
               <div style="color: #6b7280; font-size: 12px;">
                 Generated on ${formatDateTime(new Date())} | Receipt ID: ${payment.receiptNumber}
@@ -217,21 +306,146 @@ export function ServicePaymentView({ isOpen, onClose, payment }) {
         <div className="flex justify-between items-start">
           <div>
             <div className="flex items-center space-x-2 mb-2">
-              <Receipt className="w-6 h-6 text-green-600 dark:text-green-400" />
+              {payment.paymentType === 'refund' ? (
+                <ArrowLeftRight className="w-6 h-6 text-red-600 dark:text-red-400" />
+              ) : (
+                <Receipt className="w-6 h-6 text-green-600 dark:text-green-400" />
+              )}
               <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{payment.receiptNumber}</h2>
             </div>
             <div className="space-y-1 text-sm text-gray-600 dark:text-gray-400">
               <p>Payment Date: {formatDate(payment.paymentDate)}</p>
               <p>Recorded: {formatDateTime(payment.createdAt)}</p>
+              <p className="capitalize">Type: {payment.paymentType.replace('_', ' ')}</p>
             </div>
           </div>
           <div className="text-right">
             <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(payment.status)}`}>
               {payment.status.charAt(0).toUpperCase() + payment.status.slice(1)}
             </span>
-            <p className="text-2xl font-bold text-green-600 dark:text-green-400 mt-2">{formatCurrency(payment.amount)}</p>
+            <p className={`text-2xl font-bold mt-2 ${
+              payment.paymentType === 'refund' 
+                ? 'text-red-600 dark:text-red-400' 
+                : 'text-green-600 dark:text-green-400'
+            }`}>
+              {payment.paymentType === 'refund' ? '-' : ''}{formatCurrency(payment.amount)}
+            </p>
           </div>
         </div>
+
+        {/* Advance Payment Context - Only show if there are advance payments */}
+        {advanceContext && advanceContext.hasAdvance && (
+          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-2 border-blue-200 dark:border-blue-800 rounded-xl p-6">
+            <div className="flex items-center space-x-2 mb-4">
+              <TrendingUp className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+              <h3 className="text-lg font-semibold text-blue-900 dark:text-blue-200">Advance Payment Context</h3>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+              <div className="bg-white dark:bg-gray-800 border border-blue-200 dark:border-blue-700 rounded-lg p-4 text-center">
+                <div className="flex items-center justify-center mb-2">
+                  <Wrench className="w-5 h-5 text-gray-600 dark:text-gray-400 mr-2" />
+                  <p className="text-sm text-blue-700 dark:text-blue-400">Total Service Cost</p>
+                </div>
+                <p className="text-xl font-bold text-gray-900 dark:text-white">{formatCurrency(advanceContext.totalServiceCost)}</p>
+              </div>
+              <div className="bg-white dark:bg-gray-800 border border-blue-200 dark:border-blue-700 rounded-lg p-4 text-center">
+                <div className="flex items-center justify-center mb-2">
+                  <TrendingUp className="w-5 h-5 text-blue-600 dark:text-blue-400 mr-2" />
+                  <p className="text-sm text-blue-700 dark:text-blue-400">Total Advance Paid</p>
+                </div>
+                <p className="text-xl font-bold text-blue-600 dark:text-blue-400">{formatCurrency(advanceContext.totalAdvance)}</p>
+              </div>
+              <div className="bg-white dark:bg-gray-800 border border-blue-200 dark:border-blue-700 rounded-lg p-4 text-center">
+                <div className="flex items-center justify-center mb-2">
+                  {advanceContext.remainingBalance >= 0 ? (
+                    <TrendingDown className="w-5 h-5 text-red-600 dark:text-red-400 mr-2" />
+                  ) : (
+                    <ArrowLeftRight className="w-5 h-5 text-orange-600 dark:text-orange-400 mr-2" />
+                  )}
+                  <p className="text-sm text-blue-700 dark:text-blue-400">
+                    {advanceContext.remainingBalance >= 0 ? 'Remaining Balance' : 'Overpaid Amount'}
+                  </p>
+                </div>
+                <p className={`text-xl font-bold ${
+                  advanceContext.remainingBalance >= 0 
+                    ? 'text-red-600 dark:text-red-400' 
+                    : 'text-orange-600 dark:text-orange-400'
+                }`}>
+                  {formatCurrency(Math.abs(advanceContext.remainingBalance))}
+                </p>
+              </div>
+            </div>
+            
+            {/* Advance Payment History */}
+            <div className="bg-white dark:bg-gray-800 border border-blue-200 dark:border-blue-700 rounded-lg p-4">
+              <h4 className="font-medium text-blue-900 dark:text-blue-200 mb-3">Advance Payment History</h4>
+              <div className="space-y-2">
+                {advanceContext.advancePayments.map((advPayment) => (
+                  <div key={advPayment.id} className="flex items-center justify-between p-2 bg-blue-50 dark:bg-blue-900/20 rounded">
+                    <div>
+                      <p className="text-sm font-medium text-blue-900 dark:text-blue-200">{advPayment.receiptNumber}</p>
+                      <p className="text-xs text-blue-700 dark:text-blue-300">
+                        {formatDate(advPayment.paymentDate)} • {advPayment.paymentMethod}
+                      </p>
+                    </div>
+                    <span className="font-bold text-blue-600 dark:text-blue-400">{formatCurrency(advPayment.amount)}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Payment Calculation Display */}
+        {payment.paymentCalculation && (
+          <div className="bg-gradient-to-r from-cyan-50 to-blue-50 dark:from-cyan-900/20 dark:to-blue-900/20 border-2 border-cyan-200 dark:border-cyan-800 rounded-xl p-6">
+            <div className="flex items-center space-x-2 mb-4">
+              <Calculator className="w-6 h-6 text-cyan-600 dark:text-cyan-400" />
+              <h3 className="text-lg font-semibold text-cyan-900 dark:text-cyan-200">Smart Payment Calculation</h3>
+            </div>
+            
+            <p className="text-cyan-800 dark:text-cyan-200 mb-4">{payment.paymentCalculation.description}</p>
+            
+            <div className="bg-white dark:bg-gray-800 border border-cyan-200 dark:border-cyan-700 rounded-lg p-4">
+              <div className="space-y-3">
+                {payment.paymentCalculation.breakdown.map((item, index) => (
+                  <div key={index} className={`flex items-center justify-between py-2 ${
+                    item.type === 'total' || item.type === 'refund' ? 'border-t border-gray-200 dark:border-gray-600 pt-3 font-bold' : ''
+                  }`}>
+                    <span className={`${
+                      item.type === 'credit' ? 'text-green-600 dark:text-green-400' :
+                      item.type === 'refund' ? 'text-red-600 dark:text-red-400' :
+                      'text-gray-700 dark:text-gray-300'
+                    }`}>
+                      {item.label}:
+                    </span>
+                    <span className={`font-medium ${
+                      item.type === 'credit' ? 'text-green-600 dark:text-green-400' :
+                      item.type === 'refund' ? 'text-red-600 dark:text-red-400' :
+                      item.type === 'total' ? 'text-blue-600 dark:text-blue-400' :
+                      'text-gray-900 dark:text-white'
+                    }`}>
+                      {item.amount < 0 ? '-' : ''}{formatCurrency(Math.abs(item.amount))}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+            
+            {payment.paymentCalculation.refundDue > 0 && (
+              <div className="mt-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                <div className="flex items-center space-x-2">
+                  <ArrowLeftRight className="w-5 h-5 text-red-600 dark:text-red-400" />
+                  <p className="text-red-800 dark:text-red-200 font-medium">Refund Processed</p>
+                </div>
+                <p className="text-red-700 dark:text-red-300 text-sm mt-1">
+                  Customer received a refund of {formatCurrency(payment.paymentCalculation.refundDue)}
+                </p>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Customer and Service Info */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -294,6 +508,7 @@ export function ServicePaymentView({ isOpen, onClose, payment }) {
           </div>
         )}
 
+        {/* Special Payment Type Information */}
         {payment.paymentType === 'advance_payment' && (
           <div className="bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 p-4 rounded-lg">
             <h3 className="font-medium text-gray-900 dark:text-white mb-3 flex items-center">
@@ -334,6 +549,37 @@ export function ServicePaymentView({ isOpen, onClose, payment }) {
           </div>
         )}
 
+        {payment.paymentType === 'refund' && (
+          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 p-4 rounded-lg">
+            <h3 className="font-medium text-gray-900 dark:text-white mb-3 flex items-center">
+              <ArrowLeftRight className="w-5 h-5 mr-2 text-red-600 dark:text-red-400" />
+              Refund Information
+            </h3>
+            <div className="space-y-2 text-sm text-gray-700 dark:text-gray-300">
+              <p><span className="font-medium">Refund Amount:</span> 
+                <span className="ml-2 font-bold text-red-600 dark:text-red-400">{formatCurrency(payment.amount)}</span>
+              </p>
+              <p><span className="font-medium">Reason:</span> Customer overpayment through advance payments</p>
+              <p><span className="font-medium">Refund Status:</span> 
+                <span className={`ml-2 px-2 py-1 rounded-full text-xs font-medium ${
+                  payment.status === 'approved' ? 'bg-green-100 text-green-800' :
+                  payment.status === 'declined' ? 'bg-red-100 text-red-800' :
+                  'bg-yellow-100 text-yellow-800'
+                }`}>
+                  {payment.status.charAt(0).toUpperCase() + payment.status.slice(1)}
+                </span>
+              </p>
+            </div>
+            {payment.status === 'approved' && (
+              <div className="mt-3 p-3 bg-red-100 dark:bg-red-900/30 border border-red-300 dark:border-red-700 rounded">
+                <p className="text-red-800 dark:text-red-300 text-sm font-medium">
+                  💰 Refund has been processed and should be returned to customer
+                </p>
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Payment Details */}
         <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 p-4 rounded-lg">
           <h3 className="font-medium text-gray-900 dark:text-white mb-3 flex items-center">
@@ -343,7 +589,13 @@ export function ServicePaymentView({ isOpen, onClose, payment }) {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-700 dark:text-gray-300">
             <div>
               <span className="font-medium">Amount:</span>
-              <span className="ml-2 text-green-600 dark:text-green-400 font-bold">{formatCurrency(payment.amount)}</span>
+              <span className={`ml-2 font-bold ${
+                payment.paymentType === 'refund' 
+                  ? 'text-red-600 dark:text-red-400' 
+                  : 'text-green-600 dark:text-green-400'
+              }`}>
+                {payment.paymentType === 'refund' ? '-' : ''}{formatCurrency(payment.amount)}
+              </span>
             </div>
             <div>
               <span className="font-medium">Method:</span>

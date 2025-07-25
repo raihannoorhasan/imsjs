@@ -343,6 +343,11 @@ export function ServicePaymentManagement() {
                               • REFUND
                             </span>
                           )}
+                          {payment.paymentCalculation && payment.paymentCalculation.advanceApplied > 0 && (
+                            <span className="ml-2 text-green-600 dark:text-green-400">
+                              • ADV: -{formatCurrency(payment.paymentCalculation.advanceApplied)}
+                            </span>
+                          )}
                         </p>
                       </div>
                     </TableCell>
@@ -364,12 +369,12 @@ export function ServicePaymentManagement() {
                         {payment.paymentType === "parts_payment" &&
                           relatedSale && (
                             <p className="text-xs text-purple-600 dark:text-purple-400 mt-1">
-                              Linked to POS sale
+                              POS sale linked
                             </p>
                           )}
                         {payment.paymentCalculation && (
                           <p className="text-xs text-cyan-600 dark:text-cyan-400 mt-1">
-                            Smart calculated
+                            Advance: -{formatCurrency(payment.paymentCalculation.advanceApplied || 0)}
                           </p>
                         )}
                       </div>
@@ -388,6 +393,11 @@ export function ServicePaymentManagement() {
                           {formatCurrency(payment.amount)}
                         </span>
                       </div>
+                      {payment.paymentCalculation && payment.paymentCalculation.advanceApplied > 0 && (
+                        <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">
+                          Advance Used: {formatCurrency(payment.paymentCalculation.advanceApplied)}
+                        </p>
+                      )}
                       {payment.paymentType === "advance_payment" &&
                         payment.status === "approved" && (
                           <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">

@@ -15,7 +15,8 @@ import {
   TrendingUp, 
   TrendingDown,
   Calculator,
-  Info
+  Info,
+  Wrench
 } from 'lucide-react';
 import { formatCurrency, formatDate, formatDateTime } from '../../utils/helpers';
 
@@ -431,6 +432,20 @@ export function ServicePaymentView({ isOpen, onClose, payment }) {
                   </div>
                 ))}
               </div>
+              
+              {payment.paymentCalculation.advanceApplied > 0 && (
+                <div className="mt-4 p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
+                  <div className="flex items-center space-x-2">
+                    <CheckCircle className="w-4 h-4 text-green-600 dark:text-green-400" />
+                    <p className="text-green-800 dark:text-green-200 text-sm font-medium">
+                      Advance Payment Applied: {formatCurrency(payment.paymentCalculation.advanceApplied)}
+                    </p>
+                  </div>
+                  <p className="text-green-700 dark:text-green-300 text-xs mt-1">
+                    Customer's advance payment was automatically applied to reduce the amount due
+                  </p>
+                </div>
+              )}
             </div>
             
             {payment.paymentCalculation.refundDue > 0 && (
@@ -508,6 +523,45 @@ export function ServicePaymentView({ isOpen, onClose, payment }) {
           </div>
         )}
 
+        {/* External Parts Details */}
+        {payment.externalParts && payment.externalParts.length > 0 && (
+          <div className="bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 p-4 rounded-lg">
+            <h3 className="font-medium text-gray-900 dark:text-white mb-3 flex items-center">
+              <Wrench className="w-5 h-5 mr-2 text-orange-600 dark:text-orange-400" />
+              External Parts Information
+            </h3>
+            <div className="space-y-2 text-sm text-gray-700 dark:text-gray-300">
+              <p><span className="font-medium">External Parts:</span></p>
+              <div className="ml-4 space-y-2">
+                {payment.externalParts.map((part, index) => (
+                  <div key={index} className="bg-white dark:bg-gray-800 border border-orange-200 dark:border-orange-700 rounded p-3">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <p className="font-medium text-gray-900 dark:text-white">{part.name}</p>
+                        <p className="text-xs text-gray-600 dark:text-gray-400">Supplier: {part.supplier}</p>
+                        {part.description && (
+                          <p className="text-xs text-gray-500 dark:text-gray-500">{part.description}</p>
+                        )}
+                      </div>
+                      <div className="text-right">
+                        <p className="font-medium">{part.quantity} × {formatCurrency(part.unitPrice)}</p>
+                        <p className="font-bold text-orange-600 dark:text-orange-400">{formatCurrency(part.total)}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className="border-t border-gray-200 dark:border-gray-600 pt-2 mt-2">
+                <div className="flex justify-between font-medium">
+                  <span>External Parts Total:</span>
+                  <span className="text-orange-600 dark:text-orange-400">
+                    {formatCurrency(payment.externalParts.reduce((sum, part) => sum + part.total, 0))}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
         {/* Special Payment Type Information */}
         {payment.paymentType === 'advance_payment' && (
           <div className="bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 p-4 rounded-lg">

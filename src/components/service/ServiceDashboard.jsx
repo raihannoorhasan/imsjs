@@ -6,7 +6,7 @@ import { Card } from '../common/Card';
 import { formatCurrency, formatDate, getStatusColor } from '../../utils/helpers';
 
 export function ServiceDashboard() {
-  const { serviceTickets, technicians, serviceInvoices, customers } = useInventory();
+  const { serviceTickets, technicians, serviceInvoices, customers, servicePayments } = useInventory();
   const { isDark } = useTheme();
 
   // Calculate statistics

@@ -754,11 +754,16 @@ export function InventoryProvider({ children }) {
           return sum + (sale ? sale.total : 0);
         }, 0);
         
+        // Add external parts cost if any
+        const externalPartsCost = paymentData.externalParts ? 
+          paymentData.externalParts.reduce((sum, part) => sum + part.total, 0) : 0;
+        
         setServiceTickets(serviceTickets.map(ticket => 
           ticket.id === paymentData.serviceTicketId
             ? { 
                 ...ticket, 
-                partsCost: (ticket.partsCost || 0) + totalPartsCost,
+                partsCost: (ticket.partsCost || 0) + totalPartsCost + externalPartsCost,
+                externalParts: [...(ticket.externalParts || []), ...(paymentData.externalParts || [])],
                 advancePayments: ticket.advancePayments || [],
                 updatedAt: new Date()
               }
@@ -774,7 +779,7 @@ export function InventoryProvider({ children }) {
           ? { 
               ...ticket, 
               advancePayments: [...(ticket.advancePayments || []), newPayment.id],
-              totalAdvancePaid: (ticket.totalAdvancePaid || 0) + paymentData.amount,
+              totalAdvancePaid: paymentData.amount,
               updatedAt: new Date()
             }
           : ticket
@@ -840,11 +845,22 @@ export function InventoryProvider({ children }) {
     
     // Handle advance payment approval - update service ticket
     if (payment && paymentData.status === 'approved' && payment.paymentType === 'advance_payment' && payment.serviceTicketId) {
+      // Calculate total advance from all approved advance payments for this ticket
+      const allAdvancePayments = servicePayments.map(p => 
+        p.id === id ? { ...p, ...paymentData } : p
+      ).filter(p => 
+        p.serviceTicketId === payment.serviceTicketId && 
+        p.paymentType === 'advance_payment' && 
+        p.status === 'approved'
+      );
+      
+      const totalAdvance = allAdvancePayments.reduce((sum, p) => sum + p.amount, 0);
+      
       setServiceTickets(serviceTickets.map(ticket => 
         ticket.id === payment.serviceTicketId
           ? { 
               ...ticket, 
-              totalAdvancePaid: (ticket.totalAdvancePaid || 0) + payment.amount,
+              totalAdvancePaid: totalAdvance,
               updatedAt: new Date()
             }
           : ticket

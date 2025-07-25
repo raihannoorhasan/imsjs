@@ -19,7 +19,8 @@ import {
   Package,
   ArrowLeftRight,
   TrendingDown,
-  TrendingUp
+  TrendingUp,
+  Calculator
 } from 'lucide-react';
 import { generateId, formatCurrency } from '../../utils/helpers';
 
@@ -45,6 +46,15 @@ export function ServicePaymentForm({ isOpen, onClose, onSubmit, preSelectedTicke
   const [pendingSalesTotal, setPendingSalesTotal] = useState(0);
   const [advancePaymentInfo, setAdvancePaymentInfo] = useState(null);
   const [paymentCalculation, setPaymentCalculation] = useState(null);
+  const [showExternalPartsForm, setShowExternalPartsForm] = useState(false);
+  const [externalParts, setExternalParts] = useState([]);
+  const [newPart, setNewPart] = useState({
+    name: '',
+    quantity: 1,
+    unitPrice: 0,
+    supplier: '',
+    description: ''
+  });
 
   // Pre-select ticket if provided
   React.useEffect(() => {
@@ -100,14 +110,13 @@ export function ServicePaymentForm({ isOpen, onClose, onSubmit, preSelectedTicke
 
     switch (paymentType) {
       case 'parts_payment':
-        // For parts payment, subtract advance from parts cost
-        const partsAfterAdvance = Math.max(0, ticket.partsCost - advanceInfo.totalAdvance);
-        return partsAfterAdvance;
+        // For parts payment, calculate actual amount needed after advance
+        const partsTotal = pendingSalesTotal + (externalParts.reduce((sum, part) => sum + (part.quantity * part.unitPrice), 0));
+        return Math.max(0, partsTotal - advanceInfo.totalAdvance);
       
       case 'labor_payment':
-        // For labor payment, subtract advance from labor cost
-        const laborAfterAdvance = Math.max(0, ticket.laborCost - advanceInfo.totalAdvance);
-        return laborAfterAdvance;
+        // For labor payment, use remaining balance if positive, otherwise 0
+        return Math.max(0, advanceInfo.remainingBalance);
       
       case 'final_payment':
         // For final payment, calculate remaining balance
@@ -140,36 +149,30 @@ export function ServicePaymentForm({ isOpen, onClose, onSubmit, preSelectedTicke
 
     switch (paymentType) {
       case 'parts_payment':
-        if (advanceInfo.hasAdvance) {
-          const advanceToApply = Math.min(advanceInfo.totalAdvance, ticket.partsCost);
-          calculation.advanceApplied = advanceToApply;
-          calculation.finalAmount = Math.max(0, ticket.partsCost - advanceToApply);
-          calculation.description = `Parts cost ${formatCurrency(ticket.partsCost)} minus advance ${formatCurrency(advanceToApply)}`;
-          calculation.breakdown = [
-            { label: 'Parts Cost', amount: ticket.partsCost, type: 'charge' },
-            { label: 'Advance Applied', amount: -advanceToApply, type: 'credit' },
-            { label: 'Amount Due', amount: calculation.finalAmount, type: 'total' }
-          ];
-        }
+        calculation.advanceApplied = advanceInfo.totalAdvance;
+        calculation.finalAmount = Math.max(0, advanceInfo.remainingBalance);
+        calculation.description = `Total service cost ${formatCurrency(advanceInfo.totalServiceCost)} minus advance ${formatCurrency(advanceInfo.totalAdvance)}`;
+        calculation.breakdown = [
+          { label: 'Total Service Cost', amount: advanceInfo.totalServiceCost, type: 'charge' },
+          { label: 'Advance Applied', amount: -advanceInfo.totalAdvance, type: 'credit' },
+          { label: 'Amount Due', amount: calculation.finalAmount, type: 'total' }
+        ];
         break;
       
       case 'labor_payment':
-        if (advanceInfo.hasAdvance) {
-          const remainingAdvance = Math.max(0, advanceInfo.totalAdvance - ticket.partsCost);
-          const advanceToApply = Math.min(remainingAdvance, ticket.laborCost);
-          calculation.advanceApplied = advanceToApply;
-          calculation.finalAmount = Math.max(0, ticket.laborCost - advanceToApply);
-          calculation.description = `Labor cost ${formatCurrency(ticket.laborCost)} minus available advance ${formatCurrency(advanceToApply)}`;
-          calculation.breakdown = [
-            { label: 'Labor Cost', amount: ticket.laborCost, type: 'charge' },
-            { label: 'Advance Applied', amount: -advanceToApply, type: 'credit' },
-            { label: 'Amount Due', amount: calculation.finalAmount, type: 'total' }
-          ];
-        }
+        calculation.advanceApplied = advanceInfo.totalAdvance;
+        calculation.finalAmount = Math.max(0, advanceInfo.remainingBalance);
+        calculation.description = `Total service cost ${formatCurrency(advanceInfo.totalServiceCost)} minus advance ${formatCurrency(advanceInfo.totalAdvance)}`;
+        calculation.breakdown = [
+          { label: 'Total Service Cost', amount: advanceInfo.totalServiceCost, type: 'charge' },
+          { label: 'Advance Applied', amount: -advanceInfo.totalAdvance, type: 'credit' },
+          { label: 'Amount Due', amount: calculation.finalAmount, type: 'total' }
+        ];
         break;
       
       case 'final_payment':
         calculation.finalAmount = Math.max(0, advanceInfo.remainingBalance);
+        calculation.advanceApplied = advanceInfo.totalAdvance;
         if (advanceInfo.needsRefund) {
           calculation.refundDue = advanceInfo.refundAmount;
           calculation.description = `Service fully paid. Refund due: ${formatCurrency(calculation.refundDue)}`;
@@ -187,6 +190,7 @@ export function ServicePaymentForm({ isOpen, onClose, onSubmit, preSelectedTicke
         if (advanceInfo.needsRefund) {
           calculation.finalAmount = advanceInfo.refundAmount;
           calculation.refundDue = advanceInfo.refundAmount;
+          calculation.advanceApplied = advanceInfo.totalAdvance;
           calculation.description = `Refund for overpayment`;
           calculation.breakdown = [
             { label: 'Total Service Cost', amount: advanceInfo.totalServiceCost, type: 'charge' },
@@ -267,14 +271,16 @@ export function ServicePaymentForm({ isOpen, onClose, onSubmit, preSelectedTicke
       if (value && pendingSalesForTicket.length > 0) {
         const totalAmount = pendingSalesForTicket.reduce((sum, sale) => sum + sale.total, 0);
         const ticket = serviceTickets.find(t => t.id === formData.serviceTicketId);
+        const externalPartsTotal = externalParts.reduce((sum, part) => sum + (part.quantity * part.unitPrice), 0);
+        const totalPartsAmount = totalAmount + externalPartsTotal;
         const calculatedAmount = advancePaymentInfo ? 
-          calculatePaymentAmount('parts_payment', ticket, advancePaymentInfo) : totalAmount;
+          Math.max(0, totalPartsAmount - advancePaymentInfo.totalAdvance) : totalPartsAmount;
         
         setFormData(prev => ({
           ...prev,
           paymentType: 'parts_payment',
           amount: calculatedAmount,
-          notes: `Parts payment for ${pendingSalesForTicket.length} POS sale(s) - Original: ${formatCurrency(totalAmount)}${advancePaymentInfo?.hasAdvance ? `, After advance: ${formatCurrency(calculatedAmount)}` : ''}`,
+          notes: `Parts payment: POS ${formatCurrency(totalAmount)}${externalPartsTotal > 0 ? ` + External ${formatCurrency(externalPartsTotal)}` : ''} = ${formatCurrency(totalPartsAmount)}${advancePaymentInfo?.hasAdvance ? `. Advance applied: ${formatCurrency(Math.min(advancePaymentInfo.totalAdvance, totalPartsAmount))}. Customer pays: ${formatCurrency(calculatedAmount)}` : ''}`,
           autoFillFromPendingSales: true
         }));
       } else if (!value && formData.autoFillFromPendingSales) {
@@ -311,6 +317,51 @@ export function ServicePaymentForm({ isOpen, onClose, onSubmit, preSelectedTicke
         updatePaymentCalculation(formData.paymentType, parseFloat(value) || 0, ticket, advancePaymentInfo);
       }
     }
+  };
+
+  const handleAddExternalPart = () => {
+    if (!newPart.name.trim() || newPart.unitPrice <= 0) {
+      alert('Please enter part name and valid price');
+      return;
+    }
+    
+    setExternalParts([...externalParts, {
+      ...newPart,
+      id: generateId(),
+      total: newPart.quantity * newPart.unitPrice
+    }]);
+    
+    setNewPart({
+      name: '',
+      quantity: 1,
+      unitPrice: 0,
+      supplier: '',
+      description: ''
+    });
+    
+    // Recalculate payment amount if auto-fill is active
+    if (formData.completePendingSale && advancePaymentInfo) {
+      const ticket = serviceTickets.find(t => t.id === formData.serviceTicketId);
+      const calculatedAmount = calculatePaymentAmount('parts_payment', ticket, advancePaymentInfo);
+      setFormData(prev => ({ ...prev, amount: calculatedAmount }));
+      updatePaymentCalculation('parts_payment', calculatedAmount, ticket, advancePaymentInfo);
+    }
+  };
+
+  const handleRemoveExternalPart = (partId) => {
+    setExternalParts(externalParts.filter(part => part.id !== partId));
+    
+    // Recalculate payment amount if auto-fill is active
+    if (formData.completePendingSale && advancePaymentInfo) {
+      const ticket = serviceTickets.find(t => t.id === formData.serviceTicketId);
+      const calculatedAmount = calculatePaymentAmount('parts_payment', ticket, advancePaymentInfo);
+      setFormData(prev => ({ ...prev, amount: calculatedAmount }));
+      updatePaymentCalculation('parts_payment', calculatedAmount, ticket, advancePaymentInfo);
+    }
+  };
+
+  const handlePartChange = (field, value) => {
+    setNewPart(prev => ({ ...prev, [field]: value }));
   };
 
   const customerTickets = serviceTickets.filter(t => 
@@ -597,8 +648,8 @@ export function ServicePaymentForm({ isOpen, onClose, onSubmit, preSelectedTicke
                   <span className="font-bold text-lg">{formatCurrency(pendingSalesTotal)}</span>. 
                   {advancePaymentInfo?.hasAdvance && (
                     <span className="block mt-2 text-sm">
-                      💡 With advance payment of {formatCurrency(advancePaymentInfo.totalAdvance)}, 
-                      customer needs to pay only {formatCurrency(Math.max(0, pendingSalesTotal - advancePaymentInfo.totalAdvance))} more.
+                      💡 Customer has advance payment of {formatCurrency(advancePaymentInfo.totalAdvance)}. 
+                      After applying advance to total service cost, customer needs to pay only {formatCurrency(Math.max(0, advancePaymentInfo.remainingBalance))} more.
                     </span>
                   )}
                 </p>
@@ -629,6 +680,122 @@ export function ServicePaymentForm({ isOpen, onClose, onSubmit, preSelectedTicke
                   </div>
                 </div>
                 
+                {/* External Parts Section */}
+                <div className="bg-white dark:bg-gray-800 border border-amber-200 dark:border-amber-700 rounded-lg p-4 mt-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <h4 className="font-medium text-amber-900 dark:text-amber-200 flex items-center">
+                      <Wrench className="w-4 h-4 mr-2 text-amber-600 dark:text-amber-400" />
+                      External Parts (Optional)
+                    </h4>
+                    <Button
+                      type="button"
+                      size="sm"
+                      onClick={() => setShowExternalPartsForm(!showExternalPartsForm)}
+                      variant="outline"
+                      className="border-amber-300 text-amber-700 hover:bg-amber-50"
+                    >
+                      <Plus size={16} className="mr-1" />
+                      Add Part
+                    </Button>
+                  </div>
+                  
+                  {showExternalPartsForm && (
+                    <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4 mb-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <input
+                          type="text"
+                          placeholder="Part name"
+                          value={newPart.name}
+                          onChange={(e) => handlePartChange('name', e.target.value)}
+                          className="px-3 py-2 border border-amber-300 dark:border-amber-600 rounded-lg focus:ring-2 focus:ring-amber-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm"
+                        />
+                        <input
+                          type="text"
+                          placeholder="Supplier"
+                          value={newPart.supplier}
+                          onChange={(e) => handlePartChange('supplier', e.target.value)}
+                          className="px-3 py-2 border border-amber-300 dark:border-amber-600 rounded-lg focus:ring-2 focus:ring-amber-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm"
+                        />
+                        <input
+                          type="number"
+                          placeholder="Quantity"
+                          value={newPart.quantity}
+                          onChange={(e) => handlePartChange('quantity', parseInt(e.target.value) || 1)}
+                          min="1"
+                          className="px-3 py-2 border border-amber-300 dark:border-amber-600 rounded-lg focus:ring-2 focus:ring-amber-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm"
+                        />
+                        <input
+                          type="number"
+                          placeholder="Unit price"
+                          value={newPart.unitPrice}
+                          onChange={(e) => handlePartChange('unitPrice', parseFloat(e.target.value) || 0)}
+                          step="0.01"
+                          min="0"
+                          className="px-3 py-2 border border-amber-300 dark:border-amber-600 rounded-lg focus:ring-2 focus:ring-amber-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm"
+                        />
+                      </div>
+                      <textarea
+                        placeholder="Description (optional)"
+                        value={newPart.description}
+                        onChange={(e) => handlePartChange('description', e.target.value)}
+                        className="w-full mt-3 px-3 py-2 border border-amber-300 dark:border-amber-600 rounded-lg focus:ring-2 focus:ring-amber-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm"
+                        rows={2}
+                      />
+                      <div className="flex justify-end mt-3">
+                        <Button
+                          type="button"
+                          size="sm"
+                          onClick={handleAddExternalPart}
+                          className="bg-amber-600 hover:bg-amber-700"
+                        >
+                          Add Part
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {externalParts.length > 0 && (
+                    <div className="space-y-2">
+                      {externalParts.map(part => (
+                        <div key={part.id} className="flex items-center justify-between p-3 bg-amber-50 dark:bg-amber-900/20 rounded-lg border border-amber-200 dark:border-amber-800">
+                          <div className="flex items-center space-x-3">
+                            <div className="bg-amber-100 dark:bg-amber-800/50 p-1 rounded">
+                              <Wrench className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+                            </div>
+                            <div>
+                              <p className="font-medium text-amber-900 dark:text-amber-200">{part.name}</p>
+                              <p className="text-sm text-amber-700 dark:text-amber-300">
+                                {part.quantity} × {formatCurrency(part.unitPrice)} • {part.supplier}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <div className="text-right">
+                              <p className="font-bold text-amber-900 dark:text-amber-200">{formatCurrency(part.total)}</p>
+                              <p className="text-xs text-amber-600 dark:text-amber-400">EXTERNAL</p>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveExternalPart(part.id)}
+                              className="text-red-600 hover:text-red-800 p-1 rounded hover:bg-red-50"
+                            >
+                              <X size={16} />
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                      <div className="bg-amber-100 dark:bg-amber-800/30 border border-amber-300 dark:border-amber-700 rounded-lg p-3 mt-3">
+                        <div className="flex justify-between items-center">
+                          <span className="font-medium text-amber-900 dark:text-amber-200">External Parts Total:</span>
+                          <span className="font-bold text-amber-900 dark:text-amber-200">
+                            {formatCurrency(externalParts.reduce((sum, part) => sum + part.total, 0))}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+                
                 {formData.completePendingSale && (
                   <div className="mt-4 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
                     <div className="flex items-center space-x-2">
@@ -636,7 +803,24 @@ export function ServicePaymentForm({ isOpen, onClose, onSubmit, preSelectedTicke
                       <p className="text-green-800 dark:text-green-200 font-medium">Smart Calculation Active</p>
                     </div>
                     <p className="text-green-700 dark:text-green-300 text-sm mt-1">
-                      Payment type set to "Parts Payment" and amount calculated considering advance payments
+                      Payment type set to "Parts Payment" and amount calculated considering advance payments and external parts
+                    </p>
+                    {externalParts.length > 0 && (
+                      <p className="text-green-700 dark:text-green-300 text-sm mt-1">
+                        Including {externalParts.length} external part(s) totaling {formatCurrency(externalParts.reduce((sum, part) => sum + part.total, 0))}
+                      </p>
+                    )}
+                  </div>
+                )}
+                
+                {externalParts.length > 0 && !formData.completePendingSale && (
+                  <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                    <div className="flex items-center space-x-2">
+                      <Info className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                      <p className="text-blue-800 dark:text-blue-200 font-medium">External Parts Added</p>
+                    </div>
+                    <p className="text-blue-700 dark:text-blue-300 text-sm mt-1">
+                      {externalParts.length} external part(s) added. Total: {formatCurrency(externalParts.reduce((sum, part) => sum + part.total, 0))}
                     </p>
                   </div>
                 )}

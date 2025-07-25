@@ -259,7 +259,7 @@ export function ServiceTicketList({ tickets, onEdit, onMakePayment, onDelete }) 
                       <p className="text-gray-900 dark:text-white font-medium">{formatCurrency(ticket.laborCost + ticket.partsCost)}</p>
                       <p className="text-gray-500 dark:text-gray-500">Est: {formatCurrency(ticket.estimatedCost)}</p>
                       {ticket.totalAdvancePaid > 0 && (
-                        <p className="text-blue-600 dark:text-blue-400 text-xs">Advance: {formatCurrency(ticket.totalAdvancePaid)}</p>
+                        <p className="text-blue-600 dark:text-blue-400 text-xs">Advance: {formatCurrency(ticket.totalAdvancePaid || 0)}</p>
                       )}
                       {ticket.totalRefundGiven > 0 && (
                         <p className="text-orange-600 dark:text-orange-400 text-xs">Refunded: {formatCurrency(ticket.totalRefundGiven)}</p>

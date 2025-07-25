@@ -292,9 +292,8 @@ export function ServiceTicketList({ tickets, onEdit, onMakePayment, onDelete }) 
                       {ticket.status === 'completed' && (
                         <button
                           onClick={() => handleDelivery(ticket)}
-                          disabled={ticket.totalAdvancePaid > 0 && (ticket.laborCost + ticket.partsCost) > ticket.totalAdvancePaid}
                           className="text-purple-600 dark:text-purple-400 hover:text-purple-800 dark:hover:text-purple-300 p-1 rounded hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors duration-200"
-                          title={ticket.totalAdvancePaid > 0 && (ticket.laborCost + ticket.partsCost) > ticket.totalAdvancePaid ? "Payment not fully cleared" : "Mark as Delivered"}
+                          title="Mark as Delivered"
                         >
                           <Truck size={16} />
                         </button>

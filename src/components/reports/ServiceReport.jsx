@@ -42,8 +42,7 @@ export function ServiceReport({ timeRange = 'monthly' }) {
   ).length;
   const serviceRevenue = filteredInvoices.reduce((sum, invoice) => sum + invoice.total, 0);
   const averageTicketValue = completedTickets > 0 ? serviceRevenue / completedTickets : 0;
-  const totalServiceCharge = filteredTickets.reduce((sum, ticket) => sum + (ticket.serviceCharge || 0), 0);
-  const totalDiagnosticFee = filteredTickets.reduce((sum, ticket) => sum + (ticket.diagnosticFee || 0), 0);
+  const totalLaborCost = filteredTickets.reduce((sum, ticket) => sum + (ticket.laborCost || 0), 0);
   const totalPartsCost = filteredTickets.reduce((sum, ticket) => sum + (ticket.partsCost || 0), 0);
 
   const completionRate = totalTickets > 0 ? (completedTickets / totalTickets) * 100 : 0;
@@ -73,7 +72,7 @@ export function ServiceReport({ timeRange = 'monthly' }) {
   const technicianPerformance = technicians.map(technician => {
     const assignedTickets = filteredTickets.filter(ticket => ticket.assignedTechnician === technician.id);
     const completedByTech = assignedTickets.filter(ticket => ticket.status === 'completed');
-    const revenue = completedByTech.reduce((sum, ticket) => sum + (ticket.serviceCharge || 0) + (ticket.diagnosticFee || 0) + ticket.partsCost, 0);
+    const revenue = completedByTech.reduce((sum, ticket) => sum + ticket.laborCost + ticket.partsCost, 0);
     const avgCompletionTime = completedByTech.length > 0 ? 
       completedByTech.reduce((sum, ticket) => {
         const created = new Date(ticket.createdAt);
@@ -234,22 +233,12 @@ export function ServiceReport({ timeRange = 'monthly' }) {
           <div className="space-y-4">
             <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg">
               <div className="flex justify-between items-center">
-                <span className="text-blue-700 dark:text-blue-400 font-medium">Service Charges</span>
-                <span className="text-blue-900 dark:text-blue-100 font-bold">{formatCurrency(totalServiceCharge)}</span>
+                <span className="text-blue-700 dark:text-blue-400 font-medium">Labor Costs</span>
+                <span className="text-blue-900 dark:text-blue-100 font-bold">{formatCurrency(totalLaborCost)}</span>
               </div>
               <p className="text-sm text-blue-600 dark:text-blue-400 mt-1">
-                {totalServiceCharge + totalDiagnosticFee + totalPartsCost > 0 ? 
-                  ((totalServiceCharge / (totalServiceCharge + totalDiagnosticFee + totalPartsCost)) * 100).toFixed(1) : 0}% of total
-              </p>
-            </div>
-            <div className="bg-orange-50 dark:bg-orange-900/20 p-3 rounded-lg">
-              <div className="flex justify-between items-center">
-                <span className="text-orange-700 dark:text-orange-400 font-medium">Diagnostic Fees</span>
-                <span className="text-orange-900 dark:text-orange-100 font-bold">{formatCurrency(totalDiagnosticFee)}</span>
-              </div>
-              <p className="text-sm text-orange-600 dark:text-orange-400 mt-1">
-                {totalServiceCharge + totalDiagnosticFee + totalPartsCost > 0 ? 
-                  ((totalDiagnosticFee / (totalServiceCharge + totalDiagnosticFee + totalPartsCost)) * 100).toFixed(1) : 0}% of total
+                {totalLaborCost + totalPartsCost > 0 ? 
+                  ((totalLaborCost / (totalLaborCost + totalPartsCost)) * 100).toFixed(1) : 0}% of total
               </p>
             </div>
             <div className="bg-purple-50 dark:bg-purple-900/20 p-3 rounded-lg">
@@ -258,8 +247,8 @@ export function ServiceReport({ timeRange = 'monthly' }) {
                 <span className="text-purple-900 dark:text-purple-100 font-bold">{formatCurrency(totalPartsCost)}</span>
               </div>
               <p className="text-sm text-purple-600 dark:text-purple-400 mt-1">
-                {totalServiceCharge + totalDiagnosticFee + totalPartsCost > 0 ? 
-                  ((totalPartsCost / (totalServiceCharge + totalDiagnosticFee + totalPartsCost)) * 100).toFixed(1) : 0}% of total
+                {totalLaborCost + totalPartsCost > 0 ? 
+                  ((totalPartsCost / (totalLaborCost + totalPartsCost)) * 100).toFixed(1) : 0}% of total
               </p>
             </div>
             <div className="bg-green-50 dark:bg-green-900/20 p-3 rounded-lg">
@@ -396,10 +385,10 @@ export function ServiceReport({ timeRange = 'monthly' }) {
                   </td>
                   <td className="py-2">
                     <p className="font-medium text-green-600 dark:text-green-400">
-                      {formatCurrency((ticket.serviceCharge || 0) + (ticket.diagnosticFee || 0) + (ticket.partsCost || 0))}
+                      {formatCurrency((ticket.laborCost || 0) + (ticket.partsCost || 0))}
                     </p>
                     <p className="text-xs text-gray-500 dark:text-gray-400">
-                      S: {formatCurrency(ticket.serviceCharge || 0)} | D: {formatCurrency(ticket.diagnosticFee || 0)} | P: {formatCurrency(ticket.partsCost || 0)}
+                      L: {formatCurrency(ticket.laborCost || 0)} | P: {formatCurrency(ticket.partsCost || 0)}
                     </p>
                   </td>
                   <td className="py-2">

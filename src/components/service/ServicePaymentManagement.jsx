@@ -345,7 +345,7 @@ export function ServicePaymentManagement() {
                           )}
                           {payment.paymentCalculation && payment.paymentCalculation.advanceApplied > 0 && (
                             <span className="ml-2 text-green-600 dark:text-green-400">
-                              • Advance Reduced: -{formatCurrency(payment.paymentCalculation.advanceApplied)}
+                              • ADV: -{formatCurrency(payment.paymentCalculation.advanceApplied)}
                             </span>
                           )}
                         </p>
@@ -395,7 +395,7 @@ export function ServicePaymentManagement() {
                       </div>
                       {payment.paymentCalculation && payment.paymentCalculation.advanceApplied > 0 && (
                         <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">
-                          Advance Reduced: -{formatCurrency(payment.paymentCalculation.advanceApplied)}
+                          Advance Used: {formatCurrency(payment.paymentCalculation.advanceApplied)}
                         </p>
                       )}
                       {payment.paymentType === "advance_payment" &&

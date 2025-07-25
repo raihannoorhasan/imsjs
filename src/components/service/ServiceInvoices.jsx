@@ -185,7 +185,13 @@ export function ServiceInvoices() {
             <div class="detail-item">
               <span class="detail-label">Labor Cost:</span>
               <span class="detail-value">${formatCurrency(
-                invoice.laborCost
+                invoice.serviceCharge || 0
+              )}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Diagnostic Fee:</span>
+              <span class="detail-value">${formatCurrency(
+                invoice.diagnosticFee || 0
               )}</span>
             </div>
             <div class="detail-item">
@@ -392,7 +398,8 @@ export function ServiceInvoices() {
                 <TableHead>Invoice</TableHead>
                 <TableHead>Customer</TableHead>
                 <TableHead>Service Ticket</TableHead>
-                <TableHead>Labor Cost</TableHead>
+                <TableHead>Service Charge</TableHead>
+                <TableHead>Diagnostic Fee</TableHead>
                 <TableHead>Parts Cost</TableHead>
                 <TableHead>Total</TableHead>
                 <TableHead>Status</TableHead>
@@ -446,7 +453,15 @@ export function ServiceInvoices() {
                     <div className="flex items-center text-blue-600 dark:text-blue-400">
                       <DollarSign size={14} className="mr-1" />
                       <span className="font-medium">
-                        {formatCurrency(invoice.laborCost)}
+                        {formatCurrency(invoice.serviceCharge || 0)}
+                      </span>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center text-orange-600 dark:text-orange-400">
+                      <DollarSign size={14} className="mr-1" />
+                      <span className="font-medium">
+                        {formatCurrency(invoice.diagnosticFee || 0)}
                       </span>
                     </div>
                   </TableCell>
@@ -632,8 +647,12 @@ function ServiceInvoiceView({ isOpen, onClose, invoice, onPrint }) {
           </h3>
           <div className="space-y-2">
             <div className="flex justify-between text-sm text-gray-700 dark:text-gray-300">
-              <span>Labor Cost:</span>
-              <span>{formatCurrency(invoice.laborCost)}</span>
+              <span>Service Charge:</span>
+              <span>{formatCurrency(invoice.serviceCharge || 0)}</span>
+            </div>
+            <div className="flex justify-between text-sm text-gray-700 dark:text-gray-300">
+              <span>Diagnostic Fee:</span>
+              <span>{formatCurrency(invoice.diagnosticFee || 0)}</span>
             </div>
             <div className="flex justify-between text-sm text-gray-700 dark:text-gray-300">
               <span>Parts Cost:</span>

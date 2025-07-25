@@ -189,6 +189,16 @@ export function ServicePaymentView({ isOpen, onClose, payment }) {
                   </div>
                 `).join('')}
               </div>
+              ${payment.paymentCalculation.advanceApplied > 0 ? `
+                <div style="margin-top: 15px; padding: 10px; background: #dcfce7; border: 1px solid #16a34a; border-radius: 6px;">
+                  <div style="font-weight: bold; color: #166534; margin-bottom: 5px;">
+                    Advance Used: -$${payment.paymentCalculation.advanceApplied.toFixed(2)} (Reduced from advance)
+                  </div>
+                  <div style="color: #6b7280; font-size: 12px;">
+                    This amount was deducted from customer's advance balance
+                  </div>
+                </div>
+              ` : ''}
             </div>
           ` : ''}
           
@@ -438,11 +448,11 @@ export function ServicePaymentView({ isOpen, onClose, payment }) {
                   <div className="flex items-center space-x-2">
                     <CheckCircle className="w-4 h-4 text-green-600 dark:text-green-400" />
                     <p className="text-green-800 dark:text-green-200 text-sm font-medium">
-                      Advance Payment Applied: {formatCurrency(payment.paymentCalculation.advanceApplied)}
+                      Advance Used: {formatCurrency(payment.paymentCalculation.advanceApplied)} (Reduced from advance balance)
                     </p>
                   </div>
                   <p className="text-green-700 dark:text-green-300 text-xs mt-1">
-                    Customer's advance payment was automatically applied to reduce the amount due
+                    This amount was deducted from customer's advance balance to reduce payment due
                   </p>
                 </div>
               )}

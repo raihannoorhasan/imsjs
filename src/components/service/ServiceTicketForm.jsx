@@ -21,8 +21,8 @@ export function ServiceTicketForm({ isOpen, onClose, ticket, onSubmit }) {
     issueDescription: '',
     priority: 'medium',
     assignedTechnician: '',
-    estimatedCost: 0,
-    laborCost: 0,
+    serviceCharge: 0,
+    diagnosticFee: 0,
     partsCost: 0,
     status: 'received',
     customerNotes: '',
@@ -44,8 +44,8 @@ export function ServiceTicketForm({ isOpen, onClose, ticket, onSubmit }) {
         issueDescription: ticket.issueDescription,
         priority: ticket.priority,
         assignedTechnician: ticket.assignedTechnician,
-        estimatedCost: ticket.estimatedCost,
-        laborCost: ticket.laborCost,
+        serviceCharge: ticket.serviceCharge || 0,
+        diagnosticFee: ticket.diagnosticFee || 0,
         partsCost: ticket.partsCost,
         status: ticket.status,
         customerNotes: ticket.customerNotes,
@@ -62,8 +62,8 @@ export function ServiceTicketForm({ isOpen, onClose, ticket, onSubmit }) {
         issueDescription: '',
         priority: 'medium',
         assignedTechnician: '',
-        estimatedCost: 0,
-        laborCost: 0,
+        serviceCharge: 0,
+        diagnosticFee: 0,
         partsCost: 0,
         status: 'received',
         customerNotes: '',
@@ -202,7 +202,7 @@ export function ServiceTicketForm({ isOpen, onClose, ticket, onSubmit }) {
             </div>
             <div class="detail-item">
               <span class="detail-label">Estimated Cost:</span>
-              <span class="detail-value">$${generatedTicket.estimatedCost.toFixed(2)}</span>
+              <span class="detail-value">$${(generatedTicket.serviceCharge + generatedTicket.diagnosticFee + generatedTicket.partsCost).toFixed(2)}</span>
             </div>
           </div>
           
@@ -342,20 +342,20 @@ export function ServiceTicketForm({ isOpen, onClose, ticket, onSubmit }) {
           </Select>
           
           <Input
-            label="Estimated Cost"
+            label="Service Charge"
             type="number"
             step="0.01"
-            value={formData.estimatedCost}
-            onChange={(e) => handleChange('estimatedCost', parseFloat(e.target.value) || 0)}
+            value={formData.serviceCharge}
+            onChange={(e) => handleChange('serviceCharge', parseFloat(e.target.value) || 0)}
             placeholder="0.00"
           />
           
           <Input
-            label="Labor Cost"
+            label="Diagnostic Fee"
             type="number"
             step="0.01"
-            value={formData.laborCost}
-            onChange={(e) => handleChange('laborCost', parseFloat(e.target.value) || 0)}
+            value={formData.diagnosticFee}
+            onChange={(e) => handleChange('diagnosticFee', parseFloat(e.target.value) || 0)}
             placeholder="0.00"
           />
           
@@ -370,13 +370,17 @@ export function ServiceTicketForm({ isOpen, onClose, ticket, onSubmit }) {
         </div>
         
         {/* Cost Summary */}
-        {(formData.laborCost > 0 || formData.partsCost > 0) && (
+        {(formData.serviceCharge > 0 || formData.diagnosticFee > 0 || formData.partsCost > 0) && (
           <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg border border-gray-200 dark:border-gray-600">
             <h3 className="font-medium text-gray-900 dark:text-white mb-2">Cost Summary</h3>
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
-                <span className="text-gray-600 dark:text-gray-400">Labor Cost:</span>
-                <span className="ml-2 font-medium text-blue-600 dark:text-blue-400">${formData.laborCost.toFixed(2)}</span>
+                <span className="text-gray-600 dark:text-gray-400">Service Charge:</span>
+                <span className="ml-2 font-medium text-blue-600 dark:text-blue-400">${formData.serviceCharge.toFixed(2)}</span>
+              </div>
+              <div>
+                <span className="text-gray-600 dark:text-gray-400">Diagnostic Fee:</span>
+                <span className="ml-2 font-medium text-orange-600 dark:text-orange-400">${formData.diagnosticFee.toFixed(2)}</span>
               </div>
               <div>
                 <span className="text-gray-600 dark:text-gray-400">Parts Cost:</span>
@@ -384,14 +388,14 @@ export function ServiceTicketForm({ isOpen, onClose, ticket, onSubmit }) {
               </div>
               <div>
                 <span className="text-gray-600 dark:text-gray-400">Subtotal:</span>
-                <span className="ml-2 font-medium text-gray-900 dark:text-white">${(formData.laborCost + formData.partsCost).toFixed(2)}</span>
+                <span className="ml-2 font-medium text-gray-900 dark:text-white">${(formData.serviceCharge + formData.diagnosticFee + formData.partsCost).toFixed(2)}</span>
               </div>
               <div>
                 <span className="text-gray-600 dark:text-gray-400">Total (with tax):</span>
-                <span className="ml-2 font-bold text-green-600 dark:text-green-400">${((formData.laborCost + formData.partsCost) * 1.1).toFixed(2)}</span>
+                <span className="ml-2 font-bold text-green-600 dark:text-green-400">${((formData.serviceCharge + formData.diagnosticFee + formData.partsCost) * 1.1).toFixed(2)}</span>
               </div>
             </div>
-            {formData.status === 'completed' && (formData.laborCost > 0 || formData.partsCost > 0) && (
+            {formData.status === 'completed' && (formData.serviceCharge > 0 || formData.diagnosticFee > 0 || formData.partsCost > 0) && (
               <div className="mt-2 p-2 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded text-sm text-green-700 dark:text-green-400">
                 💡 Invoice will be automatically generated when this ticket is marked as completed
               </div>
@@ -482,7 +486,7 @@ export function ServiceTicketForm({ isOpen, onClose, ticket, onSubmit }) {
             <div className="text-sm text-gray-600 dark:text-gray-400">
               <p>Device: {generatedTicket?.deviceBrand} {generatedTicket?.deviceModel}</p>
               <p>Priority: {generatedTicket?.priority}</p>
-              <p>Estimated Cost: ${generatedTicket?.estimatedCost?.toFixed(2) || '0.00'}</p>
+              <p>Estimated Cost: ${((generatedTicket?.serviceCharge || 0) + (generatedTicket?.diagnosticFee || 0) + (generatedTicket?.partsCost || 0)).toFixed(2)}</p>
             </div>
           </div>
           

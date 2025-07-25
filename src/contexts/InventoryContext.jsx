@@ -380,7 +380,7 @@ export function InventoryProvider({ children }) {
       return;
     }
     const invoiceNumber = generateServiceInvoiceNumber();
-    const subtotal = ticket.laborCost + ticket.partsCost;
+    const subtotal = (ticket.serviceCharge || 0) + (ticket.diagnosticFee || 0) + ticket.partsCost;
     const tax = subtotal * 0.1; // 10% tax
     const total = subtotal + tax;
 
@@ -389,7 +389,8 @@ export function InventoryProvider({ children }) {
       invoiceNumber,
       serviceTicketId: ticket.id,
       customerId: ticket.customerId,
-      laborCost: ticket.laborCost,
+      serviceCharge: ticket.serviceCharge || 0,
+      diagnosticFee: ticket.diagnosticFee || 0,
       partsCost: ticket.partsCost,
       subtotal,
       tax,

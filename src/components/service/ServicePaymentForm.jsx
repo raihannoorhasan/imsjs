@@ -4,7 +4,8 @@ import { Modal } from '../common/Modal';
 import { Input } from '../common/Input';
 import { Select } from '../common/Select';
 import { Button } from '../common/Button';
-import { 
+import { } from 'lucide-react';
+import {
   DollarSign, 
   CreditCard, 
   Calendar, 
@@ -20,7 +21,8 @@ import {
   ArrowLeftRight,
   TrendingDown,
   TrendingUp,
-  Calculator
+  Calculator,
+  Edit2, Plus, X 
 } from 'lucide-react';
 import { generateId, formatCurrency } from '../../utils/helpers';
 
